@@ -27,12 +27,55 @@ return [
                     ],
                 ],
             ],
-            'application' => [
+            'list' => [
                 'type'    => Segment::class,
                 'options' => [
-                    'route'    => '/application[/:action]',
+                    'route'    => '/list[/:action][/:id]',
                     'defaults' => [
-                        'controller' => Controller\IndexController::class,
+                        'controller' => Controller\ListController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
+            'recipe' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/recipe[/:action][/:id]',
+                    'defaults' => [
+                        'controller' => Controller\RecipeController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
+            'ingredient' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/ingredient[/:action][/:id]',
+                    'defaults' => [
+                        'controller' => Controller\IngredientController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
+
+            // Join Management Controller Routes
+            'list-recipe' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/list/:list_id/recipes[/:action][/:id]',
+                    'defaults' => [
+                        'controller' => Controller\ListRecipeController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
+
+            'recipe-ingredient' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/recipe/:recipe_id/ingredients[/:action][/:id]',
+                    'defaults' => [
+                        'controller' => Controller\RecipeIngredientController::class,
                         'action'     => 'index',
                     ],
                 ],
@@ -42,6 +85,13 @@ return [
     'controllers' => [
         'factories' => [
             Controller\IndexController::class => InvokableFactory::class,
+            Controller\ListController::class => InvokableFactory::class,
+            Controller\RecipeController::class => InvokableFactory::class,
+            Controller\IngredientController::class => InvokableFactory::class,
+
+            // Management controllers
+            Controller\ListRecipeController::class => InvokableFactory::class,
+            Controller\RecipeIngredientController::class => InvokableFactory::class,
         ],
     ],
     'view_manager' => [

@@ -1,0 +1,18 @@
+
+<h1>Create an Ingredient</h1>
+
+<form action="<?= $this->url('ingredient', ['action' => 'save']); ?>" method="POST">
+
+    <div class="form-group">
+        <label for="name">Ingredient Name</label>
+        <input type="text" class="form-control" name="name" id="name" />
+    </div>
+
+    <div class="form-group">
+        <label for="unit">Measuring Unit</label>
+        <input type="text" class="form-control" name="unit" id="unit" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+
+</form>

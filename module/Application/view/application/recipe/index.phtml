@@ -1,0 +1,68 @@
+<?php
+
+use Lib\Recipe;
+
+?>
+
+<h2>Recipes</h2>
+
+<div class="row">
+    <div class="col mb-2 text-right">
+        <a href="<?= $this->url('recipe', ['action' => 'create']); ?>" class="btn btn-info">New</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+
+                <?php
+                /** @var Recipe $recipe */
+                foreach ($this->recipes as $recipe) : ?>
+                    <tr>
+                        <td><?= $recipe->getName(); ?></td>
+                        <td nowrap="whitespace">
+
+                            <!-- view button -->
+                            <a class="btn btn-info btn-sm"
+                               href="<?= $this->url('recipe', [
+                                   'action' => 'view',
+                                   'id' => $recipe->getId()
+                               ]); ?>">
+                                View
+                            </a>
+
+                            <!-- Edit button -->
+                            <a class="btn btn-primary btn-sm"
+                               href="<?= $this->url('recipe-ingredient', [
+                                   'recipe_id' => $recipe->getId()
+                               ]); ?>">
+                                Edit
+                            </a>
+
+                            <!-- delete button -->
+                            <a class="btn btn-danger btn-sm"
+                               href="<?= $this->url('recipe', [
+                                   'action' => 'delete',
+                                   'id' => $recipe->getId()
+                               ]); ?>">
+                                Delete
+                            </a>
+
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

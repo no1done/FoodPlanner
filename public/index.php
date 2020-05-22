@@ -23,6 +23,9 @@ if (php_sapi_name() === 'cli-server') {
 // Composer autoloading
 include __DIR__ . '/../vendor/autoload.php';
 
+// Include propel connection setup
+require_once __DIR__ . '/../generated-conf/config.php';
+
 if (! class_exists(Application::class)) {
     throw new RuntimeException(
         "Unable to load application.\n"

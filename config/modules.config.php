@@ -12,6 +12,7 @@
  * This should be an array of module namespaces used in the application.
  */
 return [
+    'WhoopsErrorHandler',
     'Laminas\Di',
     'Laminas\Log',
     'Laminas\Db',

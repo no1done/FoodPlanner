@@ -1,0 +1,57 @@
+<database name="default" defaultIdMethod="native"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://xsd.propelorm.org/1.6/database.xsd"
+          namespace="Lib"
+>
+
+    <table name="shopping_list" phpName="ShoppingList">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="name" type="varchar" size="128" required="true"/>
+        <column name="removed" type="boolean" size="1" defaultValue="false"/>
+        <behavior name="timestampable" />
+    </table>
+
+    <table name="recipe" phpName="Recipe">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="name" type="varchar" size="150" />
+        <column name="removed" type="boolean" size="1" defaultValue="false"/>
+        <behavior name="timestampable" />
+    </table>
+
+    <table name="ingredient" phpName="Ingredient">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="name" type="varchar" size="150" />
+        <column name="unit" type="varchar" size="150" />
+        <column name="removed" type="boolean" size="1" defaultValue="false"/>
+        <behavior name="timestampable" />
+    </table>
+
+    <table name="list_recipe" phpName="ListRecipe">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="shopping_list_id" type="integer" required="true"/>
+        <column name="recipe_id" type="integer" required="true"/>
+        <column name="serves"  type="integer" required="true"/>
+        <behavior name="timestampable" />
+        <foreign-key foreignTable="shopping_list" name="fk_list_recipe_1">
+            <reference local="shopping_list_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="recipe" name="fk_list_recipe_2">
+            <reference local="recipe_id" foreign="id"/>
+        </foreign-key>
+    </table>
+
+    <table name="recipe_ingredient" phpName="RecipeIngredient">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="recipe_id" type="integer" required="true" />
+        <column name="ingredient_id" type="integer" required="true"/>
+        <column name="quantity" type="integer" required="true"/>
+        <behavior name="timestampable" />
+        <foreign-key foreignTable="recipe" name="fk_recipe_ingredient_1">
+            <reference local="recipe_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="ingredient" name="fk_recipe_ingredient_2">
+            <reference local="ingredient_id" foreign="id"/>
+        </foreign-key>
+    </table>
+
+</database>
