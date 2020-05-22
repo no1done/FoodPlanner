@@ -90,7 +90,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
     /**
      * The value for the quantity field.
      *
-     * @var        int
+     * @var        double
      */
     protected $quantity;
 
@@ -384,7 +384,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
     /**
      * Get the [quantity] column value.
      *
-     * @return int
+     * @return double
      */
     public function getQuantity()
     {
@@ -502,13 +502,13 @@ abstract class RecipeIngredient implements ActiveRecordInterface
     /**
      * Set the value of [quantity] column.
      *
-     * @param int $v new value
+     * @param double $v new value
      * @return $this|\Lib\RecipeIngredient The current object (for fluent API support)
      */
     public function setQuantity($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (double) $v;
         }
 
         if ($this->quantity !== $v) {
@@ -605,7 +605,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
             $this->ingredient_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : RecipeIngredientTableMap::translateFieldName('Quantity', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->quantity = (null !== $col) ? (int) $col : null;
+            $this->quantity = (null !== $col) ? (double) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : RecipeIngredientTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
@@ -906,7 +906,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
                         $stmt->bindValue($identifier, $this->ingredient_id, PDO::PARAM_INT);
                         break;
                     case 'quantity':
-                        $stmt->bindValue($identifier, $this->quantity, PDO::PARAM_INT);
+                        $stmt->bindValue($identifier, $this->quantity, PDO::PARAM_STR);
                         break;
                     case 'created_at':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);

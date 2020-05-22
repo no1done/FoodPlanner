@@ -57,16 +57,16 @@ class ListRecipeController extends AbstractActionController
             $recipe = RecipeQuery::create()->findPk($post['recipe_id']);
             $list = ShoppingListQuery::create()->findPk($list_id);
 
-            $total = ListRecipeQuery::create()
-                ->filterByShoppingListId($list_id)
-                ->filterByRecipeId($post['recipe_id'])
-                ->count();
-
-            if ($total > 0) {
-                throw new RuntimeException(
-                    'Recipe is already in the list'
-                );
-            }
+//            $total = ListRecipeQuery::create()
+//                ->filterByShoppingListId($list_id)
+//                ->filterByRecipeId($post['recipe_id'])
+//                ->count();
+//
+//            if ($total > 0) {
+//                throw new RuntimeException(
+//                    'Recipe is already in the list'
+//                );
+//            }
 
             $listRecipe = new ListRecipe();
             $listRecipe->setShoppingList($list)

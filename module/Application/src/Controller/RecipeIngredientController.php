@@ -12,6 +12,7 @@ use Lib\Recipe;
 use Lib\RecipeIngredient;
 use Lib\RecipeIngredientQuery;
 use Lib\RecipeQuery;
+use Propel\Runtime\ActiveQuery\Criteria;
 use RuntimeException;
 use Exception;
 
@@ -35,7 +36,9 @@ class RecipeIngredientController extends AbstractActionController
                 "Recipe does not exist"
             );
 
-            $ingredients = IngredientQuery::create()->findByRemoved(false);
+            $ingredients = IngredientQuery::create()
+                ->orderByName(Criteria::ASC)
+                ->findByRemoved(false);
 
             return [
                 'recipe' => $recipe,

@@ -9,6 +9,7 @@ use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\Plugin\FlashMessenger\FlashMessenger;
 use Lib\Recipe;
 use Lib\RecipeQuery;
+use Propel\Runtime\ActiveQuery\Criteria;
 use RuntimeException;
 use Exception;
 
@@ -21,7 +22,9 @@ class RecipeController extends AbstractActionController
 {
     public function indexAction()
     {
-        $recipes = RecipeQuery::create()->findByRemoved(false);
+        $recipes = RecipeQuery::create()
+            ->orderByName(Criteria::ASC)
+            ->findByRemoved(false);
 
         return [
             'recipes' => $recipes

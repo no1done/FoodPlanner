@@ -11,6 +11,7 @@ use Laminas\Mvc\Plugin\FlashMessenger\FlashMessenger;
 use Laminas\View\Model\ViewModel;
 use Lib\Ingredient;
 use Lib\IngredientQuery;
+use Propel\Runtime\ActiveQuery\Criteria;
 use RuntimeException;
 
 /**
@@ -25,7 +26,9 @@ class IngredientController extends AbstractActionController
      */
     public function indexAction()
     {
-        $ing = IngredientQuery::create()->findByRemoved(false);
+        $ing = IngredientQuery::create()
+            ->orderByName(Criteria::ASC)
+            ->findByRemoved(false);
 
         return [
             'ingredients' => $ing

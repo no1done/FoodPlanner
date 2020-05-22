@@ -11,6 +11,7 @@ use Laminas\Mvc\Plugin\FlashMessenger\FlashMessenger;
 use Laminas\View\Model\ViewModel;
 use Lib\ShoppingList;
 use Lib\ShoppingListQuery;
+use Propel\Runtime\ActiveQuery\Criteria;
 use RuntimeException;
 
 /**
@@ -27,7 +28,9 @@ class ListController extends AbstractActionController
      */
     public function indexAction()
     {
-        $lists = ShoppingListQuery::create()->findByRemoved(false);
+        $lists = ShoppingListQuery::create()
+            ->orderById(Criteria::DESC)
+            ->findByRemoved(false);
 
         return [
             'lists' => $lists

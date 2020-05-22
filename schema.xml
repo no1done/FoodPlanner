@@ -44,7 +44,7 @@
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="recipe_id" type="integer" required="true" />
         <column name="ingredient_id" type="integer" required="true"/>
-        <column name="quantity" type="integer" required="true"/>
+        <column name="quantity" type="float" size="10" scale="2" required="true"/>
         <behavior name="timestampable" />
         <foreign-key foreignTable="recipe" name="fk_recipe_ingredient_1">
             <reference local="recipe_id" foreign="id"/>

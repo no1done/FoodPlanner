@@ -70,7 +70,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildRecipeIngredient findOneById(int $id) Return the first ChildRecipeIngredient filtered by the id column
  * @method     ChildRecipeIngredient findOneByRecipeId(int $recipe_id) Return the first ChildRecipeIngredient filtered by the recipe_id column
  * @method     ChildRecipeIngredient findOneByIngredientId(int $ingredient_id) Return the first ChildRecipeIngredient filtered by the ingredient_id column
- * @method     ChildRecipeIngredient findOneByQuantity(int $quantity) Return the first ChildRecipeIngredient filtered by the quantity column
+ * @method     ChildRecipeIngredient findOneByQuantity(double $quantity) Return the first ChildRecipeIngredient filtered by the quantity column
  * @method     ChildRecipeIngredient findOneByCreatedAt(string $created_at) Return the first ChildRecipeIngredient filtered by the created_at column
  * @method     ChildRecipeIngredient findOneByUpdatedAt(string $updated_at) Return the first ChildRecipeIngredient filtered by the updated_at column *
 
@@ -80,7 +80,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildRecipeIngredient requireOneById(int $id) Return the first ChildRecipeIngredient filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildRecipeIngredient requireOneByRecipeId(int $recipe_id) Return the first ChildRecipeIngredient filtered by the recipe_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildRecipeIngredient requireOneByIngredientId(int $ingredient_id) Return the first ChildRecipeIngredient filtered by the ingredient_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildRecipeIngredient requireOneByQuantity(int $quantity) Return the first ChildRecipeIngredient filtered by the quantity column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildRecipeIngredient requireOneByQuantity(double $quantity) Return the first ChildRecipeIngredient filtered by the quantity column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildRecipeIngredient requireOneByCreatedAt(string $created_at) Return the first ChildRecipeIngredient filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildRecipeIngredient requireOneByUpdatedAt(string $updated_at) Return the first ChildRecipeIngredient filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
@@ -88,7 +88,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildRecipeIngredient[]|ObjectCollection findById(int $id) Return ChildRecipeIngredient objects filtered by the id column
  * @method     ChildRecipeIngredient[]|ObjectCollection findByRecipeId(int $recipe_id) Return ChildRecipeIngredient objects filtered by the recipe_id column
  * @method     ChildRecipeIngredient[]|ObjectCollection findByIngredientId(int $ingredient_id) Return ChildRecipeIngredient objects filtered by the ingredient_id column
- * @method     ChildRecipeIngredient[]|ObjectCollection findByQuantity(int $quantity) Return ChildRecipeIngredient objects filtered by the quantity column
+ * @method     ChildRecipeIngredient[]|ObjectCollection findByQuantity(double $quantity) Return ChildRecipeIngredient objects filtered by the quantity column
  * @method     ChildRecipeIngredient[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildRecipeIngredient objects filtered by the created_at column
  * @method     ChildRecipeIngredient[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildRecipeIngredient objects filtered by the updated_at column
  * @method     ChildRecipeIngredient[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit

@@ -153,7 +153,7 @@ class RecipeIngredientTableMap extends TableMap
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('recipe_id', 'RecipeId', 'INTEGER', 'recipe', 'id', true, null, null);
         $this->addForeignKey('ingredient_id', 'IngredientId', 'INTEGER', 'ingredient', 'id', true, null, null);
-        $this->addColumn('quantity', 'Quantity', 'INTEGER', true, null, null);
+        $this->addColumn('quantity', 'Quantity', 'FLOAT', true, 10, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
