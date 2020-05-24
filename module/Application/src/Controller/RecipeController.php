@@ -103,7 +103,7 @@ class RecipeController extends AbstractActionController
 
             $this->flashMessenger()->addSuccessMessage('Recipe Saved.');
 
-            return $this->redirect()->toRoute('recipe-ingredient', [
+            return $this->redirect()->toRoute('recipe-item', [
                 'recipe_id' => $recipe->getId()
             ]);
 

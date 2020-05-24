@@ -9,34 +9,33 @@ use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\Plugin\FlashMessenger\FlashMessenger;
 use Laminas\View\Model\ViewModel;
-use Lib\Ingredient;
-use Lib\IngredientQuery;
+use Lib\ItemQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use RuntimeException;
 
 /**
- * Class IngredientController
+ * Class ItemController
  * @method FlashMessenger flashMessenger()
  * @package Application\Controller
  */
-class IngredientController extends AbstractActionController
+class ItemController extends AbstractActionController
 {
     /**
      * @return array|ViewModel
      */
     public function indexAction()
     {
-        $ing = IngredientQuery::create()
+        $items = ItemQuery::create()
             ->orderByName(Criteria::ASC)
             ->findByRemoved(false);
 
         return [
-            'ingredients' => $ing
+            'items' => $items
         ];
     }
 
     /**
-     * Show form for creating ingredient
+     * Show form for creating item
      *
      * @return array
      */
@@ -63,12 +62,12 @@ class IngredientController extends AbstractActionController
         try {
 
             if (isset($post['id'])) {
-                $ingredient = IngredientQuery::create()->findPk($post['id']);
+                $item = ItemQuery::create()->findPk($post['id']);
             } else {
-                $ingredient = new Ingredient();
+                $item = new Item();
             }
 
-            $ingredient->setName($post['name'])
+            $item->setName($post['name'])
                 ->setUnit($post['unit'])
                 ->save();
 
@@ -78,7 +77,7 @@ class IngredientController extends AbstractActionController
             $this->flashMessenger()->addErrorMessage($e->getMessage());
         }
 
-        return $this->redirect()->toRoute('ingredient');
+        return $this->redirect()->toRoute('item');
     }
 
     /**
@@ -92,7 +91,7 @@ class IngredientController extends AbstractActionController
 
         try {
 
-            $list = IngredientQuery::create()->findPk($id);
+            $list = ItemQuery::create()->findPk($id);
 
             if (!$list) throw new RuntimeException(
                 "Item does not exist."
@@ -100,7 +99,7 @@ class IngredientController extends AbstractActionController
 
             $list->setRemoved(true)->save();
 
-            $undoButton = "<a href=\"/ingredient/restore/{$id}\" class=\"alert-link\">Undo</a>";
+            $undoButton = "<a href=\"/item/restore/{$id}\" class=\"alert-link\">Undo</a>";
 
             $this->flashMessenger()->addSuccessMessage(
                 "Item Removed. {$undoButton}"
@@ -110,7 +109,7 @@ class IngredientController extends AbstractActionController
             $this->flashMessenger()->addErrorMessage($e->getMessage());
         }
 
-        return $this->redirect()->toRoute('ingredient');
+        return $this->redirect()->toRoute('item');
     }
 
     /**
@@ -124,7 +123,7 @@ class IngredientController extends AbstractActionController
 
         try {
 
-            $list = IngredientQuery::create()->findPk($id);
+            $list = ItemQuery::create()->findPk($id);
 
             if (!$list) throw new RuntimeException(
                 "Item does not exist."
@@ -140,6 +139,6 @@ class IngredientController extends AbstractActionController
             $this->flashMessenger()->addErrorMessage($e->getMessage());
         }
 
-        return $this->redirect()->toRoute('ingredient');
+        return $this->redirect()->toRoute('item');
     }
 }

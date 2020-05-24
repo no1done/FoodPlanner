@@ -23,6 +23,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildListRecipeQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildListRecipeQuery orderByShoppingListId($order = Criteria::ASC) Order by the shopping_list_id column
  * @method     ChildListRecipeQuery orderByRecipeId($order = Criteria::ASC) Order by the recipe_id column
+ * @method     ChildListRecipeQuery orderByRef($order = Criteria::ASC) Order by the ref column
  * @method     ChildListRecipeQuery orderByServes($order = Criteria::ASC) Order by the serves column
  * @method     ChildListRecipeQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildListRecipeQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
@@ -30,6 +31,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildListRecipeQuery groupById() Group by the id column
  * @method     ChildListRecipeQuery groupByShoppingListId() Group by the shopping_list_id column
  * @method     ChildListRecipeQuery groupByRecipeId() Group by the recipe_id column
+ * @method     ChildListRecipeQuery groupByRef() Group by the ref column
  * @method     ChildListRecipeQuery groupByServes() Group by the serves column
  * @method     ChildListRecipeQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildListRecipeQuery groupByUpdatedAt() Group by the updated_at column
@@ -70,6 +72,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildListRecipe findOneById(int $id) Return the first ChildListRecipe filtered by the id column
  * @method     ChildListRecipe findOneByShoppingListId(int $shopping_list_id) Return the first ChildListRecipe filtered by the shopping_list_id column
  * @method     ChildListRecipe findOneByRecipeId(int $recipe_id) Return the first ChildListRecipe filtered by the recipe_id column
+ * @method     ChildListRecipe findOneByRef(string $ref) Return the first ChildListRecipe filtered by the ref column
  * @method     ChildListRecipe findOneByServes(int $serves) Return the first ChildListRecipe filtered by the serves column
  * @method     ChildListRecipe findOneByCreatedAt(string $created_at) Return the first ChildListRecipe filtered by the created_at column
  * @method     ChildListRecipe findOneByUpdatedAt(string $updated_at) Return the first ChildListRecipe filtered by the updated_at column *
@@ -80,6 +83,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildListRecipe requireOneById(int $id) Return the first ChildListRecipe filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildListRecipe requireOneByShoppingListId(int $shopping_list_id) Return the first ChildListRecipe filtered by the shopping_list_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildListRecipe requireOneByRecipeId(int $recipe_id) Return the first ChildListRecipe filtered by the recipe_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildListRecipe requireOneByRef(string $ref) Return the first ChildListRecipe filtered by the ref column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildListRecipe requireOneByServes(int $serves) Return the first ChildListRecipe filtered by the serves column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildListRecipe requireOneByCreatedAt(string $created_at) Return the first ChildListRecipe filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildListRecipe requireOneByUpdatedAt(string $updated_at) Return the first ChildListRecipe filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -88,6 +92,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildListRecipe[]|ObjectCollection findById(int $id) Return ChildListRecipe objects filtered by the id column
  * @method     ChildListRecipe[]|ObjectCollection findByShoppingListId(int $shopping_list_id) Return ChildListRecipe objects filtered by the shopping_list_id column
  * @method     ChildListRecipe[]|ObjectCollection findByRecipeId(int $recipe_id) Return ChildListRecipe objects filtered by the recipe_id column
+ * @method     ChildListRecipe[]|ObjectCollection findByRef(string $ref) Return ChildListRecipe objects filtered by the ref column
  * @method     ChildListRecipe[]|ObjectCollection findByServes(int $serves) Return ChildListRecipe objects filtered by the serves column
  * @method     ChildListRecipe[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildListRecipe objects filtered by the created_at column
  * @method     ChildListRecipe[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildListRecipe objects filtered by the updated_at column
@@ -189,7 +194,7 @@ abstract class ListRecipeQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, shopping_list_id, recipe_id, serves, created_at, updated_at FROM list_recipe WHERE id = :p0';
+        $sql = 'SELECT id, shopping_list_id, recipe_id, ref, serves, created_at, updated_at FROM list_recipe WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -404,6 +409,31 @@ abstract class ListRecipeQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ListRecipeTableMap::COL_RECIPE_ID, $recipeId, $comparison);
+    }
+
+    /**
+     * Filter the query on the ref column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByRef('fooValue');   // WHERE ref = 'fooValue'
+     * $query->filterByRef('%fooValue%', Criteria::LIKE); // WHERE ref LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $ref The value to use as filter.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildListRecipeQuery The current query, for fluid interface
+     */
+    public function filterByRef($ref = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($ref)) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ListRecipeTableMap::COL_REF, $ref, $comparison);
     }
 
     /**

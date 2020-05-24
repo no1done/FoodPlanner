@@ -1,6 +1,6 @@
 <?php
 
-use Lib\Ingredient;
+use Lib\Item;
 
 ?>
 
@@ -8,7 +8,7 @@ use Lib\Ingredient;
 
 <div class="row">
     <div class="col mb-2 text-right">
-        <a href="<?= $this->url('ingredient', ['action' => 'create']); ?>" class="btn btn-info">New</a>
+        <a href="<?= $this->url('item', ['action' => 'create']); ?>" class="btn btn-info">New</a>
     </div>
 </div>
 
@@ -26,37 +26,37 @@ use Lib\Ingredient;
                 <tbody>
 
                 <?php
-                /** @var Ingredient $ingredient */
-                foreach ($this->ingredients as $ingredient) : ?>
+                /** @var Item $item */
+                foreach ($this->items as $item) : ?>
                     <tr>
-                        <td><?= $ingredient->getName(); ?></td>
-                        <td><?= $ingredient->getUnit(); ?></td>
+                        <td><?= $item->getName(); ?></td>
+                        <td><?= $item->getUnit(); ?></td>
 
                         <td nowrap="whitespace">
 
                             <!-- view button -->
                             <a class="btn btn-info btn-sm"
-                               href="<?= $this->url('ingredient', [
+                               href="<?= $this->url('item', [
                                    'action' => 'view',
-                                   'id' => $ingredient->getId()
+                                   'id' => $item->getId()
                                ]); ?>">
                                 View
                             </a>
 
                             <!-- Edit button -->
                             <a class="btn btn-primary btn-sm"
-                               href="<?= $this->url('ingredient', [
+                               href="<?= $this->url('item', [
                                    'action' => 'edit',
-                                   'id' => $ingredient->getId()
+                                   'id' => $item->getId()
                                ]); ?>">
                                 Edit
                             </a>
 
                             <!-- delete button -->
                             <a class="btn btn-danger btn-sm"
-                               href="<?= $this->url('ingredient', [
+                               href="<?= $this->url('item', [
                                    'action' => 'delete',
-                                   'id' => $ingredient->getId()
+                                   'id' => $item->getId()
                                ]); ?>">
                                 Delete
                             </a>

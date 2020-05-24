@@ -47,12 +47,12 @@ return [
                     ],
                 ],
             ],
-            'ingredient' => [
+            'item' => [
                 'type'    => Segment::class,
                 'options' => [
-                    'route'    => '/ingredient[/:action][/:id]',
+                    'route'    => '/item[/:action][/:id]',
                     'defaults' => [
-                        'controller' => Controller\IngredientController::class,
+                        'controller' => Controller\ItemController::class,
                         'action'     => 'index',
                     ],
                 ],
@@ -70,12 +70,12 @@ return [
                 ],
             ],
 
-            'recipe-ingredient' => [
+            'recipe-item' => [
                 'type'    => Segment::class,
                 'options' => [
-                    'route'    => '/recipe/:recipe_id/ingredients[/:action][/:id]',
+                    'route'    => '/recipe/:recipe_id/items[/:action][/:id]',
                     'defaults' => [
-                        'controller' => Controller\RecipeIngredientController::class,
+                        'controller' => Controller\RecipeItemController::class,
                         'action'     => 'index',
                     ],
                 ],
@@ -87,11 +87,11 @@ return [
             Controller\IndexController::class => InvokableFactory::class,
             Controller\ListController::class => InvokableFactory::class,
             Controller\RecipeController::class => InvokableFactory::class,
-            Controller\IngredientController::class => InvokableFactory::class,
+            Controller\ItemController::class => InvokableFactory::class,
 
             // Management controllers
             Controller\ListRecipeController::class => InvokableFactory::class,
-            Controller\RecipeIngredientController::class => InvokableFactory::class,
+            Controller\RecipeItemController::class => InvokableFactory::class,
         ],
     ],
     'view_manager' => [

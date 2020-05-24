@@ -164,6 +164,13 @@ class ShoppingListTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, 'ListRecipes', false);
+        $this->addRelation('ShoppingListItem', '\\Lib\\ShoppingListItem', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':shopping_list_id',
+    1 => ':id',
+  ),
+), null, null, 'ShoppingListItems', false);
     } // buildRelations()
 
     /**

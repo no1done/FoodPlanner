@@ -5,13 +5,13 @@ namespace Lib\Base;
 use \DateTime;
 use \Exception;
 use \PDO;
-use Lib\Ingredient as ChildIngredient;
-use Lib\IngredientQuery as ChildIngredientQuery;
+use Lib\Item as ChildItem;
+use Lib\ItemQuery as ChildItemQuery;
 use Lib\Recipe as ChildRecipe;
-use Lib\RecipeIngredient as ChildRecipeIngredient;
-use Lib\RecipeIngredientQuery as ChildRecipeIngredientQuery;
+use Lib\RecipeItem as ChildRecipeItem;
+use Lib\RecipeItemQuery as ChildRecipeItemQuery;
 use Lib\RecipeQuery as ChildRecipeQuery;
-use Lib\Map\RecipeIngredientTableMap;
+use Lib\Map\RecipeItemTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -26,18 +26,18 @@ use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
 
 /**
- * Base class that represents a row from the 'recipe_ingredient' table.
+ * Base class that represents a row from the 'recipe_item' table.
  *
  *
  *
  * @package    propel.generator.Lib.Base
  */
-abstract class RecipeIngredient implements ActiveRecordInterface
+abstract class RecipeItem implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Lib\\Map\\RecipeIngredientTableMap';
+    const TABLE_MAP = '\\Lib\\Map\\RecipeItemTableMap';
 
 
     /**
@@ -81,11 +81,11 @@ abstract class RecipeIngredient implements ActiveRecordInterface
     protected $recipe_id;
 
     /**
-     * The value for the ingredient_id field.
+     * The value for the item_id field.
      *
      * @var        int
      */
-    protected $ingredient_id;
+    protected $item_id;
 
     /**
      * The value for the quantity field.
@@ -114,9 +114,9 @@ abstract class RecipeIngredient implements ActiveRecordInterface
     protected $aRecipe;
 
     /**
-     * @var        ChildIngredient
+     * @var        ChildItem
      */
-    protected $aIngredient;
+    protected $aItem;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -127,7 +127,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * Initializes internal state of Lib\Base\RecipeIngredient object.
+     * Initializes internal state of Lib\Base\RecipeItem object.
      */
     public function __construct()
     {
@@ -222,9 +222,9 @@ abstract class RecipeIngredient implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>RecipeIngredient</code> instance.  If
-     * <code>obj</code> is an instance of <code>RecipeIngredient</code>, delegates to
-     * <code>equals(RecipeIngredient)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>RecipeItem</code> instance.  If
+     * <code>obj</code> is an instance of <code>RecipeItem</code>, delegates to
+     * <code>equals(RecipeItem)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -290,7 +290,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return $this|RecipeIngredient The current object, for fluid interface
+     * @return $this|RecipeItem The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -372,13 +372,13 @@ abstract class RecipeIngredient implements ActiveRecordInterface
     }
 
     /**
-     * Get the [ingredient_id] column value.
+     * Get the [item_id] column value.
      *
      * @return int
      */
-    public function getIngredientId()
+    public function getItemId()
     {
-        return $this->ingredient_id;
+        return $this->item_id;
     }
 
     /**
@@ -435,7 +435,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
      * Set the value of [id] column.
      *
      * @param int $v new value
-     * @return $this|\Lib\RecipeIngredient The current object (for fluent API support)
+     * @return $this|\Lib\RecipeItem The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -445,7 +445,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[RecipeIngredientTableMap::COL_ID] = true;
+            $this->modifiedColumns[RecipeItemTableMap::COL_ID] = true;
         }
 
         return $this;
@@ -455,7 +455,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
      * Set the value of [recipe_id] column.
      *
      * @param int $v new value
-     * @return $this|\Lib\RecipeIngredient The current object (for fluent API support)
+     * @return $this|\Lib\RecipeItem The current object (for fluent API support)
      */
     public function setRecipeId($v)
     {
@@ -465,7 +465,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
 
         if ($this->recipe_id !== $v) {
             $this->recipe_id = $v;
-            $this->modifiedColumns[RecipeIngredientTableMap::COL_RECIPE_ID] = true;
+            $this->modifiedColumns[RecipeItemTableMap::COL_RECIPE_ID] = true;
         }
 
         if ($this->aRecipe !== null && $this->aRecipe->getId() !== $v) {
@@ -476,34 +476,34 @@ abstract class RecipeIngredient implements ActiveRecordInterface
     } // setRecipeId()
 
     /**
-     * Set the value of [ingredient_id] column.
+     * Set the value of [item_id] column.
      *
      * @param int $v new value
-     * @return $this|\Lib\RecipeIngredient The current object (for fluent API support)
+     * @return $this|\Lib\RecipeItem The current object (for fluent API support)
      */
-    public function setIngredientId($v)
+    public function setItemId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->ingredient_id !== $v) {
-            $this->ingredient_id = $v;
-            $this->modifiedColumns[RecipeIngredientTableMap::COL_INGREDIENT_ID] = true;
+        if ($this->item_id !== $v) {
+            $this->item_id = $v;
+            $this->modifiedColumns[RecipeItemTableMap::COL_ITEM_ID] = true;
         }
 
-        if ($this->aIngredient !== null && $this->aIngredient->getId() !== $v) {
-            $this->aIngredient = null;
+        if ($this->aItem !== null && $this->aItem->getId() !== $v) {
+            $this->aItem = null;
         }
 
         return $this;
-    } // setIngredientId()
+    } // setItemId()
 
     /**
      * Set the value of [quantity] column.
      *
      * @param double $v new value
-     * @return $this|\Lib\RecipeIngredient The current object (for fluent API support)
+     * @return $this|\Lib\RecipeItem The current object (for fluent API support)
      */
     public function setQuantity($v)
     {
@@ -513,7 +513,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
 
         if ($this->quantity !== $v) {
             $this->quantity = $v;
-            $this->modifiedColumns[RecipeIngredientTableMap::COL_QUANTITY] = true;
+            $this->modifiedColumns[RecipeItemTableMap::COL_QUANTITY] = true;
         }
 
         return $this;
@@ -524,7 +524,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
      *
      * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
      *               Empty strings are treated as NULL.
-     * @return $this|\Lib\RecipeIngredient The current object (for fluent API support)
+     * @return $this|\Lib\RecipeItem The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -532,7 +532,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($this->created_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->created_at->format("Y-m-d H:i:s.u")) {
                 $this->created_at = $dt === null ? null : clone $dt;
-                $this->modifiedColumns[RecipeIngredientTableMap::COL_CREATED_AT] = true;
+                $this->modifiedColumns[RecipeItemTableMap::COL_CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -544,7 +544,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
      *
      * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
      *               Empty strings are treated as NULL.
-     * @return $this|\Lib\RecipeIngredient The current object (for fluent API support)
+     * @return $this|\Lib\RecipeItem The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -552,7 +552,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($this->updated_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->updated_at->format("Y-m-d H:i:s.u")) {
                 $this->updated_at = $dt === null ? null : clone $dt;
-                $this->modifiedColumns[RecipeIngredientTableMap::COL_UPDATED_AT] = true;
+                $this->modifiedColumns[RecipeItemTableMap::COL_UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -595,25 +595,25 @@ abstract class RecipeIngredient implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : RecipeIngredientTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : RecipeItemTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : RecipeIngredientTableMap::translateFieldName('RecipeId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : RecipeItemTableMap::translateFieldName('RecipeId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->recipe_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : RecipeIngredientTableMap::translateFieldName('IngredientId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->ingredient_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : RecipeItemTableMap::translateFieldName('ItemId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->item_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : RecipeIngredientTableMap::translateFieldName('Quantity', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : RecipeItemTableMap::translateFieldName('Quantity', TableMap::TYPE_PHPNAME, $indexType)];
             $this->quantity = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : RecipeIngredientTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : RecipeItemTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : RecipeIngredientTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : RecipeItemTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -626,10 +626,10 @@ abstract class RecipeIngredient implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = RecipeIngredientTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = RecipeItemTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException(sprintf('Error populating %s object', '\\Lib\\RecipeIngredient'), 0, $e);
+            throw new PropelException(sprintf('Error populating %s object', '\\Lib\\RecipeItem'), 0, $e);
         }
     }
 
@@ -651,8 +651,8 @@ abstract class RecipeIngredient implements ActiveRecordInterface
         if ($this->aRecipe !== null && $this->recipe_id !== $this->aRecipe->getId()) {
             $this->aRecipe = null;
         }
-        if ($this->aIngredient !== null && $this->ingredient_id !== $this->aIngredient->getId()) {
-            $this->aIngredient = null;
+        if ($this->aItem !== null && $this->item_id !== $this->aItem->getId()) {
+            $this->aItem = null;
         }
     } // ensureConsistency
 
@@ -677,13 +677,13 @@ abstract class RecipeIngredient implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(RecipeIngredientTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(RecipeItemTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildRecipeIngredientQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildRecipeItemQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -694,7 +694,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
         if ($deep) {  // also de-associate any related objects?
 
             $this->aRecipe = null;
-            $this->aIngredient = null;
+            $this->aItem = null;
         } // if (deep)
     }
 
@@ -704,8 +704,8 @@ abstract class RecipeIngredient implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see RecipeIngredient::setDeleted()
-     * @see RecipeIngredient::isDeleted()
+     * @see RecipeItem::setDeleted()
+     * @see RecipeItem::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -714,11 +714,11 @@ abstract class RecipeIngredient implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(RecipeIngredientTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(RecipeItemTableMap::DATABASE_NAME);
         }
 
         $con->transaction(function () use ($con) {
-            $deleteQuery = ChildRecipeIngredientQuery::create()
+            $deleteQuery = ChildRecipeItemQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -753,7 +753,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(RecipeIngredientTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(RecipeItemTableMap::DATABASE_NAME);
         }
 
         return $con->transaction(function () use ($con) {
@@ -764,16 +764,16 @@ abstract class RecipeIngredient implements ActiveRecordInterface
                 // timestampable behavior
                 $time = time();
                 $highPrecision = \Propel\Runtime\Util\PropelDateTime::createHighPrecision();
-                if (!$this->isColumnModified(RecipeIngredientTableMap::COL_CREATED_AT)) {
+                if (!$this->isColumnModified(RecipeItemTableMap::COL_CREATED_AT)) {
                     $this->setCreatedAt($highPrecision);
                 }
-                if (!$this->isColumnModified(RecipeIngredientTableMap::COL_UPDATED_AT)) {
+                if (!$this->isColumnModified(RecipeItemTableMap::COL_UPDATED_AT)) {
                     $this->setUpdatedAt($highPrecision);
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(RecipeIngredientTableMap::COL_UPDATED_AT)) {
+                if ($this->isModified() && !$this->isColumnModified(RecipeItemTableMap::COL_UPDATED_AT)) {
                     $this->setUpdatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
                 }
             }
@@ -785,7 +785,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                RecipeIngredientTableMap::addInstanceToPool($this);
+                RecipeItemTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -823,11 +823,11 @@ abstract class RecipeIngredient implements ActiveRecordInterface
                 $this->setRecipe($this->aRecipe);
             }
 
-            if ($this->aIngredient !== null) {
-                if ($this->aIngredient->isModified() || $this->aIngredient->isNew()) {
-                    $affectedRows += $this->aIngredient->save($con);
+            if ($this->aItem !== null) {
+                if ($this->aItem->isModified() || $this->aItem->isNew()) {
+                    $affectedRows += $this->aItem->save($con);
                 }
-                $this->setIngredient($this->aIngredient);
+                $this->setItem($this->aItem);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -861,33 +861,33 @@ abstract class RecipeIngredient implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[RecipeIngredientTableMap::COL_ID] = true;
+        $this->modifiedColumns[RecipeItemTableMap::COL_ID] = true;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . RecipeIngredientTableMap::COL_ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . RecipeItemTableMap::COL_ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(RecipeIngredientTableMap::COL_ID)) {
+        if ($this->isColumnModified(RecipeItemTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
         }
-        if ($this->isColumnModified(RecipeIngredientTableMap::COL_RECIPE_ID)) {
+        if ($this->isColumnModified(RecipeItemTableMap::COL_RECIPE_ID)) {
             $modifiedColumns[':p' . $index++]  = 'recipe_id';
         }
-        if ($this->isColumnModified(RecipeIngredientTableMap::COL_INGREDIENT_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'ingredient_id';
+        if ($this->isColumnModified(RecipeItemTableMap::COL_ITEM_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'item_id';
         }
-        if ($this->isColumnModified(RecipeIngredientTableMap::COL_QUANTITY)) {
+        if ($this->isColumnModified(RecipeItemTableMap::COL_QUANTITY)) {
             $modifiedColumns[':p' . $index++]  = 'quantity';
         }
-        if ($this->isColumnModified(RecipeIngredientTableMap::COL_CREATED_AT)) {
+        if ($this->isColumnModified(RecipeItemTableMap::COL_CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'created_at';
         }
-        if ($this->isColumnModified(RecipeIngredientTableMap::COL_UPDATED_AT)) {
+        if ($this->isColumnModified(RecipeItemTableMap::COL_UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'updated_at';
         }
 
         $sql = sprintf(
-            'INSERT INTO recipe_ingredient (%s) VALUES (%s)',
+            'INSERT INTO recipe_item (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -902,8 +902,8 @@ abstract class RecipeIngredient implements ActiveRecordInterface
                     case 'recipe_id':
                         $stmt->bindValue($identifier, $this->recipe_id, PDO::PARAM_INT);
                         break;
-                    case 'ingredient_id':
-                        $stmt->bindValue($identifier, $this->ingredient_id, PDO::PARAM_INT);
+                    case 'item_id':
+                        $stmt->bindValue($identifier, $this->item_id, PDO::PARAM_INT);
                         break;
                     case 'quantity':
                         $stmt->bindValue($identifier, $this->quantity, PDO::PARAM_STR);
@@ -960,7 +960,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = RecipeIngredientTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = RecipeItemTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -983,7 +983,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
                 return $this->getRecipeId();
                 break;
             case 2:
-                return $this->getIngredientId();
+                return $this->getItemId();
                 break;
             case 3:
                 return $this->getQuantity();
@@ -1018,15 +1018,15 @@ abstract class RecipeIngredient implements ActiveRecordInterface
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
-        if (isset($alreadyDumpedObjects['RecipeIngredient'][$this->hashCode()])) {
+        if (isset($alreadyDumpedObjects['RecipeItem'][$this->hashCode()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['RecipeIngredient'][$this->hashCode()] = true;
-        $keys = RecipeIngredientTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['RecipeItem'][$this->hashCode()] = true;
+        $keys = RecipeItemTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getRecipeId(),
-            $keys[2] => $this->getIngredientId(),
+            $keys[2] => $this->getItemId(),
             $keys[3] => $this->getQuantity(),
             $keys[4] => $this->getCreatedAt(),
             $keys[5] => $this->getUpdatedAt(),
@@ -1060,20 +1060,20 @@ abstract class RecipeIngredient implements ActiveRecordInterface
 
                 $result[$key] = $this->aRecipe->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aIngredient) {
+            if (null !== $this->aItem) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'ingredient';
+                        $key = 'item';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'ingredient';
+                        $key = 'item';
                         break;
                     default:
-                        $key = 'Ingredient';
+                        $key = 'Item';
                 }
 
-                $result[$key] = $this->aIngredient->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+                $result[$key] = $this->aItem->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1089,11 +1089,11 @@ abstract class RecipeIngredient implements ActiveRecordInterface
      *                one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                Defaults to TableMap::TYPE_PHPNAME.
-     * @return $this|\Lib\RecipeIngredient
+     * @return $this|\Lib\RecipeItem
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = RecipeIngredientTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = RecipeItemTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1104,7 +1104,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
      *
      * @param  int $pos position in xml schema
      * @param  mixed $value field value
-     * @return $this|\Lib\RecipeIngredient
+     * @return $this|\Lib\RecipeItem
      */
     public function setByPosition($pos, $value)
     {
@@ -1116,7 +1116,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
                 $this->setRecipeId($value);
                 break;
             case 2:
-                $this->setIngredientId($value);
+                $this->setItemId($value);
                 break;
             case 3:
                 $this->setQuantity($value);
@@ -1151,7 +1151,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = RecipeIngredientTableMap::getFieldNames($keyType);
+        $keys = RecipeItemTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
             $this->setId($arr[$keys[0]]);
@@ -1160,7 +1160,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
             $this->setRecipeId($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setIngredientId($arr[$keys[2]]);
+            $this->setItemId($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
             $this->setQuantity($arr[$keys[3]]);
@@ -1190,7 +1190,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
      * @param string $data The source data to import from
      * @param string $keyType The type of keys the array uses.
      *
-     * @return $this|\Lib\RecipeIngredient The current object, for fluid interface
+     * @return $this|\Lib\RecipeItem The current object, for fluid interface
      */
     public function importFrom($parser, $data, $keyType = TableMap::TYPE_PHPNAME)
     {
@@ -1210,25 +1210,25 @@ abstract class RecipeIngredient implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(RecipeIngredientTableMap::DATABASE_NAME);
+        $criteria = new Criteria(RecipeItemTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(RecipeIngredientTableMap::COL_ID)) {
-            $criteria->add(RecipeIngredientTableMap::COL_ID, $this->id);
+        if ($this->isColumnModified(RecipeItemTableMap::COL_ID)) {
+            $criteria->add(RecipeItemTableMap::COL_ID, $this->id);
         }
-        if ($this->isColumnModified(RecipeIngredientTableMap::COL_RECIPE_ID)) {
-            $criteria->add(RecipeIngredientTableMap::COL_RECIPE_ID, $this->recipe_id);
+        if ($this->isColumnModified(RecipeItemTableMap::COL_RECIPE_ID)) {
+            $criteria->add(RecipeItemTableMap::COL_RECIPE_ID, $this->recipe_id);
         }
-        if ($this->isColumnModified(RecipeIngredientTableMap::COL_INGREDIENT_ID)) {
-            $criteria->add(RecipeIngredientTableMap::COL_INGREDIENT_ID, $this->ingredient_id);
+        if ($this->isColumnModified(RecipeItemTableMap::COL_ITEM_ID)) {
+            $criteria->add(RecipeItemTableMap::COL_ITEM_ID, $this->item_id);
         }
-        if ($this->isColumnModified(RecipeIngredientTableMap::COL_QUANTITY)) {
-            $criteria->add(RecipeIngredientTableMap::COL_QUANTITY, $this->quantity);
+        if ($this->isColumnModified(RecipeItemTableMap::COL_QUANTITY)) {
+            $criteria->add(RecipeItemTableMap::COL_QUANTITY, $this->quantity);
         }
-        if ($this->isColumnModified(RecipeIngredientTableMap::COL_CREATED_AT)) {
-            $criteria->add(RecipeIngredientTableMap::COL_CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(RecipeItemTableMap::COL_CREATED_AT)) {
+            $criteria->add(RecipeItemTableMap::COL_CREATED_AT, $this->created_at);
         }
-        if ($this->isColumnModified(RecipeIngredientTableMap::COL_UPDATED_AT)) {
-            $criteria->add(RecipeIngredientTableMap::COL_UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(RecipeItemTableMap::COL_UPDATED_AT)) {
+            $criteria->add(RecipeItemTableMap::COL_UPDATED_AT, $this->updated_at);
         }
 
         return $criteria;
@@ -1246,8 +1246,8 @@ abstract class RecipeIngredient implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = ChildRecipeIngredientQuery::create();
-        $criteria->add(RecipeIngredientTableMap::COL_ID, $this->id);
+        $criteria = ChildRecipeItemQuery::create();
+        $criteria->add(RecipeItemTableMap::COL_ID, $this->id);
 
         return $criteria;
     }
@@ -1309,7 +1309,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Lib\RecipeIngredient (or compatible) type.
+     * @param      object $copyObj An object of \Lib\RecipeItem (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
@@ -1317,7 +1317,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setRecipeId($this->getRecipeId());
-        $copyObj->setIngredientId($this->getIngredientId());
+        $copyObj->setItemId($this->getItemId());
         $copyObj->setQuantity($this->getQuantity());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -1336,7 +1336,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
      * objects.
      *
      * @param  boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \Lib\RecipeIngredient Clone of current object.
+     * @return \Lib\RecipeItem Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1353,7 +1353,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
      * Declares an association between this object and a ChildRecipe object.
      *
      * @param  ChildRecipe $v
-     * @return $this|\Lib\RecipeIngredient The current object (for fluent API support)
+     * @return $this|\Lib\RecipeItem The current object (for fluent API support)
      * @throws PropelException
      */
     public function setRecipe(ChildRecipe $v = null)
@@ -1369,7 +1369,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the ChildRecipe object, it will not be re-added.
         if ($v !== null) {
-            $v->addRecipeIngredient($this);
+            $v->addRecipeItem($this);
         }
 
 
@@ -1393,7 +1393,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aRecipe->addRecipeIngredients($this);
+                $this->aRecipe->addRecipeItems($this);
              */
         }
 
@@ -1401,26 +1401,26 @@ abstract class RecipeIngredient implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildIngredient object.
+     * Declares an association between this object and a ChildItem object.
      *
-     * @param  ChildIngredient $v
-     * @return $this|\Lib\RecipeIngredient The current object (for fluent API support)
+     * @param  ChildItem $v
+     * @return $this|\Lib\RecipeItem The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setIngredient(ChildIngredient $v = null)
+    public function setItem(ChildItem $v = null)
     {
         if ($v === null) {
-            $this->setIngredientId(NULL);
+            $this->setItemId(NULL);
         } else {
-            $this->setIngredientId($v->getId());
+            $this->setItemId($v->getId());
         }
 
-        $this->aIngredient = $v;
+        $this->aItem = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildIngredient object, it will not be re-added.
+        // If this object has already been added to the ChildItem object, it will not be re-added.
         if ($v !== null) {
-            $v->addRecipeIngredient($this);
+            $v->addRecipeItem($this);
         }
 
 
@@ -1429,26 +1429,26 @@ abstract class RecipeIngredient implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildIngredient object
+     * Get the associated ChildItem object
      *
      * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildIngredient The associated ChildIngredient object.
+     * @return ChildItem The associated ChildItem object.
      * @throws PropelException
      */
-    public function getIngredient(ConnectionInterface $con = null)
+    public function getItem(ConnectionInterface $con = null)
     {
-        if ($this->aIngredient === null && ($this->ingredient_id != 0)) {
-            $this->aIngredient = ChildIngredientQuery::create()->findPk($this->ingredient_id, $con);
+        if ($this->aItem === null && ($this->item_id != 0)) {
+            $this->aItem = ChildItemQuery::create()->findPk($this->item_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aIngredient->addRecipeIngredients($this);
+                $this->aItem->addRecipeItems($this);
              */
         }
 
-        return $this->aIngredient;
+        return $this->aItem;
     }
 
     /**
@@ -1459,14 +1459,14 @@ abstract class RecipeIngredient implements ActiveRecordInterface
     public function clear()
     {
         if (null !== $this->aRecipe) {
-            $this->aRecipe->removeRecipeIngredient($this);
+            $this->aRecipe->removeRecipeItem($this);
         }
-        if (null !== $this->aIngredient) {
-            $this->aIngredient->removeRecipeIngredient($this);
+        if (null !== $this->aItem) {
+            $this->aItem->removeRecipeItem($this);
         }
         $this->id = null;
         $this->recipe_id = null;
-        $this->ingredient_id = null;
+        $this->item_id = null;
         $this->quantity = null;
         $this->created_at = null;
         $this->updated_at = null;
@@ -1491,7 +1491,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
         } // if ($deep)
 
         $this->aRecipe = null;
-        $this->aIngredient = null;
+        $this->aItem = null;
     }
 
     /**
@@ -1501,7 +1501,7 @@ abstract class RecipeIngredient implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(RecipeIngredientTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(RecipeItemTableMap::DEFAULT_STRING_FORMAT);
     }
 
     // timestampable behavior
@@ -1509,11 +1509,11 @@ abstract class RecipeIngredient implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     $this|ChildRecipeIngredient The current object (for fluent API support)
+     * @return     $this|ChildRecipeItem The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[RecipeIngredientTableMap::COL_UPDATED_AT] = true;
+        $this->modifiedColumns[RecipeItemTableMap::COL_UPDATED_AT] = true;
 
         return $this;
     }

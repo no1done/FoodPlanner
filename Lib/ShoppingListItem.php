@@ -2,10 +2,10 @@
 
 namespace Lib;
 
-use Lib\Base\Ingredient as BaseIngredient;
+use Lib\Base\ShoppingListItem as BaseShoppingListItem;
 
 /**
- * Skeleton subclass for representing a row from the 'ingredient' table.
+ * Skeleton subclass for representing a row from the 'shopping_list_item' table.
  *
  *
  *
@@ -13,7 +13,7 @@ use Lib\Base\Ingredient as BaseIngredient;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  */
-class Ingredient extends BaseIngredient
+class ShoppingListItem extends BaseShoppingListItem
 {
 
 }

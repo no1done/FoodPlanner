@@ -5,12 +5,15 @@ namespace Lib\Base;
 use \DateTime;
 use \Exception;
 use \PDO;
-use Lib\Ingredient as ChildIngredient;
-use Lib\IngredientQuery as ChildIngredientQuery;
-use Lib\RecipeIngredient as ChildRecipeIngredient;
-use Lib\RecipeIngredientQuery as ChildRecipeIngredientQuery;
-use Lib\Map\IngredientTableMap;
-use Lib\Map\RecipeIngredientTableMap;
+use Lib\Item as ChildItem;
+use Lib\ItemQuery as ChildItemQuery;
+use Lib\RecipeItem as ChildRecipeItem;
+use Lib\RecipeItemQuery as ChildRecipeItemQuery;
+use Lib\ShoppingListItem as ChildShoppingListItem;
+use Lib\ShoppingListItemQuery as ChildShoppingListItemQuery;
+use Lib\Map\ItemTableMap;
+use Lib\Map\RecipeItemTableMap;
+use Lib\Map\ShoppingListItemTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
@@ -26,18 +29,18 @@ use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
 
 /**
- * Base class that represents a row from the 'ingredient' table.
+ * Base class that represents a row from the 'item' table.
  *
  *
  *
  * @package    propel.generator.Lib.Base
  */
-abstract class Ingredient implements ActiveRecordInterface
+abstract class Item implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Lib\\Map\\IngredientTableMap';
+    const TABLE_MAP = '\\Lib\\Map\\ItemTableMap';
 
 
     /**
@@ -110,10 +113,16 @@ abstract class Ingredient implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * @var        ObjectCollection|ChildRecipeIngredient[] Collection to store aggregation of ChildRecipeIngredient objects.
+     * @var        ObjectCollection|ChildRecipeItem[] Collection to store aggregation of ChildRecipeItem objects.
      */
-    protected $collRecipeIngredients;
-    protected $collRecipeIngredientsPartial;
+    protected $collRecipeItems;
+    protected $collRecipeItemsPartial;
+
+    /**
+     * @var        ObjectCollection|ChildShoppingListItem[] Collection to store aggregation of ChildShoppingListItem objects.
+     */
+    protected $collShoppingListItems;
+    protected $collShoppingListItemsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -125,9 +134,15 @@ abstract class Ingredient implements ActiveRecordInterface
 
     /**
      * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildRecipeIngredient[]
+     * @var ObjectCollection|ChildRecipeItem[]
      */
-    protected $recipeIngredientsScheduledForDeletion = null;
+    protected $recipeItemsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildShoppingListItem[]
+     */
+    protected $shoppingListItemsScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -141,7 +156,7 @@ abstract class Ingredient implements ActiveRecordInterface
     }
 
     /**
-     * Initializes internal state of Lib\Base\Ingredient object.
+     * Initializes internal state of Lib\Base\Item object.
      * @see applyDefaults()
      */
     public function __construct()
@@ -238,9 +253,9 @@ abstract class Ingredient implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>Ingredient</code> instance.  If
-     * <code>obj</code> is an instance of <code>Ingredient</code>, delegates to
-     * <code>equals(Ingredient)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>Item</code> instance.  If
+     * <code>obj</code> is an instance of <code>Item</code>, delegates to
+     * <code>equals(Item)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -306,7 +321,7 @@ abstract class Ingredient implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return $this|Ingredient The current object, for fluid interface
+     * @return $this|Item The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -461,7 +476,7 @@ abstract class Ingredient implements ActiveRecordInterface
      * Set the value of [id] column.
      *
      * @param int $v new value
-     * @return $this|\Lib\Ingredient The current object (for fluent API support)
+     * @return $this|\Lib\Item The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -471,7 +486,7 @@ abstract class Ingredient implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[IngredientTableMap::COL_ID] = true;
+            $this->modifiedColumns[ItemTableMap::COL_ID] = true;
         }
 
         return $this;
@@ -481,7 +496,7 @@ abstract class Ingredient implements ActiveRecordInterface
      * Set the value of [name] column.
      *
      * @param string $v new value
-     * @return $this|\Lib\Ingredient The current object (for fluent API support)
+     * @return $this|\Lib\Item The current object (for fluent API support)
      */
     public function setName($v)
     {
@@ -491,7 +506,7 @@ abstract class Ingredient implements ActiveRecordInterface
 
         if ($this->name !== $v) {
             $this->name = $v;
-            $this->modifiedColumns[IngredientTableMap::COL_NAME] = true;
+            $this->modifiedColumns[ItemTableMap::COL_NAME] = true;
         }
 
         return $this;
@@ -501,7 +516,7 @@ abstract class Ingredient implements ActiveRecordInterface
      * Set the value of [unit] column.
      *
      * @param string $v new value
-     * @return $this|\Lib\Ingredient The current object (for fluent API support)
+     * @return $this|\Lib\Item The current object (for fluent API support)
      */
     public function setUnit($v)
     {
@@ -511,7 +526,7 @@ abstract class Ingredient implements ActiveRecordInterface
 
         if ($this->unit !== $v) {
             $this->unit = $v;
-            $this->modifiedColumns[IngredientTableMap::COL_UNIT] = true;
+            $this->modifiedColumns[ItemTableMap::COL_UNIT] = true;
         }
 
         return $this;
@@ -525,7 +540,7 @@ abstract class Ingredient implements ActiveRecordInterface
      * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
      *
      * @param  boolean|integer|string $v The new value
-     * @return $this|\Lib\Ingredient The current object (for fluent API support)
+     * @return $this|\Lib\Item The current object (for fluent API support)
      */
     public function setRemoved($v)
     {
@@ -539,7 +554,7 @@ abstract class Ingredient implements ActiveRecordInterface
 
         if ($this->removed !== $v) {
             $this->removed = $v;
-            $this->modifiedColumns[IngredientTableMap::COL_REMOVED] = true;
+            $this->modifiedColumns[ItemTableMap::COL_REMOVED] = true;
         }
 
         return $this;
@@ -550,7 +565,7 @@ abstract class Ingredient implements ActiveRecordInterface
      *
      * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
      *               Empty strings are treated as NULL.
-     * @return $this|\Lib\Ingredient The current object (for fluent API support)
+     * @return $this|\Lib\Item The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -558,7 +573,7 @@ abstract class Ingredient implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($this->created_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->created_at->format("Y-m-d H:i:s.u")) {
                 $this->created_at = $dt === null ? null : clone $dt;
-                $this->modifiedColumns[IngredientTableMap::COL_CREATED_AT] = true;
+                $this->modifiedColumns[ItemTableMap::COL_CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -570,7 +585,7 @@ abstract class Ingredient implements ActiveRecordInterface
      *
      * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
      *               Empty strings are treated as NULL.
-     * @return $this|\Lib\Ingredient The current object (for fluent API support)
+     * @return $this|\Lib\Item The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -578,7 +593,7 @@ abstract class Ingredient implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($this->updated_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->updated_at->format("Y-m-d H:i:s.u")) {
                 $this->updated_at = $dt === null ? null : clone $dt;
-                $this->modifiedColumns[IngredientTableMap::COL_UPDATED_AT] = true;
+                $this->modifiedColumns[ItemTableMap::COL_UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -625,25 +640,25 @@ abstract class Ingredient implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : IngredientTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ItemTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : IngredientTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ItemTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
             $this->name = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : IngredientTableMap::translateFieldName('Unit', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ItemTableMap::translateFieldName('Unit', TableMap::TYPE_PHPNAME, $indexType)];
             $this->unit = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : IngredientTableMap::translateFieldName('Removed', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ItemTableMap::translateFieldName('Removed', TableMap::TYPE_PHPNAME, $indexType)];
             $this->removed = (null !== $col) ? (boolean) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : IngredientTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ItemTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : IngredientTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ItemTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -656,10 +671,10 @@ abstract class Ingredient implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = IngredientTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = ItemTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException(sprintf('Error populating %s object', '\\Lib\\Ingredient'), 0, $e);
+            throw new PropelException(sprintf('Error populating %s object', '\\Lib\\Item'), 0, $e);
         }
     }
 
@@ -701,13 +716,13 @@ abstract class Ingredient implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(IngredientTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ItemTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildIngredientQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildItemQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -717,7 +732,9 @@ abstract class Ingredient implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collRecipeIngredients = null;
+            $this->collRecipeItems = null;
+
+            $this->collShoppingListItems = null;
 
         } // if (deep)
     }
@@ -728,8 +745,8 @@ abstract class Ingredient implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see Ingredient::setDeleted()
-     * @see Ingredient::isDeleted()
+     * @see Item::setDeleted()
+     * @see Item::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -738,11 +755,11 @@ abstract class Ingredient implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(IngredientTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ItemTableMap::DATABASE_NAME);
         }
 
         $con->transaction(function () use ($con) {
-            $deleteQuery = ChildIngredientQuery::create()
+            $deleteQuery = ChildItemQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -777,7 +794,7 @@ abstract class Ingredient implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(IngredientTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ItemTableMap::DATABASE_NAME);
         }
 
         return $con->transaction(function () use ($con) {
@@ -788,16 +805,16 @@ abstract class Ingredient implements ActiveRecordInterface
                 // timestampable behavior
                 $time = time();
                 $highPrecision = \Propel\Runtime\Util\PropelDateTime::createHighPrecision();
-                if (!$this->isColumnModified(IngredientTableMap::COL_CREATED_AT)) {
+                if (!$this->isColumnModified(ItemTableMap::COL_CREATED_AT)) {
                     $this->setCreatedAt($highPrecision);
                 }
-                if (!$this->isColumnModified(IngredientTableMap::COL_UPDATED_AT)) {
+                if (!$this->isColumnModified(ItemTableMap::COL_UPDATED_AT)) {
                     $this->setUpdatedAt($highPrecision);
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(IngredientTableMap::COL_UPDATED_AT)) {
+                if ($this->isModified() && !$this->isColumnModified(ItemTableMap::COL_UPDATED_AT)) {
                     $this->setUpdatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
                 }
             }
@@ -809,7 +826,7 @@ abstract class Ingredient implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                IngredientTableMap::addInstanceToPool($this);
+                ItemTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -846,17 +863,34 @@ abstract class Ingredient implements ActiveRecordInterface
                 $this->resetModified();
             }
 
-            if ($this->recipeIngredientsScheduledForDeletion !== null) {
-                if (!$this->recipeIngredientsScheduledForDeletion->isEmpty()) {
-                    \Lib\RecipeIngredientQuery::create()
-                        ->filterByPrimaryKeys($this->recipeIngredientsScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->recipeItemsScheduledForDeletion !== null) {
+                if (!$this->recipeItemsScheduledForDeletion->isEmpty()) {
+                    \Lib\RecipeItemQuery::create()
+                        ->filterByPrimaryKeys($this->recipeItemsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->recipeIngredientsScheduledForDeletion = null;
+                    $this->recipeItemsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collRecipeIngredients !== null) {
-                foreach ($this->collRecipeIngredients as $referrerFK) {
+            if ($this->collRecipeItems !== null) {
+                foreach ($this->collRecipeItems as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->shoppingListItemsScheduledForDeletion !== null) {
+                if (!$this->shoppingListItemsScheduledForDeletion->isEmpty()) {
+                    \Lib\ShoppingListItemQuery::create()
+                        ->filterByPrimaryKeys($this->shoppingListItemsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->shoppingListItemsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collShoppingListItems !== null) {
+                foreach ($this->collShoppingListItems as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -883,33 +917,33 @@ abstract class Ingredient implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[IngredientTableMap::COL_ID] = true;
+        $this->modifiedColumns[ItemTableMap::COL_ID] = true;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . IngredientTableMap::COL_ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ItemTableMap::COL_ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(IngredientTableMap::COL_ID)) {
+        if ($this->isColumnModified(ItemTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
         }
-        if ($this->isColumnModified(IngredientTableMap::COL_NAME)) {
+        if ($this->isColumnModified(ItemTableMap::COL_NAME)) {
             $modifiedColumns[':p' . $index++]  = 'name';
         }
-        if ($this->isColumnModified(IngredientTableMap::COL_UNIT)) {
+        if ($this->isColumnModified(ItemTableMap::COL_UNIT)) {
             $modifiedColumns[':p' . $index++]  = 'unit';
         }
-        if ($this->isColumnModified(IngredientTableMap::COL_REMOVED)) {
+        if ($this->isColumnModified(ItemTableMap::COL_REMOVED)) {
             $modifiedColumns[':p' . $index++]  = 'removed';
         }
-        if ($this->isColumnModified(IngredientTableMap::COL_CREATED_AT)) {
+        if ($this->isColumnModified(ItemTableMap::COL_CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'created_at';
         }
-        if ($this->isColumnModified(IngredientTableMap::COL_UPDATED_AT)) {
+        if ($this->isColumnModified(ItemTableMap::COL_UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'updated_at';
         }
 
         $sql = sprintf(
-            'INSERT INTO ingredient (%s) VALUES (%s)',
+            'INSERT INTO item (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -982,7 +1016,7 @@ abstract class Ingredient implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = IngredientTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ItemTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -1040,11 +1074,11 @@ abstract class Ingredient implements ActiveRecordInterface
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
-        if (isset($alreadyDumpedObjects['Ingredient'][$this->hashCode()])) {
+        if (isset($alreadyDumpedObjects['Item'][$this->hashCode()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Ingredient'][$this->hashCode()] = true;
-        $keys = IngredientTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['Item'][$this->hashCode()] = true;
+        $keys = ItemTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
@@ -1067,20 +1101,35 @@ abstract class Ingredient implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->collRecipeIngredients) {
+            if (null !== $this->collRecipeItems) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'recipeIngredients';
+                        $key = 'recipeItems';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'recipe_ingredients';
+                        $key = 'recipe_items';
                         break;
                     default:
-                        $key = 'RecipeIngredients';
+                        $key = 'RecipeItems';
                 }
 
-                $result[$key] = $this->collRecipeIngredients->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+                $result[$key] = $this->collRecipeItems->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collShoppingListItems) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'shoppingListItems';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'shopping_list_items';
+                        break;
+                    default:
+                        $key = 'ShoppingListItems';
+                }
+
+                $result[$key] = $this->collShoppingListItems->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1096,11 +1145,11 @@ abstract class Ingredient implements ActiveRecordInterface
      *                one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                Defaults to TableMap::TYPE_PHPNAME.
-     * @return $this|\Lib\Ingredient
+     * @return $this|\Lib\Item
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = IngredientTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ItemTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1111,7 +1160,7 @@ abstract class Ingredient implements ActiveRecordInterface
      *
      * @param  int $pos position in xml schema
      * @param  mixed $value field value
-     * @return $this|\Lib\Ingredient
+     * @return $this|\Lib\Item
      */
     public function setByPosition($pos, $value)
     {
@@ -1158,7 +1207,7 @@ abstract class Ingredient implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = IngredientTableMap::getFieldNames($keyType);
+        $keys = ItemTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
             $this->setId($arr[$keys[0]]);
@@ -1197,7 +1246,7 @@ abstract class Ingredient implements ActiveRecordInterface
      * @param string $data The source data to import from
      * @param string $keyType The type of keys the array uses.
      *
-     * @return $this|\Lib\Ingredient The current object, for fluid interface
+     * @return $this|\Lib\Item The current object, for fluid interface
      */
     public function importFrom($parser, $data, $keyType = TableMap::TYPE_PHPNAME)
     {
@@ -1217,25 +1266,25 @@ abstract class Ingredient implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(IngredientTableMap::DATABASE_NAME);
+        $criteria = new Criteria(ItemTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(IngredientTableMap::COL_ID)) {
-            $criteria->add(IngredientTableMap::COL_ID, $this->id);
+        if ($this->isColumnModified(ItemTableMap::COL_ID)) {
+            $criteria->add(ItemTableMap::COL_ID, $this->id);
         }
-        if ($this->isColumnModified(IngredientTableMap::COL_NAME)) {
-            $criteria->add(IngredientTableMap::COL_NAME, $this->name);
+        if ($this->isColumnModified(ItemTableMap::COL_NAME)) {
+            $criteria->add(ItemTableMap::COL_NAME, $this->name);
         }
-        if ($this->isColumnModified(IngredientTableMap::COL_UNIT)) {
-            $criteria->add(IngredientTableMap::COL_UNIT, $this->unit);
+        if ($this->isColumnModified(ItemTableMap::COL_UNIT)) {
+            $criteria->add(ItemTableMap::COL_UNIT, $this->unit);
         }
-        if ($this->isColumnModified(IngredientTableMap::COL_REMOVED)) {
-            $criteria->add(IngredientTableMap::COL_REMOVED, $this->removed);
+        if ($this->isColumnModified(ItemTableMap::COL_REMOVED)) {
+            $criteria->add(ItemTableMap::COL_REMOVED, $this->removed);
         }
-        if ($this->isColumnModified(IngredientTableMap::COL_CREATED_AT)) {
-            $criteria->add(IngredientTableMap::COL_CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(ItemTableMap::COL_CREATED_AT)) {
+            $criteria->add(ItemTableMap::COL_CREATED_AT, $this->created_at);
         }
-        if ($this->isColumnModified(IngredientTableMap::COL_UPDATED_AT)) {
-            $criteria->add(IngredientTableMap::COL_UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(ItemTableMap::COL_UPDATED_AT)) {
+            $criteria->add(ItemTableMap::COL_UPDATED_AT, $this->updated_at);
         }
 
         return $criteria;
@@ -1253,8 +1302,8 @@ abstract class Ingredient implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = ChildIngredientQuery::create();
-        $criteria->add(IngredientTableMap::COL_ID, $this->id);
+        $criteria = ChildItemQuery::create();
+        $criteria->add(ItemTableMap::COL_ID, $this->id);
 
         return $criteria;
     }
@@ -1316,7 +1365,7 @@ abstract class Ingredient implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Lib\Ingredient (or compatible) type.
+     * @param      object $copyObj An object of \Lib\Item (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
@@ -1334,9 +1383,15 @@ abstract class Ingredient implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
-            foreach ($this->getRecipeIngredients() as $relObj) {
+            foreach ($this->getRecipeItems() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addRecipeIngredient($relObj->copy($deepCopy));
+                    $copyObj->addRecipeItem($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getShoppingListItems() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addShoppingListItem($relObj->copy($deepCopy));
                 }
             }
 
@@ -1357,7 +1412,7 @@ abstract class Ingredient implements ActiveRecordInterface
      * objects.
      *
      * @param  boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \Lib\Ingredient Clone of current object.
+     * @return \Lib\Item Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1381,38 +1436,42 @@ abstract class Ingredient implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('RecipeIngredient' == $relationName) {
-            $this->initRecipeIngredients();
+        if ('RecipeItem' == $relationName) {
+            $this->initRecipeItems();
+            return;
+        }
+        if ('ShoppingListItem' == $relationName) {
+            $this->initShoppingListItems();
             return;
         }
     }
 
     /**
-     * Clears out the collRecipeIngredients collection
+     * Clears out the collRecipeItems collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addRecipeIngredients()
+     * @see        addRecipeItems()
      */
-    public function clearRecipeIngredients()
+    public function clearRecipeItems()
     {
-        $this->collRecipeIngredients = null; // important to set this to NULL since that means it is uninitialized
+        $this->collRecipeItems = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collRecipeIngredients collection loaded partially.
+     * Reset is the collRecipeItems collection loaded partially.
      */
-    public function resetPartialRecipeIngredients($v = true)
+    public function resetPartialRecipeItems($v = true)
     {
-        $this->collRecipeIngredientsPartial = $v;
+        $this->collRecipeItemsPartial = $v;
     }
 
     /**
-     * Initializes the collRecipeIngredients collection.
+     * Initializes the collRecipeItems collection.
      *
-     * By default this just sets the collRecipeIngredients collection to an empty array (like clearcollRecipeIngredients());
+     * By default this just sets the collRecipeItems collection to an empty array (like clearcollRecipeItems());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1421,162 +1480,162 @@ abstract class Ingredient implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initRecipeIngredients($overrideExisting = true)
+    public function initRecipeItems($overrideExisting = true)
     {
-        if (null !== $this->collRecipeIngredients && !$overrideExisting) {
+        if (null !== $this->collRecipeItems && !$overrideExisting) {
             return;
         }
 
-        $collectionClassName = RecipeIngredientTableMap::getTableMap()->getCollectionClassName();
+        $collectionClassName = RecipeItemTableMap::getTableMap()->getCollectionClassName();
 
-        $this->collRecipeIngredients = new $collectionClassName;
-        $this->collRecipeIngredients->setModel('\Lib\RecipeIngredient');
+        $this->collRecipeItems = new $collectionClassName;
+        $this->collRecipeItems->setModel('\Lib\RecipeItem');
     }
 
     /**
-     * Gets an array of ChildRecipeIngredient objects which contain a foreign key that references this object.
+     * Gets an array of ChildRecipeItem objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildIngredient is new, it will return
+     * If this ChildItem is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildRecipeIngredient[] List of ChildRecipeIngredient objects
+     * @return ObjectCollection|ChildRecipeItem[] List of ChildRecipeItem objects
      * @throws PropelException
      */
-    public function getRecipeIngredients(Criteria $criteria = null, ConnectionInterface $con = null)
+    public function getRecipeItems(Criteria $criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collRecipeIngredientsPartial && !$this->isNew();
-        if (null === $this->collRecipeIngredients || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collRecipeIngredients) {
+        $partial = $this->collRecipeItemsPartial && !$this->isNew();
+        if (null === $this->collRecipeItems || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collRecipeItems) {
                 // return empty collection
-                $this->initRecipeIngredients();
+                $this->initRecipeItems();
             } else {
-                $collRecipeIngredients = ChildRecipeIngredientQuery::create(null, $criteria)
-                    ->filterByIngredient($this)
+                $collRecipeItems = ChildRecipeItemQuery::create(null, $criteria)
+                    ->filterByItem($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collRecipeIngredientsPartial && count($collRecipeIngredients)) {
-                        $this->initRecipeIngredients(false);
+                    if (false !== $this->collRecipeItemsPartial && count($collRecipeItems)) {
+                        $this->initRecipeItems(false);
 
-                        foreach ($collRecipeIngredients as $obj) {
-                            if (false == $this->collRecipeIngredients->contains($obj)) {
-                                $this->collRecipeIngredients->append($obj);
+                        foreach ($collRecipeItems as $obj) {
+                            if (false == $this->collRecipeItems->contains($obj)) {
+                                $this->collRecipeItems->append($obj);
                             }
                         }
 
-                        $this->collRecipeIngredientsPartial = true;
+                        $this->collRecipeItemsPartial = true;
                     }
 
-                    return $collRecipeIngredients;
+                    return $collRecipeItems;
                 }
 
-                if ($partial && $this->collRecipeIngredients) {
-                    foreach ($this->collRecipeIngredients as $obj) {
+                if ($partial && $this->collRecipeItems) {
+                    foreach ($this->collRecipeItems as $obj) {
                         if ($obj->isNew()) {
-                            $collRecipeIngredients[] = $obj;
+                            $collRecipeItems[] = $obj;
                         }
                     }
                 }
 
-                $this->collRecipeIngredients = $collRecipeIngredients;
-                $this->collRecipeIngredientsPartial = false;
+                $this->collRecipeItems = $collRecipeItems;
+                $this->collRecipeItemsPartial = false;
             }
         }
 
-        return $this->collRecipeIngredients;
+        return $this->collRecipeItems;
     }
 
     /**
-     * Sets a collection of ChildRecipeIngredient objects related by a one-to-many relationship
+     * Sets a collection of ChildRecipeItem objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $recipeIngredients A Propel collection.
+     * @param      Collection $recipeItems A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildIngredient The current object (for fluent API support)
+     * @return $this|ChildItem The current object (for fluent API support)
      */
-    public function setRecipeIngredients(Collection $recipeIngredients, ConnectionInterface $con = null)
+    public function setRecipeItems(Collection $recipeItems, ConnectionInterface $con = null)
     {
-        /** @var ChildRecipeIngredient[] $recipeIngredientsToDelete */
-        $recipeIngredientsToDelete = $this->getRecipeIngredients(new Criteria(), $con)->diff($recipeIngredients);
+        /** @var ChildRecipeItem[] $recipeItemsToDelete */
+        $recipeItemsToDelete = $this->getRecipeItems(new Criteria(), $con)->diff($recipeItems);
 
 
-        $this->recipeIngredientsScheduledForDeletion = $recipeIngredientsToDelete;
+        $this->recipeItemsScheduledForDeletion = $recipeItemsToDelete;
 
-        foreach ($recipeIngredientsToDelete as $recipeIngredientRemoved) {
-            $recipeIngredientRemoved->setIngredient(null);
+        foreach ($recipeItemsToDelete as $recipeItemRemoved) {
+            $recipeItemRemoved->setItem(null);
         }
 
-        $this->collRecipeIngredients = null;
-        foreach ($recipeIngredients as $recipeIngredient) {
-            $this->addRecipeIngredient($recipeIngredient);
+        $this->collRecipeItems = null;
+        foreach ($recipeItems as $recipeItem) {
+            $this->addRecipeItem($recipeItem);
         }
 
-        $this->collRecipeIngredients = $recipeIngredients;
-        $this->collRecipeIngredientsPartial = false;
+        $this->collRecipeItems = $recipeItems;
+        $this->collRecipeItemsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related RecipeIngredient objects.
+     * Returns the number of related RecipeItem objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related RecipeIngredient objects.
+     * @return int             Count of related RecipeItem objects.
      * @throws PropelException
      */
-    public function countRecipeIngredients(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countRecipeItems(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collRecipeIngredientsPartial && !$this->isNew();
-        if (null === $this->collRecipeIngredients || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collRecipeIngredients) {
+        $partial = $this->collRecipeItemsPartial && !$this->isNew();
+        if (null === $this->collRecipeItems || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collRecipeItems) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getRecipeIngredients());
+                return count($this->getRecipeItems());
             }
 
-            $query = ChildRecipeIngredientQuery::create(null, $criteria);
+            $query = ChildRecipeItemQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
 
             return $query
-                ->filterByIngredient($this)
+                ->filterByItem($this)
                 ->count($con);
         }
 
-        return count($this->collRecipeIngredients);
+        return count($this->collRecipeItems);
     }
 
     /**
-     * Method called to associate a ChildRecipeIngredient object to this object
-     * through the ChildRecipeIngredient foreign key attribute.
+     * Method called to associate a ChildRecipeItem object to this object
+     * through the ChildRecipeItem foreign key attribute.
      *
-     * @param  ChildRecipeIngredient $l ChildRecipeIngredient
-     * @return $this|\Lib\Ingredient The current object (for fluent API support)
+     * @param  ChildRecipeItem $l ChildRecipeItem
+     * @return $this|\Lib\Item The current object (for fluent API support)
      */
-    public function addRecipeIngredient(ChildRecipeIngredient $l)
+    public function addRecipeItem(ChildRecipeItem $l)
     {
-        if ($this->collRecipeIngredients === null) {
-            $this->initRecipeIngredients();
-            $this->collRecipeIngredientsPartial = true;
+        if ($this->collRecipeItems === null) {
+            $this->initRecipeItems();
+            $this->collRecipeItemsPartial = true;
         }
 
-        if (!$this->collRecipeIngredients->contains($l)) {
-            $this->doAddRecipeIngredient($l);
+        if (!$this->collRecipeItems->contains($l)) {
+            $this->doAddRecipeItem($l);
 
-            if ($this->recipeIngredientsScheduledForDeletion and $this->recipeIngredientsScheduledForDeletion->contains($l)) {
-                $this->recipeIngredientsScheduledForDeletion->remove($this->recipeIngredientsScheduledForDeletion->search($l));
+            if ($this->recipeItemsScheduledForDeletion and $this->recipeItemsScheduledForDeletion->contains($l)) {
+                $this->recipeItemsScheduledForDeletion->remove($this->recipeItemsScheduledForDeletion->search($l));
             }
         }
 
@@ -1584,29 +1643,29 @@ abstract class Ingredient implements ActiveRecordInterface
     }
 
     /**
-     * @param ChildRecipeIngredient $recipeIngredient The ChildRecipeIngredient object to add.
+     * @param ChildRecipeItem $recipeItem The ChildRecipeItem object to add.
      */
-    protected function doAddRecipeIngredient(ChildRecipeIngredient $recipeIngredient)
+    protected function doAddRecipeItem(ChildRecipeItem $recipeItem)
     {
-        $this->collRecipeIngredients[]= $recipeIngredient;
-        $recipeIngredient->setIngredient($this);
+        $this->collRecipeItems[]= $recipeItem;
+        $recipeItem->setItem($this);
     }
 
     /**
-     * @param  ChildRecipeIngredient $recipeIngredient The ChildRecipeIngredient object to remove.
-     * @return $this|ChildIngredient The current object (for fluent API support)
+     * @param  ChildRecipeItem $recipeItem The ChildRecipeItem object to remove.
+     * @return $this|ChildItem The current object (for fluent API support)
      */
-    public function removeRecipeIngredient(ChildRecipeIngredient $recipeIngredient)
+    public function removeRecipeItem(ChildRecipeItem $recipeItem)
     {
-        if ($this->getRecipeIngredients()->contains($recipeIngredient)) {
-            $pos = $this->collRecipeIngredients->search($recipeIngredient);
-            $this->collRecipeIngredients->remove($pos);
-            if (null === $this->recipeIngredientsScheduledForDeletion) {
-                $this->recipeIngredientsScheduledForDeletion = clone $this->collRecipeIngredients;
-                $this->recipeIngredientsScheduledForDeletion->clear();
+        if ($this->getRecipeItems()->contains($recipeItem)) {
+            $pos = $this->collRecipeItems->search($recipeItem);
+            $this->collRecipeItems->remove($pos);
+            if (null === $this->recipeItemsScheduledForDeletion) {
+                $this->recipeItemsScheduledForDeletion = clone $this->collRecipeItems;
+                $this->recipeItemsScheduledForDeletion->clear();
             }
-            $this->recipeIngredientsScheduledForDeletion[]= clone $recipeIngredient;
-            $recipeIngredient->setIngredient(null);
+            $this->recipeItemsScheduledForDeletion[]= clone $recipeItem;
+            $recipeItem->setItem(null);
         }
 
         return $this;
@@ -1616,25 +1675,275 @@ abstract class Ingredient implements ActiveRecordInterface
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
-     * Otherwise if this Ingredient is new, it will return
-     * an empty collection; or if this Ingredient has previously
-     * been saved, it will retrieve related RecipeIngredients from storage.
+     * Otherwise if this Item is new, it will return
+     * an empty collection; or if this Item has previously
+     * been saved, it will retrieve related RecipeItems from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
-     * actually need in Ingredient.
+     * actually need in Item.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildRecipeIngredient[] List of ChildRecipeIngredient objects
+     * @return ObjectCollection|ChildRecipeItem[] List of ChildRecipeItem objects
      */
-    public function getRecipeIngredientsJoinRecipe(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getRecipeItemsJoinRecipe(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
-        $query = ChildRecipeIngredientQuery::create(null, $criteria);
+        $query = ChildRecipeItemQuery::create(null, $criteria);
         $query->joinWith('Recipe', $joinBehavior);
 
-        return $this->getRecipeIngredients($query, $con);
+        return $this->getRecipeItems($query, $con);
+    }
+
+    /**
+     * Clears out the collShoppingListItems collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addShoppingListItems()
+     */
+    public function clearShoppingListItems()
+    {
+        $this->collShoppingListItems = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collShoppingListItems collection loaded partially.
+     */
+    public function resetPartialShoppingListItems($v = true)
+    {
+        $this->collShoppingListItemsPartial = $v;
+    }
+
+    /**
+     * Initializes the collShoppingListItems collection.
+     *
+     * By default this just sets the collShoppingListItems collection to an empty array (like clearcollShoppingListItems());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initShoppingListItems($overrideExisting = true)
+    {
+        if (null !== $this->collShoppingListItems && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = ShoppingListItemTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collShoppingListItems = new $collectionClassName;
+        $this->collShoppingListItems->setModel('\Lib\ShoppingListItem');
+    }
+
+    /**
+     * Gets an array of ChildShoppingListItem objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildItem is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildShoppingListItem[] List of ChildShoppingListItem objects
+     * @throws PropelException
+     */
+    public function getShoppingListItems(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collShoppingListItemsPartial && !$this->isNew();
+        if (null === $this->collShoppingListItems || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collShoppingListItems) {
+                // return empty collection
+                $this->initShoppingListItems();
+            } else {
+                $collShoppingListItems = ChildShoppingListItemQuery::create(null, $criteria)
+                    ->filterByItem($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collShoppingListItemsPartial && count($collShoppingListItems)) {
+                        $this->initShoppingListItems(false);
+
+                        foreach ($collShoppingListItems as $obj) {
+                            if (false == $this->collShoppingListItems->contains($obj)) {
+                                $this->collShoppingListItems->append($obj);
+                            }
+                        }
+
+                        $this->collShoppingListItemsPartial = true;
+                    }
+
+                    return $collShoppingListItems;
+                }
+
+                if ($partial && $this->collShoppingListItems) {
+                    foreach ($this->collShoppingListItems as $obj) {
+                        if ($obj->isNew()) {
+                            $collShoppingListItems[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collShoppingListItems = $collShoppingListItems;
+                $this->collShoppingListItemsPartial = false;
+            }
+        }
+
+        return $this->collShoppingListItems;
+    }
+
+    /**
+     * Sets a collection of ChildShoppingListItem objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $shoppingListItems A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildItem The current object (for fluent API support)
+     */
+    public function setShoppingListItems(Collection $shoppingListItems, ConnectionInterface $con = null)
+    {
+        /** @var ChildShoppingListItem[] $shoppingListItemsToDelete */
+        $shoppingListItemsToDelete = $this->getShoppingListItems(new Criteria(), $con)->diff($shoppingListItems);
+
+
+        $this->shoppingListItemsScheduledForDeletion = $shoppingListItemsToDelete;
+
+        foreach ($shoppingListItemsToDelete as $shoppingListItemRemoved) {
+            $shoppingListItemRemoved->setItem(null);
+        }
+
+        $this->collShoppingListItems = null;
+        foreach ($shoppingListItems as $shoppingListItem) {
+            $this->addShoppingListItem($shoppingListItem);
+        }
+
+        $this->collShoppingListItems = $shoppingListItems;
+        $this->collShoppingListItemsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ShoppingListItem objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ShoppingListItem objects.
+     * @throws PropelException
+     */
+    public function countShoppingListItems(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collShoppingListItemsPartial && !$this->isNew();
+        if (null === $this->collShoppingListItems || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collShoppingListItems) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getShoppingListItems());
+            }
+
+            $query = ChildShoppingListItemQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByItem($this)
+                ->count($con);
+        }
+
+        return count($this->collShoppingListItems);
+    }
+
+    /**
+     * Method called to associate a ChildShoppingListItem object to this object
+     * through the ChildShoppingListItem foreign key attribute.
+     *
+     * @param  ChildShoppingListItem $l ChildShoppingListItem
+     * @return $this|\Lib\Item The current object (for fluent API support)
+     */
+    public function addShoppingListItem(ChildShoppingListItem $l)
+    {
+        if ($this->collShoppingListItems === null) {
+            $this->initShoppingListItems();
+            $this->collShoppingListItemsPartial = true;
+        }
+
+        if (!$this->collShoppingListItems->contains($l)) {
+            $this->doAddShoppingListItem($l);
+
+            if ($this->shoppingListItemsScheduledForDeletion and $this->shoppingListItemsScheduledForDeletion->contains($l)) {
+                $this->shoppingListItemsScheduledForDeletion->remove($this->shoppingListItemsScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildShoppingListItem $shoppingListItem The ChildShoppingListItem object to add.
+     */
+    protected function doAddShoppingListItem(ChildShoppingListItem $shoppingListItem)
+    {
+        $this->collShoppingListItems[]= $shoppingListItem;
+        $shoppingListItem->setItem($this);
+    }
+
+    /**
+     * @param  ChildShoppingListItem $shoppingListItem The ChildShoppingListItem object to remove.
+     * @return $this|ChildItem The current object (for fluent API support)
+     */
+    public function removeShoppingListItem(ChildShoppingListItem $shoppingListItem)
+    {
+        if ($this->getShoppingListItems()->contains($shoppingListItem)) {
+            $pos = $this->collShoppingListItems->search($shoppingListItem);
+            $this->collShoppingListItems->remove($pos);
+            if (null === $this->shoppingListItemsScheduledForDeletion) {
+                $this->shoppingListItemsScheduledForDeletion = clone $this->collShoppingListItems;
+                $this->shoppingListItemsScheduledForDeletion->clear();
+            }
+            $this->shoppingListItemsScheduledForDeletion[]= clone $shoppingListItem;
+            $shoppingListItem->setItem(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Item is new, it will return
+     * an empty collection; or if this Item has previously
+     * been saved, it will retrieve related ShoppingListItems from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Item.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildShoppingListItem[] List of ChildShoppingListItem objects
+     */
+    public function getShoppingListItemsJoinShoppingList(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildShoppingListItemQuery::create(null, $criteria);
+        $query->joinWith('ShoppingList', $joinBehavior);
+
+        return $this->getShoppingListItems($query, $con);
     }
 
     /**
@@ -1669,14 +1978,20 @@ abstract class Ingredient implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collRecipeIngredients) {
-                foreach ($this->collRecipeIngredients as $o) {
+            if ($this->collRecipeItems) {
+                foreach ($this->collRecipeItems as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collShoppingListItems) {
+                foreach ($this->collShoppingListItems as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
         } // if ($deep)
 
-        $this->collRecipeIngredients = null;
+        $this->collRecipeItems = null;
+        $this->collShoppingListItems = null;
     }
 
     /**
@@ -1686,7 +2001,7 @@ abstract class Ingredient implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(IngredientTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(ItemTableMap::DEFAULT_STRING_FORMAT);
     }
 
     // timestampable behavior
@@ -1694,11 +2009,11 @@ abstract class Ingredient implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     $this|ChildIngredient The current object (for fluent API support)
+     * @return     $this|ChildItem The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[IngredientTableMap::COL_UPDATED_AT] = true;
+        $this->modifiedColumns[ItemTableMap::COL_UPDATED_AT] = true;
 
         return $this;
     }

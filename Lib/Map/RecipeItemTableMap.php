@@ -2,8 +2,8 @@
 
 namespace Lib\Map;
 
-use Lib\Ingredient;
-use Lib\IngredientQuery;
+use Lib\RecipeItem;
+use Lib\RecipeItemQuery;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\InstancePoolTrait;
@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'ingredient' table.
+ * This class defines the structure of the 'recipe_item' table.
  *
  *
  *
@@ -25,7 +25,7 @@ use Propel\Runtime\Map\TableMapTrait;
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  */
-class IngredientTableMap extends TableMap
+class RecipeItemTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
@@ -33,7 +33,7 @@ class IngredientTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Lib.Map.IngredientTableMap';
+    const CLASS_NAME = 'Lib.Map.RecipeItemTableMap';
 
     /**
      * The default database name for this class
@@ -43,17 +43,17 @@ class IngredientTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'ingredient';
+    const TABLE_NAME = 'recipe_item';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Lib\\Ingredient';
+    const OM_CLASS = '\\Lib\\RecipeItem';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Lib.Ingredient';
+    const CLASS_DEFAULT = 'Lib.RecipeItem';
 
     /**
      * The total number of columns
@@ -73,32 +73,32 @@ class IngredientTableMap extends TableMap
     /**
      * the column name for the id field
      */
-    const COL_ID = 'ingredient.id';
+    const COL_ID = 'recipe_item.id';
 
     /**
-     * the column name for the name field
+     * the column name for the recipe_id field
      */
-    const COL_NAME = 'ingredient.name';
+    const COL_RECIPE_ID = 'recipe_item.recipe_id';
 
     /**
-     * the column name for the unit field
+     * the column name for the item_id field
      */
-    const COL_UNIT = 'ingredient.unit';
+    const COL_ITEM_ID = 'recipe_item.item_id';
 
     /**
-     * the column name for the removed field
+     * the column name for the quantity field
      */
-    const COL_REMOVED = 'ingredient.removed';
+    const COL_QUANTITY = 'recipe_item.quantity';
 
     /**
      * the column name for the created_at field
      */
-    const COL_CREATED_AT = 'ingredient.created_at';
+    const COL_CREATED_AT = 'recipe_item.created_at';
 
     /**
      * the column name for the updated_at field
      */
-    const COL_UPDATED_AT = 'ingredient.updated_at';
+    const COL_UPDATED_AT = 'recipe_item.updated_at';
 
     /**
      * The default string format for model objects of the related table
@@ -112,10 +112,10 @@ class IngredientTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'Unit', 'Removed', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'name', 'unit', 'removed', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(IngredientTableMap::COL_ID, IngredientTableMap::COL_NAME, IngredientTableMap::COL_UNIT, IngredientTableMap::COL_REMOVED, IngredientTableMap::COL_CREATED_AT, IngredientTableMap::COL_UPDATED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'name', 'unit', 'removed', 'created_at', 'updated_at', ),
+        self::TYPE_PHPNAME       => array('Id', 'RecipeId', 'ItemId', 'Quantity', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'recipeId', 'itemId', 'quantity', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(RecipeItemTableMap::COL_ID, RecipeItemTableMap::COL_RECIPE_ID, RecipeItemTableMap::COL_ITEM_ID, RecipeItemTableMap::COL_QUANTITY, RecipeItemTableMap::COL_CREATED_AT, RecipeItemTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'recipe_id', 'item_id', 'quantity', 'created_at', 'updated_at', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
@@ -126,10 +126,10 @@ class IngredientTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Unit' => 2, 'Removed' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'unit' => 2, 'removed' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        self::TYPE_COLNAME       => array(IngredientTableMap::COL_ID => 0, IngredientTableMap::COL_NAME => 1, IngredientTableMap::COL_UNIT => 2, IngredientTableMap::COL_REMOVED => 3, IngredientTableMap::COL_CREATED_AT => 4, IngredientTableMap::COL_UPDATED_AT => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'unit' => 2, 'removed' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'RecipeId' => 1, 'ItemId' => 2, 'Quantity' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'recipeId' => 1, 'itemId' => 2, 'quantity' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        self::TYPE_COLNAME       => array(RecipeItemTableMap::COL_ID => 0, RecipeItemTableMap::COL_RECIPE_ID => 1, RecipeItemTableMap::COL_ITEM_ID => 2, RecipeItemTableMap::COL_QUANTITY => 3, RecipeItemTableMap::COL_CREATED_AT => 4, RecipeItemTableMap::COL_UPDATED_AT => 5, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'recipe_id' => 1, 'item_id' => 2, 'quantity' => 3, 'created_at' => 4, 'updated_at' => 5, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
@@ -143,17 +143,17 @@ class IngredientTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('ingredient');
-        $this->setPhpName('Ingredient');
+        $this->setName('recipe_item');
+        $this->setPhpName('RecipeItem');
         $this->setIdentifierQuoting(false);
-        $this->setClassName('\\Lib\\Ingredient');
+        $this->setClassName('\\Lib\\RecipeItem');
         $this->setPackage('Lib');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('name', 'Name', 'VARCHAR', false, 150, null);
-        $this->addColumn('unit', 'Unit', 'VARCHAR', false, 150, null);
-        $this->addColumn('removed', 'Removed', 'BOOLEAN', false, 1, false);
+        $this->addForeignKey('recipe_id', 'RecipeId', 'INTEGER', 'recipe', 'id', true, null, null);
+        $this->addForeignKey('item_id', 'ItemId', 'INTEGER', 'item', 'id', true, null, null);
+        $this->addColumn('quantity', 'Quantity', 'FLOAT', true, 10, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -163,13 +163,20 @@ class IngredientTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('RecipeIngredient', '\\Lib\\RecipeIngredient', RelationMap::ONE_TO_MANY, array (
+        $this->addRelation('Recipe', '\\Lib\\Recipe', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
-    0 => ':ingredient_id',
+    0 => ':recipe_id',
     1 => ':id',
   ),
-), null, null, 'RecipeIngredients', false);
+), null, null, null, false);
+        $this->addRelation('Item', '\\Lib\\Item', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':item_id',
+    1 => ':id',
+  ),
+), null, null, null, false);
     } // buildRelations()
 
     /**
@@ -242,7 +249,7 @@ class IngredientTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? IngredientTableMap::CLASS_DEFAULT : IngredientTableMap::OM_CLASS;
+        return $withPrefix ? RecipeItemTableMap::CLASS_DEFAULT : RecipeItemTableMap::OM_CLASS;
     }
 
     /**
@@ -256,22 +263,22 @@ class IngredientTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (Ingredient object, last column rank)
+     * @return array           (RecipeItem object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = IngredientTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = IngredientTableMap::getInstanceFromPool($key))) {
+        $key = RecipeItemTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = RecipeItemTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + IngredientTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + RecipeItemTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = IngredientTableMap::OM_CLASS;
-            /** @var Ingredient $obj */
+            $cls = RecipeItemTableMap::OM_CLASS;
+            /** @var RecipeItem $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            IngredientTableMap::addInstanceToPool($obj, $key);
+            RecipeItemTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -294,18 +301,18 @@ class IngredientTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = IngredientTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = IngredientTableMap::getInstanceFromPool($key))) {
+            $key = RecipeItemTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = RecipeItemTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var Ingredient $obj */
+                /** @var RecipeItem $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                IngredientTableMap::addInstanceToPool($obj, $key);
+                RecipeItemTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -326,17 +333,17 @@ class IngredientTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(IngredientTableMap::COL_ID);
-            $criteria->addSelectColumn(IngredientTableMap::COL_NAME);
-            $criteria->addSelectColumn(IngredientTableMap::COL_UNIT);
-            $criteria->addSelectColumn(IngredientTableMap::COL_REMOVED);
-            $criteria->addSelectColumn(IngredientTableMap::COL_CREATED_AT);
-            $criteria->addSelectColumn(IngredientTableMap::COL_UPDATED_AT);
+            $criteria->addSelectColumn(RecipeItemTableMap::COL_ID);
+            $criteria->addSelectColumn(RecipeItemTableMap::COL_RECIPE_ID);
+            $criteria->addSelectColumn(RecipeItemTableMap::COL_ITEM_ID);
+            $criteria->addSelectColumn(RecipeItemTableMap::COL_QUANTITY);
+            $criteria->addSelectColumn(RecipeItemTableMap::COL_CREATED_AT);
+            $criteria->addSelectColumn(RecipeItemTableMap::COL_UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.name');
-            $criteria->addSelectColumn($alias . '.unit');
-            $criteria->addSelectColumn($alias . '.removed');
+            $criteria->addSelectColumn($alias . '.recipe_id');
+            $criteria->addSelectColumn($alias . '.item_id');
+            $criteria->addSelectColumn($alias . '.quantity');
             $criteria->addSelectColumn($alias . '.created_at');
             $criteria->addSelectColumn($alias . '.updated_at');
         }
@@ -351,7 +358,7 @@ class IngredientTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(IngredientTableMap::DATABASE_NAME)->getTable(IngredientTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(RecipeItemTableMap::DATABASE_NAME)->getTable(RecipeItemTableMap::TABLE_NAME);
     }
 
     /**
@@ -359,16 +366,16 @@ class IngredientTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(IngredientTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(IngredientTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new IngredientTableMap());
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(RecipeItemTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(RecipeItemTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new RecipeItemTableMap());
         }
     }
 
     /**
-     * Performs a DELETE on the database, given a Ingredient or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a RecipeItem or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Ingredient object or primary key or array of primary keys
+     * @param mixed               $values Criteria or RecipeItem object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param  ConnectionInterface $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -379,27 +386,27 @@ class IngredientTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(IngredientTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(RecipeItemTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Lib\Ingredient) { // it's a model object
+        } elseif ($values instanceof \Lib\RecipeItem) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(IngredientTableMap::DATABASE_NAME);
-            $criteria->add(IngredientTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(RecipeItemTableMap::DATABASE_NAME);
+            $criteria->add(RecipeItemTableMap::COL_ID, (array) $values, Criteria::IN);
         }
 
-        $query = IngredientQuery::create()->mergeWith($criteria);
+        $query = RecipeItemQuery::create()->mergeWith($criteria);
 
         if ($values instanceof Criteria) {
-            IngredientTableMap::clearInstancePool();
+            RecipeItemTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
             foreach ((array) $values as $singleval) {
-                IngredientTableMap::removeInstanceFromPool($singleval);
+                RecipeItemTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -407,20 +414,20 @@ class IngredientTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the ingredient table.
+     * Deletes all rows from the recipe_item table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return IngredientQuery::create()->doDeleteAll($con);
+        return RecipeItemQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Ingredient or Criteria object.
+     * Performs an INSERT on the database, given a RecipeItem or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Ingredient object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or RecipeItem object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -429,22 +436,22 @@ class IngredientTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(IngredientTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(RecipeItemTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Ingredient object
+            $criteria = $criteria->buildCriteria(); // build Criteria from RecipeItem object
         }
 
-        if ($criteria->containsKey(IngredientTableMap::COL_ID) && $criteria->keyContainsValue(IngredientTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.IngredientTableMap::COL_ID.')');
+        if ($criteria->containsKey(RecipeItemTableMap::COL_ID) && $criteria->keyContainsValue(RecipeItemTableMap::COL_ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.RecipeItemTableMap::COL_ID.')');
         }
 
 
         // Set the correct dbName
-        $query = IngredientQuery::create()->mergeWith($criteria);
+        $query = RecipeItemQuery::create()->mergeWith($criteria);
 
         // use transaction because $criteria could contain info
         // for more than one table (I guess, conceivably)
@@ -453,7 +460,7 @@ class IngredientTableMap extends TableMap
         });
     }
 
-} // IngredientTableMap
+} // RecipeItemTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-IngredientTableMap::buildTableMap();
+RecipeItemTableMap::buildTableMap();

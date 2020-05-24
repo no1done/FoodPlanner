@@ -88,6 +88,13 @@ abstract class ListRecipe implements ActiveRecordInterface
     protected $recipe_id;
 
     /**
+     * The value for the ref field.
+     *
+     * @var        string
+     */
+    protected $ref;
+
+    /**
      * The value for the serves field.
      *
      * @var        int
@@ -382,6 +389,16 @@ abstract class ListRecipe implements ActiveRecordInterface
     }
 
     /**
+     * Get the [ref] column value.
+     *
+     * @return string
+     */
+    public function getRef()
+    {
+        return $this->ref;
+    }
+
+    /**
      * Get the [serves] column value.
      *
      * @return int
@@ -500,6 +517,26 @@ abstract class ListRecipe implements ActiveRecordInterface
     } // setRecipeId()
 
     /**
+     * Set the value of [ref] column.
+     *
+     * @param string $v new value
+     * @return $this|\Lib\ListRecipe The current object (for fluent API support)
+     */
+    public function setRef($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->ref !== $v) {
+            $this->ref = $v;
+            $this->modifiedColumns[ListRecipeTableMap::COL_REF] = true;
+        }
+
+        return $this;
+    } // setRef()
+
+    /**
      * Set the value of [serves] column.
      *
      * @param int $v new value
@@ -604,16 +641,19 @@ abstract class ListRecipe implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ListRecipeTableMap::translateFieldName('RecipeId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->recipe_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ListRecipeTableMap::translateFieldName('Serves', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ListRecipeTableMap::translateFieldName('Ref', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->ref = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ListRecipeTableMap::translateFieldName('Serves', TableMap::TYPE_PHPNAME, $indexType)];
             $this->serves = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ListRecipeTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ListRecipeTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ListRecipeTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ListRecipeTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -626,7 +666,7 @@ abstract class ListRecipe implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = ListRecipeTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = ListRecipeTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Lib\\ListRecipe'), 0, $e);
@@ -876,6 +916,9 @@ abstract class ListRecipe implements ActiveRecordInterface
         if ($this->isColumnModified(ListRecipeTableMap::COL_RECIPE_ID)) {
             $modifiedColumns[':p' . $index++]  = 'recipe_id';
         }
+        if ($this->isColumnModified(ListRecipeTableMap::COL_REF)) {
+            $modifiedColumns[':p' . $index++]  = 'ref';
+        }
         if ($this->isColumnModified(ListRecipeTableMap::COL_SERVES)) {
             $modifiedColumns[':p' . $index++]  = 'serves';
         }
@@ -904,6 +947,9 @@ abstract class ListRecipe implements ActiveRecordInterface
                         break;
                     case 'recipe_id':
                         $stmt->bindValue($identifier, $this->recipe_id, PDO::PARAM_INT);
+                        break;
+                    case 'ref':
+                        $stmt->bindValue($identifier, $this->ref, PDO::PARAM_STR);
                         break;
                     case 'serves':
                         $stmt->bindValue($identifier, $this->serves, PDO::PARAM_INT);
@@ -986,12 +1032,15 @@ abstract class ListRecipe implements ActiveRecordInterface
                 return $this->getRecipeId();
                 break;
             case 3:
-                return $this->getServes();
+                return $this->getRef();
                 break;
             case 4:
-                return $this->getCreatedAt();
+                return $this->getServes();
                 break;
             case 5:
+                return $this->getCreatedAt();
+                break;
+            case 6:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1027,16 +1076,17 @@ abstract class ListRecipe implements ActiveRecordInterface
             $keys[0] => $this->getId(),
             $keys[1] => $this->getShoppingListId(),
             $keys[2] => $this->getRecipeId(),
-            $keys[3] => $this->getServes(),
-            $keys[4] => $this->getCreatedAt(),
-            $keys[5] => $this->getUpdatedAt(),
+            $keys[3] => $this->getRef(),
+            $keys[4] => $this->getServes(),
+            $keys[5] => $this->getCreatedAt(),
+            $keys[6] => $this->getUpdatedAt(),
         );
-        if ($result[$keys[4]] instanceof \DateTimeInterface) {
-            $result[$keys[4]] = $result[$keys[4]]->format('c');
-        }
-
         if ($result[$keys[5]] instanceof \DateTimeInterface) {
             $result[$keys[5]] = $result[$keys[5]]->format('c');
+        }
+
+        if ($result[$keys[6]] instanceof \DateTimeInterface) {
+            $result[$keys[6]] = $result[$keys[6]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1119,12 +1169,15 @@ abstract class ListRecipe implements ActiveRecordInterface
                 $this->setRecipeId($value);
                 break;
             case 3:
-                $this->setServes($value);
+                $this->setRef($value);
                 break;
             case 4:
-                $this->setCreatedAt($value);
+                $this->setServes($value);
                 break;
             case 5:
+                $this->setCreatedAt($value);
+                break;
+            case 6:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1163,13 +1216,16 @@ abstract class ListRecipe implements ActiveRecordInterface
             $this->setRecipeId($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setServes($arr[$keys[3]]);
+            $this->setRef($arr[$keys[3]]);
         }
         if (array_key_exists($keys[4], $arr)) {
-            $this->setCreatedAt($arr[$keys[4]]);
+            $this->setServes($arr[$keys[4]]);
         }
         if (array_key_exists($keys[5], $arr)) {
-            $this->setUpdatedAt($arr[$keys[5]]);
+            $this->setCreatedAt($arr[$keys[5]]);
+        }
+        if (array_key_exists($keys[6], $arr)) {
+            $this->setUpdatedAt($arr[$keys[6]]);
         }
     }
 
@@ -1220,6 +1276,9 @@ abstract class ListRecipe implements ActiveRecordInterface
         }
         if ($this->isColumnModified(ListRecipeTableMap::COL_RECIPE_ID)) {
             $criteria->add(ListRecipeTableMap::COL_RECIPE_ID, $this->recipe_id);
+        }
+        if ($this->isColumnModified(ListRecipeTableMap::COL_REF)) {
+            $criteria->add(ListRecipeTableMap::COL_REF, $this->ref);
         }
         if ($this->isColumnModified(ListRecipeTableMap::COL_SERVES)) {
             $criteria->add(ListRecipeTableMap::COL_SERVES, $this->serves);
@@ -1318,6 +1377,7 @@ abstract class ListRecipe implements ActiveRecordInterface
     {
         $copyObj->setShoppingListId($this->getShoppingListId());
         $copyObj->setRecipeId($this->getRecipeId());
+        $copyObj->setRef($this->getRef());
         $copyObj->setServes($this->getServes());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -1467,6 +1527,7 @@ abstract class ListRecipe implements ActiveRecordInterface
         $this->id = null;
         $this->shopping_list_id = null;
         $this->recipe_id = null;
+        $this->ref = null;
         $this->serves = null;
         $this->created_at = null;
         $this->updated_at = null;
