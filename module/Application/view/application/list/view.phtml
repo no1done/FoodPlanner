@@ -19,7 +19,29 @@ use Lib\ShoppingListItem;
             </div>
             <div class="card-body">
 
+                <form action="<?= $this->url('list', ['action' => 'addItem', 'id' => $list->getId()]); ?>"
+                      method="POST">
 
+                    <div class="form-group">
+                        <label for="item_id">Item</label>
+                        <select class="form-control select2" name="item_id" id="item_id">
+                            <?php foreach ($this->items as $item) : ?>
+                                <option value="<?= $item->getId(); ?>">
+                                    <?= $item->getName(); ?> (<?= $item->getUnit(); ?>)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quantity">Quantity</label>
+                        <input type="text" class="form-control" name="quantity" id="quantity" />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary float-right">
+                        Add to List
+                    </button>
+                </form>
 
             </div>
         </div>

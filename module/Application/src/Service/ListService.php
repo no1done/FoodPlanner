@@ -59,6 +59,29 @@ class ListService {
     }
 
     /**
+     * Add a single item to a shopping list
+     *
+     * @param ShoppingList $list
+     * @param int $item_id
+     * @param float $quantity
+     * @return ShoppingListItem
+     * @throws PropelException
+     */
+    public function addSingleItem(
+        ShoppingList $list,
+        int $item_id,
+        float $quantity
+    ) {
+        $listItem = new ShoppingListItem();
+        $listItem->setQuantity($quantity)
+            ->setShoppingList($list)
+            ->setItemId($item_id)
+            ->save();
+
+        return $listItem;
+    }
+
+    /**
      * @param ShoppingList $list
      * @return ShoppingListItem[]|ObjectCollection
      * @throws PropelException

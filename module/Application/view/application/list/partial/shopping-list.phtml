@@ -17,7 +17,7 @@ use Lib\ShoppingListItem;
                 />
             </td>
             <td><?= $item->getItem()->getName(); ?></td>
-            <td><?= $item->getVirtualColumn('total'); ?> <?= $item->getItem()->getUnit(); ?></td>
+            <td><?= round($item->getVirtualColumn('total'), 2); ?> <?= $item->getItem()->getUnit(); ?></td>
             <td>
                 <button type="button"
                         class="btn btn-outline-danger btn-sm item-delete-btn"
