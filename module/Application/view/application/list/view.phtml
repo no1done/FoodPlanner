@@ -1,3 +1,8 @@
+<?php
+
+use Lib\ShoppingListItem;
+
+?>
 
 <div class="row">
     <div class="col">
@@ -10,22 +15,11 @@
 
         <div class="card mt-3">
             <div class="card-header">
-                Recipes in List
+                Add Single Item
             </div>
-            <div class="table-responsive">
+            <div class="card-body">
 
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Serves</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
 
-                    </tbody>
-                </table>
 
             </div>
         </div>
@@ -37,7 +31,13 @@
             <div class="card-header">
                 Full Shopping List
             </div>
-            <div class="card-body">
+            <div class="table-responsive" style="max-height: 600px; overflow: auto;">
+
+                <?= $this->partial('shopping/list', [
+                    'items' => $this->shoppingList,
+                    'list' => $list
+                ]); ?>
+
 
             </div>
         </div>

@@ -9,6 +9,7 @@ use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\Plugin\FlashMessenger\FlashMessenger;
 use Laminas\View\Model\ViewModel;
+use Lib\Item;
 use Lib\ItemQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use RuntimeException;

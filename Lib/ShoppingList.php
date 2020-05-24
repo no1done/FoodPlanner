@@ -15,31 +15,5 @@ use Lib\Base\ShoppingList as BaseShoppingList;
  */
 class ShoppingList extends BaseShoppingList
 {
-    public function getFullItemList()
-    {
-        $recipes = $this->getListRecipesJoinRecipe();
 
-        $items = [];
-
-        /** @var ListRecipe $recipe */
-        foreach ($recipes as $recipe) {
-            $recipeItems = $recipe->getRecipe()->getRecipeItems();
-
-            /** @var  $item */
-            foreach ($recipeItems as $recipeItem) {
-
-
-                if (!isset($items[$recipeItem->getItem()->getId()])) {
-                    $items[$recipeItem->getItem()->getId()] =
-                        $recipeItem->getItem()->toArray();
-                }
-
-                $items[
-                $recipeItem->getItem()->getId()
-                ]['total'] += $recipeItem->getQuantity() * $recipe->getServes();
-            }
-        }
-
-        return $items;
-    }
 }

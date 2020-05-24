@@ -25,6 +25,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildShoppingListItemQuery orderByItemId($order = Criteria::ASC) Order by the item_id column
  * @method     ChildShoppingListItemQuery orderByQuantity($order = Criteria::ASC) Order by the quantity column
  * @method     ChildShoppingListItemQuery orderByRef($order = Criteria::ASC) Order by the ref column
+ * @method     ChildShoppingListItemQuery orderByPurchased($order = Criteria::ASC) Order by the purchased column
  * @method     ChildShoppingListItemQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildShoppingListItemQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -33,6 +34,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildShoppingListItemQuery groupByItemId() Group by the item_id column
  * @method     ChildShoppingListItemQuery groupByQuantity() Group by the quantity column
  * @method     ChildShoppingListItemQuery groupByRef() Group by the ref column
+ * @method     ChildShoppingListItemQuery groupByPurchased() Group by the purchased column
  * @method     ChildShoppingListItemQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildShoppingListItemQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -74,6 +76,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildShoppingListItem findOneByItemId(int $item_id) Return the first ChildShoppingListItem filtered by the item_id column
  * @method     ChildShoppingListItem findOneByQuantity(double $quantity) Return the first ChildShoppingListItem filtered by the quantity column
  * @method     ChildShoppingListItem findOneByRef(string $ref) Return the first ChildShoppingListItem filtered by the ref column
+ * @method     ChildShoppingListItem findOneByPurchased(boolean $purchased) Return the first ChildShoppingListItem filtered by the purchased column
  * @method     ChildShoppingListItem findOneByCreatedAt(string $created_at) Return the first ChildShoppingListItem filtered by the created_at column
  * @method     ChildShoppingListItem findOneByUpdatedAt(string $updated_at) Return the first ChildShoppingListItem filtered by the updated_at column *
 
@@ -85,6 +88,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildShoppingListItem requireOneByItemId(int $item_id) Return the first ChildShoppingListItem filtered by the item_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildShoppingListItem requireOneByQuantity(double $quantity) Return the first ChildShoppingListItem filtered by the quantity column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildShoppingListItem requireOneByRef(string $ref) Return the first ChildShoppingListItem filtered by the ref column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildShoppingListItem requireOneByPurchased(boolean $purchased) Return the first ChildShoppingListItem filtered by the purchased column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildShoppingListItem requireOneByCreatedAt(string $created_at) Return the first ChildShoppingListItem filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildShoppingListItem requireOneByUpdatedAt(string $updated_at) Return the first ChildShoppingListItem filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
@@ -94,6 +98,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildShoppingListItem[]|ObjectCollection findByItemId(int $item_id) Return ChildShoppingListItem objects filtered by the item_id column
  * @method     ChildShoppingListItem[]|ObjectCollection findByQuantity(double $quantity) Return ChildShoppingListItem objects filtered by the quantity column
  * @method     ChildShoppingListItem[]|ObjectCollection findByRef(string $ref) Return ChildShoppingListItem objects filtered by the ref column
+ * @method     ChildShoppingListItem[]|ObjectCollection findByPurchased(boolean $purchased) Return ChildShoppingListItem objects filtered by the purchased column
  * @method     ChildShoppingListItem[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildShoppingListItem objects filtered by the created_at column
  * @method     ChildShoppingListItem[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildShoppingListItem objects filtered by the updated_at column
  * @method     ChildShoppingListItem[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
@@ -194,7 +199,7 @@ abstract class ShoppingListItemQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, shopping_list_id, item_id, quantity, ref, created_at, updated_at FROM shopping_list_item WHERE id = :p0';
+        $sql = 'SELECT id, shopping_list_id, item_id, quantity, ref, purchased, created_at, updated_at FROM shopping_list_item WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -475,6 +480,33 @@ abstract class ShoppingListItemQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ShoppingListItemTableMap::COL_REF, $ref, $comparison);
+    }
+
+    /**
+     * Filter the query on the purchased column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPurchased(true); // WHERE purchased = true
+     * $query->filterByPurchased('yes'); // WHERE purchased = true
+     * </code>
+     *
+     * @param     boolean|string $purchased The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildShoppingListItemQuery The current query, for fluid interface
+     */
+    public function filterByPurchased($purchased = null, $comparison = null)
+    {
+        if (is_string($purchased)) {
+            $purchased = in_array(strtolower($purchased), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(ShoppingListItemTableMap::COL_PURCHASED, $purchased, $comparison);
     }
 
     /**

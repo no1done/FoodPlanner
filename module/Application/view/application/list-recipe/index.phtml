@@ -1,6 +1,7 @@
 <?php
 
 use Lib\ShoppingList;
+use Lib\ShoppingListItem;
 
 /** @var ShoppingList $list */
 $list = $this->list;
@@ -25,7 +26,7 @@ $list = $this->list;
 
                     <div class="form-group">
                         <label for="recipe_id">Select Recipe</label>
-                        <select class="form-control" name="recipe_id" id="recipe_id">
+                        <select class="form-control select2" name="recipe_id" id="recipe_id">
                             <?php foreach ($this->recipes as $recipe) : ?>
                                 <option value="<?= $recipe->getId(); ?>">
                                     <?= $recipe->getName(); ?>
@@ -98,16 +99,10 @@ $list = $this->list;
             <div class="table-responsive" style="max-height: 650px; overflow: auto;">
 
 
-                <table class="table table-condensed">
-                    <tbody>
-                        <?php foreach ($list->getFullItemList() as $item) : ?>
-                            <tr>
-                                <td><?= $item['Name']; ?></td>
-                                <td><?= $item['total']; ?> <?= $item['Unit']; ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                <?= $this->partial('shopping/list', [
+                    'items' => $this->shoppingList,
+                    'list' => $list
+                ]); ?>
 
             </div>
         </div>
@@ -115,4 +110,3 @@ $list = $this->list;
     </div>
 
 </div>
-

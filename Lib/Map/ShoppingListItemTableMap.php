@@ -58,7 +58,7 @@ class ShoppingListItemTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 8;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class ShoppingListItemTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 8;
 
     /**
      * the column name for the id field
@@ -96,6 +96,11 @@ class ShoppingListItemTableMap extends TableMap
     const COL_REF = 'shopping_list_item.ref';
 
     /**
+     * the column name for the purchased field
+     */
+    const COL_PURCHASED = 'shopping_list_item.purchased';
+
+    /**
      * the column name for the created_at field
      */
     const COL_CREATED_AT = 'shopping_list_item.created_at';
@@ -117,11 +122,11 @@ class ShoppingListItemTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'ShoppingListId', 'ItemId', 'Quantity', 'Ref', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'shoppingListId', 'itemId', 'quantity', 'ref', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ShoppingListItemTableMap::COL_ID, ShoppingListItemTableMap::COL_SHOPPING_LIST_ID, ShoppingListItemTableMap::COL_ITEM_ID, ShoppingListItemTableMap::COL_QUANTITY, ShoppingListItemTableMap::COL_REF, ShoppingListItemTableMap::COL_CREATED_AT, ShoppingListItemTableMap::COL_UPDATED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'shopping_list_id', 'item_id', 'quantity', 'ref', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id', 'ShoppingListId', 'ItemId', 'Quantity', 'Ref', 'Purchased', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'shoppingListId', 'itemId', 'quantity', 'ref', 'purchased', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ShoppingListItemTableMap::COL_ID, ShoppingListItemTableMap::COL_SHOPPING_LIST_ID, ShoppingListItemTableMap::COL_ITEM_ID, ShoppingListItemTableMap::COL_QUANTITY, ShoppingListItemTableMap::COL_REF, ShoppingListItemTableMap::COL_PURCHASED, ShoppingListItemTableMap::COL_CREATED_AT, ShoppingListItemTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'shopping_list_id', 'item_id', 'quantity', 'ref', 'purchased', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -131,11 +136,11 @@ class ShoppingListItemTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'ShoppingListId' => 1, 'ItemId' => 2, 'Quantity' => 3, 'Ref' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'shoppingListId' => 1, 'itemId' => 2, 'quantity' => 3, 'ref' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        self::TYPE_COLNAME       => array(ShoppingListItemTableMap::COL_ID => 0, ShoppingListItemTableMap::COL_SHOPPING_LIST_ID => 1, ShoppingListItemTableMap::COL_ITEM_ID => 2, ShoppingListItemTableMap::COL_QUANTITY => 3, ShoppingListItemTableMap::COL_REF => 4, ShoppingListItemTableMap::COL_CREATED_AT => 5, ShoppingListItemTableMap::COL_UPDATED_AT => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'shopping_list_id' => 1, 'item_id' => 2, 'quantity' => 3, 'ref' => 4, 'created_at' => 5, 'updated_at' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ShoppingListId' => 1, 'ItemId' => 2, 'Quantity' => 3, 'Ref' => 4, 'Purchased' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'shoppingListId' => 1, 'itemId' => 2, 'quantity' => 3, 'ref' => 4, 'purchased' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
+        self::TYPE_COLNAME       => array(ShoppingListItemTableMap::COL_ID => 0, ShoppingListItemTableMap::COL_SHOPPING_LIST_ID => 1, ShoppingListItemTableMap::COL_ITEM_ID => 2, ShoppingListItemTableMap::COL_QUANTITY => 3, ShoppingListItemTableMap::COL_REF => 4, ShoppingListItemTableMap::COL_PURCHASED => 5, ShoppingListItemTableMap::COL_CREATED_AT => 6, ShoppingListItemTableMap::COL_UPDATED_AT => 7, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'shopping_list_id' => 1, 'item_id' => 2, 'quantity' => 3, 'ref' => 4, 'purchased' => 5, 'created_at' => 6, 'updated_at' => 7, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -160,6 +165,7 @@ class ShoppingListItemTableMap extends TableMap
         $this->addForeignKey('item_id', 'ItemId', 'INTEGER', 'item', 'id', true, null, null);
         $this->addColumn('quantity', 'Quantity', 'FLOAT', true, 10, null);
         $this->addColumn('ref', 'Ref', 'VARCHAR', false, 20, null);
+        $this->addColumn('purchased', 'Purchased', 'BOOLEAN', false, 1, false);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -344,6 +350,7 @@ class ShoppingListItemTableMap extends TableMap
             $criteria->addSelectColumn(ShoppingListItemTableMap::COL_ITEM_ID);
             $criteria->addSelectColumn(ShoppingListItemTableMap::COL_QUANTITY);
             $criteria->addSelectColumn(ShoppingListItemTableMap::COL_REF);
+            $criteria->addSelectColumn(ShoppingListItemTableMap::COL_PURCHASED);
             $criteria->addSelectColumn(ShoppingListItemTableMap::COL_CREATED_AT);
             $criteria->addSelectColumn(ShoppingListItemTableMap::COL_UPDATED_AT);
         } else {
@@ -352,6 +359,7 @@ class ShoppingListItemTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.item_id');
             $criteria->addSelectColumn($alias . '.quantity');
             $criteria->addSelectColumn($alias . '.ref');
+            $criteria->addSelectColumn($alias . '.purchased');
             $criteria->addSelectColumn($alias . '.created_at');
             $criteria->addSelectColumn($alias . '.updated_at');
         }

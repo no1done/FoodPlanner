@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Application\Controller;
 
+use Application\Service\ListService;
 use Exception;
 use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
@@ -21,6 +22,18 @@ use RuntimeException;
  */
 class ListController extends AbstractActionController
 {
+    /** @var ListService */
+    protected ListService $listService;
+
+    /**
+     * ListController constructor.
+     * @param ListService $listService
+     */
+    public function __construct(ListService $listService)
+    {
+        $this->listService = $listService;
+    }
+
     /**
      * List all shopping lists
      *
@@ -51,7 +64,8 @@ class ListController extends AbstractActionController
             if (!$list) throw new RuntimeException("List does not exist");
 
             return [
-                'list' => ShoppingListQuery::create()->findPk($id)
+                'list' => ShoppingListQuery::create()->findPk($id),
+                'shoppingList' => $this->listService->getShopList($list)
             ];
         } catch (Exception $e) {
             $this->flashMessenger()->addErrorMessage($e->getMessage());
