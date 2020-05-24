@@ -21,6 +21,12 @@ $recipe = $this->recipe;
         <div class="card mt-3">
             <div class="card-header">
                 Instructions
+
+                <a href="<?= $this->url('recipe', ['id' => $recipe->getId(), 'action' => 'print']); ?>"
+                   class="btn btn-warning btn-sm float-right">
+                    Print View
+                </a>
+
             </div>
             <div class="card-body">
                 <?= $this->recipe->getInstructions(); ?>
