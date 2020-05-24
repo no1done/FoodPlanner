@@ -5,21 +5,18 @@ namespace Lib\Base;
 use \DateTime;
 use \Exception;
 use \PDO;
-use Lib\ListRecipe as ChildListRecipe;
-use Lib\ListRecipeQuery as ChildListRecipeQuery;
+use Lib\Item as ChildItem;
+use Lib\ItemQuery as ChildItemQuery;
 use Lib\ShoppingList as ChildShoppingList;
 use Lib\ShoppingListItem as ChildShoppingListItem;
 use Lib\ShoppingListItemQuery as ChildShoppingListItemQuery;
 use Lib\ShoppingListQuery as ChildShoppingListQuery;
-use Lib\Map\ListRecipeTableMap;
 use Lib\Map\ShoppingListItemTableMap;
-use Lib\Map\ShoppingListTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
-use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
@@ -29,18 +26,18 @@ use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
 
 /**
- * Base class that represents a row from the 'shopping_list' table.
+ * Base class that represents a row from the 'shopping_list_item' table.
  *
  *
  *
  * @package    propel.generator.Lib.Base
  */
-abstract class ShoppingList implements ActiveRecordInterface
+abstract class ShoppingListItem implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Lib\\Map\\ShoppingListTableMap';
+    const TABLE_MAP = '\\Lib\\Map\\ShoppingListItemTableMap';
 
 
     /**
@@ -77,19 +74,40 @@ abstract class ShoppingList implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the name field.
+     * The value for the shopping_list_id field.
+     *
+     * @var        int
+     */
+    protected $shopping_list_id;
+
+    /**
+     * The value for the item_id field.
+     *
+     * @var        int
+     */
+    protected $item_id;
+
+    /**
+     * The value for the quantity field.
+     *
+     * @var        double
+     */
+    protected $quantity;
+
+    /**
+     * The value for the ref field.
      *
      * @var        string
      */
-    protected $name;
+    protected $ref;
 
     /**
-     * The value for the removed field.
+     * The value for the purchased field.
      *
      * Note: this column has a database default value of: false
      * @var        boolean
      */
-    protected $removed;
+    protected $purchased;
 
     /**
      * The value for the created_at field.
@@ -106,16 +124,14 @@ abstract class ShoppingList implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * @var        ObjectCollection|ChildListRecipe[] Collection to store aggregation of ChildListRecipe objects.
+     * @var        ChildShoppingList
      */
-    protected $collListRecipes;
-    protected $collListRecipesPartial;
+    protected $aShoppingList;
 
     /**
-     * @var        ObjectCollection|ChildShoppingListItem[] Collection to store aggregation of ChildShoppingListItem objects.
+     * @var        ChildItem
      */
-    protected $collShoppingListItems;
-    protected $collShoppingListItemsPartial;
+    protected $aItem;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -126,18 +142,6 @@ abstract class ShoppingList implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildListRecipe[]
-     */
-    protected $listRecipesScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildShoppingListItem[]
-     */
-    protected $shoppingListItemsScheduledForDeletion = null;
-
-    /**
      * Applies default values to this object.
      * This method should be called from the object's constructor (or
      * equivalent initialization method).
@@ -145,11 +149,11 @@ abstract class ShoppingList implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
-        $this->removed = false;
+        $this->purchased = false;
     }
 
     /**
-     * Initializes internal state of Lib\Base\ShoppingList object.
+     * Initializes internal state of Lib\Base\ShoppingListItem object.
      * @see applyDefaults()
      */
     public function __construct()
@@ -246,9 +250,9 @@ abstract class ShoppingList implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>ShoppingList</code> instance.  If
-     * <code>obj</code> is an instance of <code>ShoppingList</code>, delegates to
-     * <code>equals(ShoppingList)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>ShoppingListItem</code> instance.  If
+     * <code>obj</code> is an instance of <code>ShoppingListItem</code>, delegates to
+     * <code>equals(ShoppingListItem)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -314,7 +318,7 @@ abstract class ShoppingList implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return $this|ShoppingList The current object, for fluid interface
+     * @return $this|ShoppingListItem The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -386,33 +390,63 @@ abstract class ShoppingList implements ActiveRecordInterface
     }
 
     /**
-     * Get the [name] column value.
+     * Get the [shopping_list_id] column value.
+     *
+     * @return int
+     */
+    public function getShoppingListId()
+    {
+        return $this->shopping_list_id;
+    }
+
+    /**
+     * Get the [item_id] column value.
+     *
+     * @return int
+     */
+    public function getItemId()
+    {
+        return $this->item_id;
+    }
+
+    /**
+     * Get the [quantity] column value.
+     *
+     * @return double
+     */
+    public function getQuantity()
+    {
+        return $this->quantity;
+    }
+
+    /**
+     * Get the [ref] column value.
      *
      * @return string
      */
-    public function getName()
+    public function getRef()
     {
-        return $this->name;
+        return $this->ref;
     }
 
     /**
-     * Get the [removed] column value.
+     * Get the [purchased] column value.
      *
      * @return boolean
      */
-    public function getRemoved()
+    public function getPurchased()
     {
-        return $this->removed;
+        return $this->purchased;
     }
 
     /**
-     * Get the [removed] column value.
+     * Get the [purchased] column value.
      *
      * @return boolean
      */
-    public function isRemoved()
+    public function isPurchased()
     {
-        return $this->getRemoved();
+        return $this->getPurchased();
     }
 
     /**
@@ -459,7 +493,7 @@ abstract class ShoppingList implements ActiveRecordInterface
      * Set the value of [id] column.
      *
      * @param int $v new value
-     * @return $this|\Lib\ShoppingList The current object (for fluent API support)
+     * @return $this|\Lib\ShoppingListItem The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -469,43 +503,111 @@ abstract class ShoppingList implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[ShoppingListTableMap::COL_ID] = true;
+            $this->modifiedColumns[ShoppingListItemTableMap::COL_ID] = true;
         }
 
         return $this;
     } // setId()
 
     /**
-     * Set the value of [name] column.
+     * Set the value of [shopping_list_id] column.
+     *
+     * @param int $v new value
+     * @return $this|\Lib\ShoppingListItem The current object (for fluent API support)
+     */
+    public function setShoppingListId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->shopping_list_id !== $v) {
+            $this->shopping_list_id = $v;
+            $this->modifiedColumns[ShoppingListItemTableMap::COL_SHOPPING_LIST_ID] = true;
+        }
+
+        if ($this->aShoppingList !== null && $this->aShoppingList->getId() !== $v) {
+            $this->aShoppingList = null;
+        }
+
+        return $this;
+    } // setShoppingListId()
+
+    /**
+     * Set the value of [item_id] column.
+     *
+     * @param int $v new value
+     * @return $this|\Lib\ShoppingListItem The current object (for fluent API support)
+     */
+    public function setItemId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->item_id !== $v) {
+            $this->item_id = $v;
+            $this->modifiedColumns[ShoppingListItemTableMap::COL_ITEM_ID] = true;
+        }
+
+        if ($this->aItem !== null && $this->aItem->getId() !== $v) {
+            $this->aItem = null;
+        }
+
+        return $this;
+    } // setItemId()
+
+    /**
+     * Set the value of [quantity] column.
+     *
+     * @param double $v new value
+     * @return $this|\Lib\ShoppingListItem The current object (for fluent API support)
+     */
+    public function setQuantity($v)
+    {
+        if ($v !== null) {
+            $v = (double) $v;
+        }
+
+        if ($this->quantity !== $v) {
+            $this->quantity = $v;
+            $this->modifiedColumns[ShoppingListItemTableMap::COL_QUANTITY] = true;
+        }
+
+        return $this;
+    } // setQuantity()
+
+    /**
+     * Set the value of [ref] column.
      *
      * @param string $v new value
-     * @return $this|\Lib\ShoppingList The current object (for fluent API support)
+     * @return $this|\Lib\ShoppingListItem The current object (for fluent API support)
      */
-    public function setName($v)
+    public function setRef($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->name !== $v) {
-            $this->name = $v;
-            $this->modifiedColumns[ShoppingListTableMap::COL_NAME] = true;
+        if ($this->ref !== $v) {
+            $this->ref = $v;
+            $this->modifiedColumns[ShoppingListItemTableMap::COL_REF] = true;
         }
 
         return $this;
-    } // setName()
+    } // setRef()
 
     /**
-     * Sets the value of the [removed] column.
+     * Sets the value of the [purchased] column.
      * Non-boolean arguments are converted using the following rules:
      *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
      *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
      * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
      *
      * @param  boolean|integer|string $v The new value
-     * @return $this|\Lib\ShoppingList The current object (for fluent API support)
+     * @return $this|\Lib\ShoppingListItem The current object (for fluent API support)
      */
-    public function setRemoved($v)
+    public function setPurchased($v)
     {
         if ($v !== null) {
             if (is_string($v)) {
@@ -515,20 +617,20 @@ abstract class ShoppingList implements ActiveRecordInterface
             }
         }
 
-        if ($this->removed !== $v) {
-            $this->removed = $v;
-            $this->modifiedColumns[ShoppingListTableMap::COL_REMOVED] = true;
+        if ($this->purchased !== $v) {
+            $this->purchased = $v;
+            $this->modifiedColumns[ShoppingListItemTableMap::COL_PURCHASED] = true;
         }
 
         return $this;
-    } // setRemoved()
+    } // setPurchased()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
      *               Empty strings are treated as NULL.
-     * @return $this|\Lib\ShoppingList The current object (for fluent API support)
+     * @return $this|\Lib\ShoppingListItem The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -536,7 +638,7 @@ abstract class ShoppingList implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($this->created_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->created_at->format("Y-m-d H:i:s.u")) {
                 $this->created_at = $dt === null ? null : clone $dt;
-                $this->modifiedColumns[ShoppingListTableMap::COL_CREATED_AT] = true;
+                $this->modifiedColumns[ShoppingListItemTableMap::COL_CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -548,7 +650,7 @@ abstract class ShoppingList implements ActiveRecordInterface
      *
      * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
      *               Empty strings are treated as NULL.
-     * @return $this|\Lib\ShoppingList The current object (for fluent API support)
+     * @return $this|\Lib\ShoppingListItem The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -556,7 +658,7 @@ abstract class ShoppingList implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($this->updated_at === null || $dt === null || $dt->format("Y-m-d H:i:s.u") !== $this->updated_at->format("Y-m-d H:i:s.u")) {
                 $this->updated_at = $dt === null ? null : clone $dt;
-                $this->modifiedColumns[ShoppingListTableMap::COL_UPDATED_AT] = true;
+                $this->modifiedColumns[ShoppingListItemTableMap::COL_UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -573,7 +675,7 @@ abstract class ShoppingList implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->removed !== false) {
+            if ($this->purchased !== false) {
                 return false;
             }
 
@@ -603,22 +705,31 @@ abstract class ShoppingList implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ShoppingListTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ShoppingListItemTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ShoppingListTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->name = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ShoppingListItemTableMap::translateFieldName('ShoppingListId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->shopping_list_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ShoppingListTableMap::translateFieldName('Removed', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->removed = (null !== $col) ? (boolean) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ShoppingListItemTableMap::translateFieldName('ItemId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->item_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ShoppingListTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ShoppingListItemTableMap::translateFieldName('Quantity', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->quantity = (null !== $col) ? (double) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ShoppingListItemTableMap::translateFieldName('Ref', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->ref = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ShoppingListItemTableMap::translateFieldName('Purchased', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->purchased = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ShoppingListItemTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ShoppingListTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ShoppingListItemTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -631,10 +742,10 @@ abstract class ShoppingList implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = ShoppingListTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = ShoppingListItemTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException(sprintf('Error populating %s object', '\\Lib\\ShoppingList'), 0, $e);
+            throw new PropelException(sprintf('Error populating %s object', '\\Lib\\ShoppingListItem'), 0, $e);
         }
     }
 
@@ -653,6 +764,12 @@ abstract class ShoppingList implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aShoppingList !== null && $this->shopping_list_id !== $this->aShoppingList->getId()) {
+            $this->aShoppingList = null;
+        }
+        if ($this->aItem !== null && $this->item_id !== $this->aItem->getId()) {
+            $this->aItem = null;
+        }
     } // ensureConsistency
 
     /**
@@ -676,13 +793,13 @@ abstract class ShoppingList implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(ShoppingListTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ShoppingListItemTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildShoppingListQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildShoppingListItemQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -692,10 +809,8 @@ abstract class ShoppingList implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collListRecipes = null;
-
-            $this->collShoppingListItems = null;
-
+            $this->aShoppingList = null;
+            $this->aItem = null;
         } // if (deep)
     }
 
@@ -705,8 +820,8 @@ abstract class ShoppingList implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see ShoppingList::setDeleted()
-     * @see ShoppingList::isDeleted()
+     * @see ShoppingListItem::setDeleted()
+     * @see ShoppingListItem::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -715,11 +830,11 @@ abstract class ShoppingList implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ShoppingListTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ShoppingListItemTableMap::DATABASE_NAME);
         }
 
         $con->transaction(function () use ($con) {
-            $deleteQuery = ChildShoppingListQuery::create()
+            $deleteQuery = ChildShoppingListItemQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -754,7 +869,7 @@ abstract class ShoppingList implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ShoppingListTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ShoppingListItemTableMap::DATABASE_NAME);
         }
 
         return $con->transaction(function () use ($con) {
@@ -765,16 +880,16 @@ abstract class ShoppingList implements ActiveRecordInterface
                 // timestampable behavior
                 $time = time();
                 $highPrecision = \Propel\Runtime\Util\PropelDateTime::createHighPrecision();
-                if (!$this->isColumnModified(ShoppingListTableMap::COL_CREATED_AT)) {
+                if (!$this->isColumnModified(ShoppingListItemTableMap::COL_CREATED_AT)) {
                     $this->setCreatedAt($highPrecision);
                 }
-                if (!$this->isColumnModified(ShoppingListTableMap::COL_UPDATED_AT)) {
+                if (!$this->isColumnModified(ShoppingListItemTableMap::COL_UPDATED_AT)) {
                     $this->setUpdatedAt($highPrecision);
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(ShoppingListTableMap::COL_UPDATED_AT)) {
+                if ($this->isModified() && !$this->isColumnModified(ShoppingListItemTableMap::COL_UPDATED_AT)) {
                     $this->setUpdatedAt(\Propel\Runtime\Util\PropelDateTime::createHighPrecision());
                 }
             }
@@ -786,7 +901,7 @@ abstract class ShoppingList implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                ShoppingListTableMap::addInstanceToPool($this);
+                ShoppingListItemTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -812,6 +927,25 @@ abstract class ShoppingList implements ActiveRecordInterface
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their corresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aShoppingList !== null) {
+                if ($this->aShoppingList->isModified() || $this->aShoppingList->isNew()) {
+                    $affectedRows += $this->aShoppingList->save($con);
+                }
+                $this->setShoppingList($this->aShoppingList);
+            }
+
+            if ($this->aItem !== null) {
+                if ($this->aItem->isModified() || $this->aItem->isNew()) {
+                    $affectedRows += $this->aItem->save($con);
+                }
+                $this->setItem($this->aItem);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -821,40 +955,6 @@ abstract class ShoppingList implements ActiveRecordInterface
                     $affectedRows += $this->doUpdate($con);
                 }
                 $this->resetModified();
-            }
-
-            if ($this->listRecipesScheduledForDeletion !== null) {
-                if (!$this->listRecipesScheduledForDeletion->isEmpty()) {
-                    \Lib\ListRecipeQuery::create()
-                        ->filterByPrimaryKeys($this->listRecipesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->listRecipesScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collListRecipes !== null) {
-                foreach ($this->collListRecipes as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->shoppingListItemsScheduledForDeletion !== null) {
-                if (!$this->shoppingListItemsScheduledForDeletion->isEmpty()) {
-                    \Lib\ShoppingListItemQuery::create()
-                        ->filterByPrimaryKeys($this->shoppingListItemsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->shoppingListItemsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collShoppingListItems !== null) {
-                foreach ($this->collShoppingListItems as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
             }
 
             $this->alreadyInSave = false;
@@ -877,30 +977,39 @@ abstract class ShoppingList implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[ShoppingListTableMap::COL_ID] = true;
+        $this->modifiedColumns[ShoppingListItemTableMap::COL_ID] = true;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ShoppingListTableMap::COL_ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ShoppingListItemTableMap::COL_ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(ShoppingListTableMap::COL_ID)) {
+        if ($this->isColumnModified(ShoppingListItemTableMap::COL_ID)) {
             $modifiedColumns[':p' . $index++]  = 'id';
         }
-        if ($this->isColumnModified(ShoppingListTableMap::COL_NAME)) {
-            $modifiedColumns[':p' . $index++]  = 'name';
+        if ($this->isColumnModified(ShoppingListItemTableMap::COL_SHOPPING_LIST_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'shopping_list_id';
         }
-        if ($this->isColumnModified(ShoppingListTableMap::COL_REMOVED)) {
-            $modifiedColumns[':p' . $index++]  = 'removed';
+        if ($this->isColumnModified(ShoppingListItemTableMap::COL_ITEM_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'item_id';
         }
-        if ($this->isColumnModified(ShoppingListTableMap::COL_CREATED_AT)) {
+        if ($this->isColumnModified(ShoppingListItemTableMap::COL_QUANTITY)) {
+            $modifiedColumns[':p' . $index++]  = 'quantity';
+        }
+        if ($this->isColumnModified(ShoppingListItemTableMap::COL_REF)) {
+            $modifiedColumns[':p' . $index++]  = 'ref';
+        }
+        if ($this->isColumnModified(ShoppingListItemTableMap::COL_PURCHASED)) {
+            $modifiedColumns[':p' . $index++]  = 'purchased';
+        }
+        if ($this->isColumnModified(ShoppingListItemTableMap::COL_CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'created_at';
         }
-        if ($this->isColumnModified(ShoppingListTableMap::COL_UPDATED_AT)) {
+        if ($this->isColumnModified(ShoppingListItemTableMap::COL_UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'updated_at';
         }
 
         $sql = sprintf(
-            'INSERT INTO shopping_list (%s) VALUES (%s)',
+            'INSERT INTO shopping_list_item (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -912,11 +1021,20 @@ abstract class ShoppingList implements ActiveRecordInterface
                     case 'id':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'name':
-                        $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
+                    case 'shopping_list_id':
+                        $stmt->bindValue($identifier, $this->shopping_list_id, PDO::PARAM_INT);
                         break;
-                    case 'removed':
-                        $stmt->bindValue($identifier, (int) $this->removed, PDO::PARAM_INT);
+                    case 'item_id':
+                        $stmt->bindValue($identifier, $this->item_id, PDO::PARAM_INT);
+                        break;
+                    case 'quantity':
+                        $stmt->bindValue($identifier, $this->quantity, PDO::PARAM_STR);
+                        break;
+                    case 'ref':
+                        $stmt->bindValue($identifier, $this->ref, PDO::PARAM_STR);
+                        break;
+                    case 'purchased':
+                        $stmt->bindValue($identifier, (int) $this->purchased, PDO::PARAM_INT);
                         break;
                     case 'created_at':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
@@ -970,7 +1088,7 @@ abstract class ShoppingList implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = ShoppingListTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ShoppingListItemTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -990,15 +1108,24 @@ abstract class ShoppingList implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getName();
+                return $this->getShoppingListId();
                 break;
             case 2:
-                return $this->getRemoved();
+                return $this->getItemId();
                 break;
             case 3:
-                return $this->getCreatedAt();
+                return $this->getQuantity();
                 break;
             case 4:
+                return $this->getRef();
+                break;
+            case 5:
+                return $this->getPurchased();
+                break;
+            case 6:
+                return $this->getCreatedAt();
+                break;
+            case 7:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1025,24 +1152,27 @@ abstract class ShoppingList implements ActiveRecordInterface
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
 
-        if (isset($alreadyDumpedObjects['ShoppingList'][$this->hashCode()])) {
+        if (isset($alreadyDumpedObjects['ShoppingListItem'][$this->hashCode()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['ShoppingList'][$this->hashCode()] = true;
-        $keys = ShoppingListTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['ShoppingListItem'][$this->hashCode()] = true;
+        $keys = ShoppingListItemTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getName(),
-            $keys[2] => $this->getRemoved(),
-            $keys[3] => $this->getCreatedAt(),
-            $keys[4] => $this->getUpdatedAt(),
+            $keys[1] => $this->getShoppingListId(),
+            $keys[2] => $this->getItemId(),
+            $keys[3] => $this->getQuantity(),
+            $keys[4] => $this->getRef(),
+            $keys[5] => $this->getPurchased(),
+            $keys[6] => $this->getCreatedAt(),
+            $keys[7] => $this->getUpdatedAt(),
         );
-        if ($result[$keys[3]] instanceof \DateTimeInterface) {
-            $result[$keys[3]] = $result[$keys[3]]->format('c');
+        if ($result[$keys[6]] instanceof \DateTimeInterface) {
+            $result[$keys[6]] = $result[$keys[6]]->format('c');
         }
 
-        if ($result[$keys[4]] instanceof \DateTimeInterface) {
-            $result[$keys[4]] = $result[$keys[4]]->format('c');
+        if ($result[$keys[7]] instanceof \DateTimeInterface) {
+            $result[$keys[7]] = $result[$keys[7]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1051,35 +1181,35 @@ abstract class ShoppingList implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->collListRecipes) {
+            if (null !== $this->aShoppingList) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'listRecipes';
+                        $key = 'shoppingList';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'list_recipes';
+                        $key = 'shopping_list';
                         break;
                     default:
-                        $key = 'ListRecipes';
+                        $key = 'ShoppingList';
                 }
 
-                $result[$key] = $this->collListRecipes->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+                $result[$key] = $this->aShoppingList->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->collShoppingListItems) {
+            if (null !== $this->aItem) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'shoppingListItems';
+                        $key = 'item';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'shopping_list_items';
+                        $key = 'item';
                         break;
                     default:
-                        $key = 'ShoppingListItems';
+                        $key = 'Item';
                 }
 
-                $result[$key] = $this->collShoppingListItems->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+                $result[$key] = $this->aItem->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1095,11 +1225,11 @@ abstract class ShoppingList implements ActiveRecordInterface
      *                one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                Defaults to TableMap::TYPE_PHPNAME.
-     * @return $this|\Lib\ShoppingList
+     * @return $this|\Lib\ShoppingListItem
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = ShoppingListTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ShoppingListItemTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1110,7 +1240,7 @@ abstract class ShoppingList implements ActiveRecordInterface
      *
      * @param  int $pos position in xml schema
      * @param  mixed $value field value
-     * @return $this|\Lib\ShoppingList
+     * @return $this|\Lib\ShoppingListItem
      */
     public function setByPosition($pos, $value)
     {
@@ -1119,15 +1249,24 @@ abstract class ShoppingList implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setName($value);
+                $this->setShoppingListId($value);
                 break;
             case 2:
-                $this->setRemoved($value);
+                $this->setItemId($value);
                 break;
             case 3:
-                $this->setCreatedAt($value);
+                $this->setQuantity($value);
                 break;
             case 4:
+                $this->setRef($value);
+                break;
+            case 5:
+                $this->setPurchased($value);
+                break;
+            case 6:
+                $this->setCreatedAt($value);
+                break;
+            case 7:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1154,22 +1293,31 @@ abstract class ShoppingList implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = ShoppingListTableMap::getFieldNames($keyType);
+        $keys = ShoppingListItemTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
             $this->setId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setName($arr[$keys[1]]);
+            $this->setShoppingListId($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setRemoved($arr[$keys[2]]);
+            $this->setItemId($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setCreatedAt($arr[$keys[3]]);
+            $this->setQuantity($arr[$keys[3]]);
         }
         if (array_key_exists($keys[4], $arr)) {
-            $this->setUpdatedAt($arr[$keys[4]]);
+            $this->setRef($arr[$keys[4]]);
+        }
+        if (array_key_exists($keys[5], $arr)) {
+            $this->setPurchased($arr[$keys[5]]);
+        }
+        if (array_key_exists($keys[6], $arr)) {
+            $this->setCreatedAt($arr[$keys[6]]);
+        }
+        if (array_key_exists($keys[7], $arr)) {
+            $this->setUpdatedAt($arr[$keys[7]]);
         }
     }
 
@@ -1190,7 +1338,7 @@ abstract class ShoppingList implements ActiveRecordInterface
      * @param string $data The source data to import from
      * @param string $keyType The type of keys the array uses.
      *
-     * @return $this|\Lib\ShoppingList The current object, for fluid interface
+     * @return $this|\Lib\ShoppingListItem The current object, for fluid interface
      */
     public function importFrom($parser, $data, $keyType = TableMap::TYPE_PHPNAME)
     {
@@ -1210,22 +1358,31 @@ abstract class ShoppingList implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(ShoppingListTableMap::DATABASE_NAME);
+        $criteria = new Criteria(ShoppingListItemTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(ShoppingListTableMap::COL_ID)) {
-            $criteria->add(ShoppingListTableMap::COL_ID, $this->id);
+        if ($this->isColumnModified(ShoppingListItemTableMap::COL_ID)) {
+            $criteria->add(ShoppingListItemTableMap::COL_ID, $this->id);
         }
-        if ($this->isColumnModified(ShoppingListTableMap::COL_NAME)) {
-            $criteria->add(ShoppingListTableMap::COL_NAME, $this->name);
+        if ($this->isColumnModified(ShoppingListItemTableMap::COL_SHOPPING_LIST_ID)) {
+            $criteria->add(ShoppingListItemTableMap::COL_SHOPPING_LIST_ID, $this->shopping_list_id);
         }
-        if ($this->isColumnModified(ShoppingListTableMap::COL_REMOVED)) {
-            $criteria->add(ShoppingListTableMap::COL_REMOVED, $this->removed);
+        if ($this->isColumnModified(ShoppingListItemTableMap::COL_ITEM_ID)) {
+            $criteria->add(ShoppingListItemTableMap::COL_ITEM_ID, $this->item_id);
         }
-        if ($this->isColumnModified(ShoppingListTableMap::COL_CREATED_AT)) {
-            $criteria->add(ShoppingListTableMap::COL_CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(ShoppingListItemTableMap::COL_QUANTITY)) {
+            $criteria->add(ShoppingListItemTableMap::COL_QUANTITY, $this->quantity);
         }
-        if ($this->isColumnModified(ShoppingListTableMap::COL_UPDATED_AT)) {
-            $criteria->add(ShoppingListTableMap::COL_UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(ShoppingListItemTableMap::COL_REF)) {
+            $criteria->add(ShoppingListItemTableMap::COL_REF, $this->ref);
+        }
+        if ($this->isColumnModified(ShoppingListItemTableMap::COL_PURCHASED)) {
+            $criteria->add(ShoppingListItemTableMap::COL_PURCHASED, $this->purchased);
+        }
+        if ($this->isColumnModified(ShoppingListItemTableMap::COL_CREATED_AT)) {
+            $criteria->add(ShoppingListItemTableMap::COL_CREATED_AT, $this->created_at);
+        }
+        if ($this->isColumnModified(ShoppingListItemTableMap::COL_UPDATED_AT)) {
+            $criteria->add(ShoppingListItemTableMap::COL_UPDATED_AT, $this->updated_at);
         }
 
         return $criteria;
@@ -1243,8 +1400,8 @@ abstract class ShoppingList implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = ChildShoppingListQuery::create();
-        $criteria->add(ShoppingListTableMap::COL_ID, $this->id);
+        $criteria = ChildShoppingListItemQuery::create();
+        $criteria->add(ShoppingListItemTableMap::COL_ID, $this->id);
 
         return $criteria;
     }
@@ -1306,37 +1463,20 @@ abstract class ShoppingList implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Lib\ShoppingList (or compatible) type.
+     * @param      object $copyObj An object of \Lib\ShoppingListItem (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setName($this->getName());
-        $copyObj->setRemoved($this->getRemoved());
+        $copyObj->setShoppingListId($this->getShoppingListId());
+        $copyObj->setItemId($this->getItemId());
+        $copyObj->setQuantity($this->getQuantity());
+        $copyObj->setRef($this->getRef());
+        $copyObj->setPurchased($this->getPurchased());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
-
-        if ($deepCopy) {
-            // important: temporarily setNew(false) because this affects the behavior of
-            // the getter/setter methods for fkey referrer objects.
-            $copyObj->setNew(false);
-
-            foreach ($this->getListRecipes() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addListRecipe($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getShoppingListItems() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addShoppingListItem($relObj->copy($deepCopy));
-                }
-            }
-
-        } // if ($deepCopy)
-
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1352,7 +1492,7 @@ abstract class ShoppingList implements ActiveRecordInterface
      * objects.
      *
      * @param  boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return \Lib\ShoppingList Clone of current object.
+     * @return \Lib\ShoppingListItem Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1365,525 +1505,106 @@ abstract class ShoppingList implements ActiveRecordInterface
         return $copyObj;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a ChildShoppingList object.
      *
-     * @param      string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-        if ('ListRecipe' == $relationName) {
-            $this->initListRecipes();
-            return;
-        }
-        if ('ShoppingListItem' == $relationName) {
-            $this->initShoppingListItems();
-            return;
-        }
-    }
-
-    /**
-     * Clears out the collListRecipes collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addListRecipes()
-     */
-    public function clearListRecipes()
-    {
-        $this->collListRecipes = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collListRecipes collection loaded partially.
-     */
-    public function resetPartialListRecipes($v = true)
-    {
-        $this->collListRecipesPartial = $v;
-    }
-
-    /**
-     * Initializes the collListRecipes collection.
-     *
-     * By default this just sets the collListRecipes collection to an empty array (like clearcollListRecipes());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initListRecipes($overrideExisting = true)
-    {
-        if (null !== $this->collListRecipes && !$overrideExisting) {
-            return;
-        }
-
-        $collectionClassName = ListRecipeTableMap::getTableMap()->getCollectionClassName();
-
-        $this->collListRecipes = new $collectionClassName;
-        $this->collListRecipes->setModel('\Lib\ListRecipe');
-    }
-
-    /**
-     * Gets an array of ChildListRecipe objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildShoppingList is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildListRecipe[] List of ChildListRecipe objects
+     * @param  ChildShoppingList $v
+     * @return $this|\Lib\ShoppingListItem The current object (for fluent API support)
      * @throws PropelException
      */
-    public function getListRecipes(Criteria $criteria = null, ConnectionInterface $con = null)
+    public function setShoppingList(ChildShoppingList $v = null)
     {
-        $partial = $this->collListRecipesPartial && !$this->isNew();
-        if (null === $this->collListRecipes || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collListRecipes) {
-                // return empty collection
-                $this->initListRecipes();
-            } else {
-                $collListRecipes = ChildListRecipeQuery::create(null, $criteria)
-                    ->filterByShoppingList($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collListRecipesPartial && count($collListRecipes)) {
-                        $this->initListRecipes(false);
-
-                        foreach ($collListRecipes as $obj) {
-                            if (false == $this->collListRecipes->contains($obj)) {
-                                $this->collListRecipes->append($obj);
-                            }
-                        }
-
-                        $this->collListRecipesPartial = true;
-                    }
-
-                    return $collListRecipes;
-                }
-
-                if ($partial && $this->collListRecipes) {
-                    foreach ($this->collListRecipes as $obj) {
-                        if ($obj->isNew()) {
-                            $collListRecipes[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collListRecipes = $collListRecipes;
-                $this->collListRecipesPartial = false;
-            }
+        if ($v === null) {
+            $this->setShoppingListId(NULL);
+        } else {
+            $this->setShoppingListId($v->getId());
         }
 
-        return $this->collListRecipes;
-    }
+        $this->aShoppingList = $v;
 
-    /**
-     * Sets a collection of ChildListRecipe objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $listRecipes A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildShoppingList The current object (for fluent API support)
-     */
-    public function setListRecipes(Collection $listRecipes, ConnectionInterface $con = null)
-    {
-        /** @var ChildListRecipe[] $listRecipesToDelete */
-        $listRecipesToDelete = $this->getListRecipes(new Criteria(), $con)->diff($listRecipes);
-
-
-        $this->listRecipesScheduledForDeletion = $listRecipesToDelete;
-
-        foreach ($listRecipesToDelete as $listRecipeRemoved) {
-            $listRecipeRemoved->setShoppingList(null);
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildShoppingList object, it will not be re-added.
+        if ($v !== null) {
+            $v->addShoppingListItem($this);
         }
 
-        $this->collListRecipes = null;
-        foreach ($listRecipes as $listRecipe) {
-            $this->addListRecipe($listRecipe);
-        }
-
-        $this->collListRecipes = $listRecipes;
-        $this->collListRecipesPartial = false;
 
         return $this;
     }
 
+
     /**
-     * Returns the number of related ListRecipe objects.
+     * Get the associated ChildShoppingList object
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related ListRecipe objects.
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildShoppingList The associated ChildShoppingList object.
      * @throws PropelException
      */
-    public function countListRecipes(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function getShoppingList(ConnectionInterface $con = null)
     {
-        $partial = $this->collListRecipesPartial && !$this->isNew();
-        if (null === $this->collListRecipes || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collListRecipes) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getListRecipes());
-            }
-
-            $query = ChildListRecipeQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByShoppingList($this)
-                ->count($con);
+        if ($this->aShoppingList === null && ($this->shopping_list_id != 0)) {
+            $this->aShoppingList = ChildShoppingListQuery::create()->findPk($this->shopping_list_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aShoppingList->addShoppingListItems($this);
+             */
         }
 
-        return count($this->collListRecipes);
+        return $this->aShoppingList;
     }
 
     /**
-     * Method called to associate a ChildListRecipe object to this object
-     * through the ChildListRecipe foreign key attribute.
+     * Declares an association between this object and a ChildItem object.
      *
-     * @param  ChildListRecipe $l ChildListRecipe
-     * @return $this|\Lib\ShoppingList The current object (for fluent API support)
-     */
-    public function addListRecipe(ChildListRecipe $l)
-    {
-        if ($this->collListRecipes === null) {
-            $this->initListRecipes();
-            $this->collListRecipesPartial = true;
-        }
-
-        if (!$this->collListRecipes->contains($l)) {
-            $this->doAddListRecipe($l);
-
-            if ($this->listRecipesScheduledForDeletion and $this->listRecipesScheduledForDeletion->contains($l)) {
-                $this->listRecipesScheduledForDeletion->remove($this->listRecipesScheduledForDeletion->search($l));
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param ChildListRecipe $listRecipe The ChildListRecipe object to add.
-     */
-    protected function doAddListRecipe(ChildListRecipe $listRecipe)
-    {
-        $this->collListRecipes[]= $listRecipe;
-        $listRecipe->setShoppingList($this);
-    }
-
-    /**
-     * @param  ChildListRecipe $listRecipe The ChildListRecipe object to remove.
-     * @return $this|ChildShoppingList The current object (for fluent API support)
-     */
-    public function removeListRecipe(ChildListRecipe $listRecipe)
-    {
-        if ($this->getListRecipes()->contains($listRecipe)) {
-            $pos = $this->collListRecipes->search($listRecipe);
-            $this->collListRecipes->remove($pos);
-            if (null === $this->listRecipesScheduledForDeletion) {
-                $this->listRecipesScheduledForDeletion = clone $this->collListRecipes;
-                $this->listRecipesScheduledForDeletion->clear();
-            }
-            $this->listRecipesScheduledForDeletion[]= clone $listRecipe;
-            $listRecipe->setShoppingList(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this ShoppingList is new, it will return
-     * an empty collection; or if this ShoppingList has previously
-     * been saved, it will retrieve related ListRecipes from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in ShoppingList.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildListRecipe[] List of ChildListRecipe objects
-     */
-    public function getListRecipesJoinRecipe(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildListRecipeQuery::create(null, $criteria);
-        $query->joinWith('Recipe', $joinBehavior);
-
-        return $this->getListRecipes($query, $con);
-    }
-
-    /**
-     * Clears out the collShoppingListItems collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addShoppingListItems()
-     */
-    public function clearShoppingListItems()
-    {
-        $this->collShoppingListItems = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collShoppingListItems collection loaded partially.
-     */
-    public function resetPartialShoppingListItems($v = true)
-    {
-        $this->collShoppingListItemsPartial = $v;
-    }
-
-    /**
-     * Initializes the collShoppingListItems collection.
-     *
-     * By default this just sets the collShoppingListItems collection to an empty array (like clearcollShoppingListItems());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initShoppingListItems($overrideExisting = true)
-    {
-        if (null !== $this->collShoppingListItems && !$overrideExisting) {
-            return;
-        }
-
-        $collectionClassName = ShoppingListItemTableMap::getTableMap()->getCollectionClassName();
-
-        $this->collShoppingListItems = new $collectionClassName;
-        $this->collShoppingListItems->setModel('\Lib\ShoppingListItem');
-    }
-
-    /**
-     * Gets an array of ChildShoppingListItem objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildShoppingList is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildShoppingListItem[] List of ChildShoppingListItem objects
+     * @param  ChildItem $v
+     * @return $this|\Lib\ShoppingListItem The current object (for fluent API support)
      * @throws PropelException
      */
-    public function getShoppingListItems(Criteria $criteria = null, ConnectionInterface $con = null)
+    public function setItem(ChildItem $v = null)
     {
-        $partial = $this->collShoppingListItemsPartial && !$this->isNew();
-        if (null === $this->collShoppingListItems || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collShoppingListItems) {
-                // return empty collection
-                $this->initShoppingListItems();
-            } else {
-                $collShoppingListItems = ChildShoppingListItemQuery::create(null, $criteria)
-                    ->filterByShoppingList($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collShoppingListItemsPartial && count($collShoppingListItems)) {
-                        $this->initShoppingListItems(false);
-
-                        foreach ($collShoppingListItems as $obj) {
-                            if (false == $this->collShoppingListItems->contains($obj)) {
-                                $this->collShoppingListItems->append($obj);
-                            }
-                        }
-
-                        $this->collShoppingListItemsPartial = true;
-                    }
-
-                    return $collShoppingListItems;
-                }
-
-                if ($partial && $this->collShoppingListItems) {
-                    foreach ($this->collShoppingListItems as $obj) {
-                        if ($obj->isNew()) {
-                            $collShoppingListItems[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collShoppingListItems = $collShoppingListItems;
-                $this->collShoppingListItemsPartial = false;
-            }
+        if ($v === null) {
+            $this->setItemId(NULL);
+        } else {
+            $this->setItemId($v->getId());
         }
 
-        return $this->collShoppingListItems;
-    }
+        $this->aItem = $v;
 
-    /**
-     * Sets a collection of ChildShoppingListItem objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $shoppingListItems A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildShoppingList The current object (for fluent API support)
-     */
-    public function setShoppingListItems(Collection $shoppingListItems, ConnectionInterface $con = null)
-    {
-        /** @var ChildShoppingListItem[] $shoppingListItemsToDelete */
-        $shoppingListItemsToDelete = $this->getShoppingListItems(new Criteria(), $con)->diff($shoppingListItems);
-
-
-        $this->shoppingListItemsScheduledForDeletion = $shoppingListItemsToDelete;
-
-        foreach ($shoppingListItemsToDelete as $shoppingListItemRemoved) {
-            $shoppingListItemRemoved->setShoppingList(null);
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildItem object, it will not be re-added.
+        if ($v !== null) {
+            $v->addShoppingListItem($this);
         }
 
-        $this->collShoppingListItems = null;
-        foreach ($shoppingListItems as $shoppingListItem) {
-            $this->addShoppingListItem($shoppingListItem);
-        }
-
-        $this->collShoppingListItems = $shoppingListItems;
-        $this->collShoppingListItemsPartial = false;
 
         return $this;
     }
 
+
     /**
-     * Returns the number of related ShoppingListItem objects.
+     * Get the associated ChildItem object
      *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related ShoppingListItem objects.
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildItem The associated ChildItem object.
      * @throws PropelException
      */
-    public function countShoppingListItems(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function getItem(ConnectionInterface $con = null)
     {
-        $partial = $this->collShoppingListItemsPartial && !$this->isNew();
-        if (null === $this->collShoppingListItems || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collShoppingListItems) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getShoppingListItems());
-            }
-
-            $query = ChildShoppingListItemQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByShoppingList($this)
-                ->count($con);
+        if ($this->aItem === null && ($this->item_id != 0)) {
+            $this->aItem = ChildItemQuery::create()->findPk($this->item_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aItem->addShoppingListItems($this);
+             */
         }
 
-        return count($this->collShoppingListItems);
-    }
-
-    /**
-     * Method called to associate a ChildShoppingListItem object to this object
-     * through the ChildShoppingListItem foreign key attribute.
-     *
-     * @param  ChildShoppingListItem $l ChildShoppingListItem
-     * @return $this|\Lib\ShoppingList The current object (for fluent API support)
-     */
-    public function addShoppingListItem(ChildShoppingListItem $l)
-    {
-        if ($this->collShoppingListItems === null) {
-            $this->initShoppingListItems();
-            $this->collShoppingListItemsPartial = true;
-        }
-
-        if (!$this->collShoppingListItems->contains($l)) {
-            $this->doAddShoppingListItem($l);
-
-            if ($this->shoppingListItemsScheduledForDeletion and $this->shoppingListItemsScheduledForDeletion->contains($l)) {
-                $this->shoppingListItemsScheduledForDeletion->remove($this->shoppingListItemsScheduledForDeletion->search($l));
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param ChildShoppingListItem $shoppingListItem The ChildShoppingListItem object to add.
-     */
-    protected function doAddShoppingListItem(ChildShoppingListItem $shoppingListItem)
-    {
-        $this->collShoppingListItems[]= $shoppingListItem;
-        $shoppingListItem->setShoppingList($this);
-    }
-
-    /**
-     * @param  ChildShoppingListItem $shoppingListItem The ChildShoppingListItem object to remove.
-     * @return $this|ChildShoppingList The current object (for fluent API support)
-     */
-    public function removeShoppingListItem(ChildShoppingListItem $shoppingListItem)
-    {
-        if ($this->getShoppingListItems()->contains($shoppingListItem)) {
-            $pos = $this->collShoppingListItems->search($shoppingListItem);
-            $this->collShoppingListItems->remove($pos);
-            if (null === $this->shoppingListItemsScheduledForDeletion) {
-                $this->shoppingListItemsScheduledForDeletion = clone $this->collShoppingListItems;
-                $this->shoppingListItemsScheduledForDeletion->clear();
-            }
-            $this->shoppingListItemsScheduledForDeletion[]= clone $shoppingListItem;
-            $shoppingListItem->setShoppingList(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this ShoppingList is new, it will return
-     * an empty collection; or if this ShoppingList has previously
-     * been saved, it will retrieve related ShoppingListItems from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in ShoppingList.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildShoppingListItem[] List of ChildShoppingListItem objects
-     */
-    public function getShoppingListItemsJoinItem(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildShoppingListItemQuery::create(null, $criteria);
-        $query->joinWith('Item', $joinBehavior);
-
-        return $this->getShoppingListItems($query, $con);
+        return $this->aItem;
     }
 
     /**
@@ -1893,9 +1614,18 @@ abstract class ShoppingList implements ActiveRecordInterface
      */
     public function clear()
     {
+        if (null !== $this->aShoppingList) {
+            $this->aShoppingList->removeShoppingListItem($this);
+        }
+        if (null !== $this->aItem) {
+            $this->aItem->removeShoppingListItem($this);
+        }
         $this->id = null;
-        $this->name = null;
-        $this->removed = null;
+        $this->shopping_list_id = null;
+        $this->item_id = null;
+        $this->quantity = null;
+        $this->ref = null;
+        $this->purchased = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -1917,20 +1647,10 @@ abstract class ShoppingList implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collListRecipes) {
-                foreach ($this->collListRecipes as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
-            if ($this->collShoppingListItems) {
-                foreach ($this->collShoppingListItems as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
         } // if ($deep)
 
-        $this->collListRecipes = null;
-        $this->collShoppingListItems = null;
+        $this->aShoppingList = null;
+        $this->aItem = null;
     }
 
     /**
@@ -1940,7 +1660,7 @@ abstract class ShoppingList implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(ShoppingListTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(ShoppingListItemTableMap::DEFAULT_STRING_FORMAT);
     }
 
     // timestampable behavior
@@ -1948,11 +1668,11 @@ abstract class ShoppingList implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     $this|ChildShoppingList The current object (for fluent API support)
+     * @return     $this|ChildShoppingListItem The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[ShoppingListTableMap::COL_UPDATED_AT] = true;
+        $this->modifiedColumns[ShoppingListItemTableMap::COL_UPDATED_AT] = true;
 
         return $this;
     }

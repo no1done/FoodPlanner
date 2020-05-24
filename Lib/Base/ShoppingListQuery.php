@@ -50,7 +50,17 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildShoppingListQuery rightJoinWithListRecipe() Adds a RIGHT JOIN clause and with to the query using the ListRecipe relation
  * @method     ChildShoppingListQuery innerJoinWithListRecipe() Adds a INNER JOIN clause and with to the query using the ListRecipe relation
  *
- * @method     \Lib\ListRecipeQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     ChildShoppingListQuery leftJoinShoppingListItem($relationAlias = null) Adds a LEFT JOIN clause to the query using the ShoppingListItem relation
+ * @method     ChildShoppingListQuery rightJoinShoppingListItem($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ShoppingListItem relation
+ * @method     ChildShoppingListQuery innerJoinShoppingListItem($relationAlias = null) Adds a INNER JOIN clause to the query using the ShoppingListItem relation
+ *
+ * @method     ChildShoppingListQuery joinWithShoppingListItem($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the ShoppingListItem relation
+ *
+ * @method     ChildShoppingListQuery leftJoinWithShoppingListItem() Adds a LEFT JOIN clause and with to the query using the ShoppingListItem relation
+ * @method     ChildShoppingListQuery rightJoinWithShoppingListItem() Adds a RIGHT JOIN clause and with to the query using the ShoppingListItem relation
+ * @method     ChildShoppingListQuery innerJoinWithShoppingListItem() Adds a INNER JOIN clause and with to the query using the ShoppingListItem relation
+ *
+ * @method     \Lib\ListRecipeQuery|\Lib\ShoppingListItemQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildShoppingList findOne(ConnectionInterface $con = null) Return the first ChildShoppingList matching the query
  * @method     ChildShoppingList findOneOrCreate(ConnectionInterface $con = null) Return the first ChildShoppingList matching the query, or a new ChildShoppingList object populated from the query conditions when no match is found
@@ -514,6 +524,79 @@ abstract class ShoppingListQuery extends ModelCriteria
         return $this
             ->joinListRecipe($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'ListRecipe', '\Lib\ListRecipeQuery');
+    }
+
+    /**
+     * Filter the query by a related \Lib\ShoppingListItem object
+     *
+     * @param \Lib\ShoppingListItem|ObjectCollection $shoppingListItem the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildShoppingListQuery The current query, for fluid interface
+     */
+    public function filterByShoppingListItem($shoppingListItem, $comparison = null)
+    {
+        if ($shoppingListItem instanceof \Lib\ShoppingListItem) {
+            return $this
+                ->addUsingAlias(ShoppingListTableMap::COL_ID, $shoppingListItem->getShoppingListId(), $comparison);
+        } elseif ($shoppingListItem instanceof ObjectCollection) {
+            return $this
+                ->useShoppingListItemQuery()
+                ->filterByPrimaryKeys($shoppingListItem->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByShoppingListItem() only accepts arguments of type \Lib\ShoppingListItem or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ShoppingListItem relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildShoppingListQuery The current query, for fluid interface
+     */
+    public function joinShoppingListItem($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ShoppingListItem');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ShoppingListItem');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ShoppingListItem relation ShoppingListItem object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \Lib\ShoppingListItemQuery A secondary query class using the current class as primary query
+     */
+    public function useShoppingListItemQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinShoppingListItem($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ShoppingListItem', '\Lib\ShoppingListItemQuery');
     }
 
     /**

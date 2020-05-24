@@ -7,10 +7,10 @@ namespace Application\Controller;
 use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\Plugin\FlashMessenger\FlashMessenger;
-use Lib\IngredientQuery;
-use Lib\Recipe;
-use Lib\RecipeIngredient;
-use Lib\RecipeIngredientQuery;
+use Laminas\View\Model\ViewModel;
+use Lib\ItemQuery;
+use Lib\RecipeItem;
+use Lib\RecipeItemQuery;
 use Lib\RecipeQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use RuntimeException;
@@ -21,28 +21,31 @@ use Exception;
  * @method FlashMessenger flashMessenger()
  * @package Application\Controller
  */
-class RecipeIngredientController extends AbstractActionController
+class RecipeItemController extends AbstractActionController
 {
+    /**
+     * @return array|Response|ViewModel
+     */
     public function indexAction()
     {
         try {
             $recipe_id = $this->params()->fromRoute('recipe_id');
 
             $recipe = RecipeQuery::create()
-                ->leftJoinWithRecipeIngredient()
+                ->leftJoinWithRecipeItem()
                 ->findPk($recipe_id);
 
             if (!$recipe) throw new RuntimeException(
                 "Recipe does not exist"
             );
 
-            $ingredients = IngredientQuery::create()
+            $items = ItemQuery::create()
                 ->orderByName(Criteria::ASC)
                 ->findByRemoved(false);
 
             return [
                 'recipe' => $recipe,
-                'ingredients' => $ingredients
+                'items' => $items
             ];
         } catch (Exception $e) {
             $this->flashMessenger()->addErrorMessage($e->getMessage());
@@ -50,6 +53,9 @@ class RecipeIngredientController extends AbstractActionController
         }
     }
 
+    /**
+     * @return Response
+     */
     public function addAction()
     {
         $post = $this->params()->fromPost();
@@ -57,30 +63,30 @@ class RecipeIngredientController extends AbstractActionController
 
         try {
 
-            $ing = IngredientQuery::create()->findPk($post['ingredient_id']);
+            $ing = ItemQuery::create()->findPk($post['item_id']);
             $recipe = RecipeQuery::create()->findPk($recipe_id);
 
             if (!$ing || !$recipe) {
                 throw new RuntimeException(
-                    'Ingredient or Recipe did not exist.'
+                    'Item or Recipe did not exist.'
                 );
             }
 
-            $total = RecipeIngredientQuery::create()
+            $total = RecipeItemQuery::create()
                 ->filterByRecipeId($recipe_id)
-                ->filterByIngredientId($post['ingredient_id'])
+                ->filterByItemId($post['item_id'])
                 ->count();
 
             if ($total > 0) {
                 throw new RuntimeException(
-                    'Ingredient is already in the recipe'
+                    'Item is already in the recipe'
                 );
             }
 
-            $recipeIngredient = new RecipeIngredient();
-            $recipeIngredient
+            $recipeItem = new RecipeItem();
+            $recipeItem
                 ->setRecipe($recipe)
-                ->setIngredient($ing)
+                ->setItem($ing)
                 ->setQuantity($post['quantity'])
                 ->save();
 
@@ -92,25 +98,28 @@ class RecipeIngredientController extends AbstractActionController
             $this->flashMessenger()->addErrorMessage($e->getMessage());
         }
 
-        return $this->redirect()->toRoute('recipe-ingredient', [
+        return $this->redirect()->toRoute('recipe-item', [
             'recipe_id' => $recipe_id
         ]);
     }
 
+    /**
+     * @return Response
+     */
     public function removeAction()
     {
         $recipe_id = $this->params()->fromRoute('recipe_id');
-        $recipe_ingredient_id = $this->params()->fromRoute('id');
+        $recipe_item_id = $this->params()->fromRoute('id');
 
         try {
-            $ri = RecipeIngredientQuery::create()->findPk($recipe_ingredient_id);
+            $ri = RecipeItemQuery::create()->findPk($recipe_item_id);
 
             if (!$ri) throw new RuntimeException(
-                'Recipe ingredient ID does not exist.'
+                'Recipe item ID does not exist.'
             );
 
             $recipeName = $ri->getRecipe()->getName();
-            $ingName = $ri->getIngredient()->getName();
+            $ingName = $ri->getItem()->getName();
 
             $ri->delete();
 
@@ -122,7 +131,7 @@ class RecipeIngredientController extends AbstractActionController
             $this->flashMessenger()->addErrorMessage($e->getMessage());
         }
 
-        return $this->redirect()->toRoute('recipe-ingredient', [
+        return $this->redirect()->toRoute('recipe-item', [
             'recipe_id' => $recipe_id
         ]);
     }

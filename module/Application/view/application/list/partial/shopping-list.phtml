@@ -1,0 +1,83 @@
+<?php
+use Lib\ShoppingListItem;
+?>
+
+<table class="table table-striped">
+    <tbody>
+    <?php
+    /** @var ShoppingListItem $item */
+    foreach ($this->items as $item) : ?>
+        <tr id="row_<?= $item->getItemId(); ?>_<?= $this->list->getId(); ?>">
+            <td>
+                <input type="checkbox"
+                       class="mark-item-checked"
+                       data-id="<?= $item->getItemId(); ?>"
+                       data-list-id="<?= $this->list->getId(); ?>"
+                       <?= !$item->isPurchased() ?: 'checked'; ?>
+                />
+            </td>
+            <td><?= $item->getItem()->getName(); ?></td>
+            <td><?= round($item->getVirtualColumn('total'), 2); ?> <?= $item->getItem()->getUnit(); ?></td>
+            <td>
+                <button type="button"
+                        class="btn btn-outline-danger btn-sm item-delete-btn"
+                        data-id="<?= $item->getItemId(); ?>"
+                        data-list-id="<?= $this->list->getId(); ?>"
+                >
+                    X
+                </button>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+</table>
+
+<script type="text/javascript">
+    $(function() {
+        $('.item-delete-btn').on('click', function(){
+
+            let id = $(this).data('id')
+            let listId = $(this).data('list-id')
+
+            $.post("/shopping/item/remove", {
+                listId: listId,
+                itemId: id
+            }, async function(data) {
+
+                if (data.status === 'error') {
+                    alert(data.message);
+                } else {
+
+                    // Remove the row
+                    $('#row_' + id + '_' + listId).remove();
+
+                }
+
+            });
+
+        });
+
+
+        $('.mark-item-checked').on('change', function() {
+
+            let checked = this.checked;
+
+            let id = $(this).data('id')
+            let listId = $(this).data('list-id')
+            let postUrl = '';
+
+            $.post("/shopping/item/checked", {
+                listId: listId,
+                itemId: id,
+                checked: checked
+            }, async function(data) {
+
+                if (data.status === 'error') {
+                    alert(data.message);
+                }
+
+            });
+
+        });
+    })
+</script>

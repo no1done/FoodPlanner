@@ -2,10 +2,10 @@
 
 namespace Lib;
 
-use Lib\Base\IngredientQuery as BaseIngredientQuery;
+use Lib\Base\RecipeItemQuery as BaseRecipeItemQuery;
 
 /**
- * Skeleton subclass for performing query and update operations on the 'ingredient' table.
+ * Skeleton subclass for performing query and update operations on the 'recipe_item' table.
  *
  *
  *
@@ -13,7 +13,7 @@ use Lib\Base\IngredientQuery as BaseIngredientQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  */
-class IngredientQuery extends BaseIngredientQuery
+class RecipeItemQuery extends BaseRecipeItemQuery
 {
 
 }

@@ -21,6 +21,12 @@ $recipe = $this->recipe;
         <div class="card mt-3">
             <div class="card-header">
                 Instructions
+
+                <a href="<?= $this->url('recipe', ['id' => $recipe->getId(), 'action' => 'print']); ?>"
+                   class="btn btn-warning btn-sm float-right">
+                    Print View
+                </a>
+
             </div>
             <div class="card-body">
                 <?= $this->recipe->getInstructions(); ?>
@@ -29,13 +35,13 @@ $recipe = $this->recipe;
     </div>
     <!-- /End instructions -->
 
-    <!-- Ingredients -->
+    <!-- Items -->
     <div class="col-lg-4">
         <div class="card mt-3">
             <div class="card-header">
-                Ingredients
+                Items
 
-                <a href="<?= $this->url('recipe-ingredient', ['recipe_id' => $recipe->getId()]); ?>"
+                <a href="<?= $this->url('recipe-item', ['recipe_id' => $recipe->getId()]); ?>"
                    class="btn btn-info btn-sm float-right">
                     Edit
                 </a>
@@ -43,12 +49,12 @@ $recipe = $this->recipe;
 
             <div class="table-responsive">
                 <table class="table">
-                    <?php foreach ($recipe->getRecipeIngredients() as $recipeIngredient) : ?>
+                    <?php foreach ($recipe->getRecipeItems() as $recipeItem) : ?>
                     <tr>
-                        <td><?= $recipeIngredient->getIngredient()->getName(); ?></td>
+                        <td><?= $recipeItem->getItem()->getName(); ?></td>
                         <td>
-                            <?= $recipeIngredient->getQuantity(); ?>
-                            <?= $recipeIngredient->getIngredient()->getUnit(); ?>
+                            <?= $recipeItem->getQuantity(); ?>
+                            <?= $recipeItem->getItem()->getUnit(); ?>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -56,7 +62,7 @@ $recipe = $this->recipe;
             </div>
         </div>
     </div>
-    <!-- /End ingredients -->
+    <!-- /End items -->
 
 
 </div>

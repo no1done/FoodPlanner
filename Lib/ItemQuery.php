@@ -2,10 +2,10 @@
 
 namespace Lib;
 
-use Lib\Base\ShoppingList as BaseShoppingList;
+use Lib\Base\ItemQuery as BaseItemQuery;
 
 /**
- * Skeleton subclass for representing a row from the 'shopping_list' table.
+ * Skeleton subclass for performing query and update operations on the 'item' table.
  *
  *
  *
@@ -13,7 +13,7 @@ use Lib\Base\ShoppingList as BaseShoppingList;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  */
-class ShoppingList extends BaseShoppingList
+class ItemQuery extends BaseItemQuery
 {
 
 }

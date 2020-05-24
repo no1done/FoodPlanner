@@ -1,6 +1,6 @@
 <?php
 
-use Lib\Ingredient;
+use Lib\Item;
 use Lib\Recipe;
 
 /** @var Recipe $recipe */
@@ -16,7 +16,7 @@ $recipe = $this->recipe;
     ]); ?>">
         Edit
     </a>
-    / Ingredients
+    / Items
 </h2>
 
 <div class="row">
@@ -24,7 +24,7 @@ $recipe = $this->recipe;
 
         <div class="card mt-3">
             <div class="card-header">
-                Ingredients in Recipe
+                Items in Recipe
             </div>
             <div class="table-responsive">
 
@@ -38,16 +38,16 @@ $recipe = $this->recipe;
                     </tr>
                     </thead>
                     <tbody>
-                    <?php foreach ($recipe->getRecipeIngredientsJoinIngredient() as $ingredient) : ?>
+                    <?php foreach ($recipe->getRecipeItemsJoinItem() as $item) : ?>
                         <tr>
-                            <td><?= $ingredient->getIngredient()->getName(); ?></td>
-                            <td><?= $ingredient->getQuantity(); ?></td>
-                            <td><?= $ingredient->getIngredient()->getUnit(); ?></td>
+                            <td><?= $item->getItem()->getName(); ?></td>
+                            <td><?= $item->getQuantity(); ?></td>
+                            <td><?= $item->getItem()->getUnit(); ?></td>
                             <td>
-                                <a class="btn btn-sm btn-danger" href="<?= $this->url('recipe-ingredient', [
+                                <a class="btn btn-sm btn-danger" href="<?= $this->url('recipe-item', [
                                     'action' => 'remove',
                                     'recipe_id' => $recipe->getId(),
-                                    'id' => $ingredient->getId()
+                                    'id' => $item->getId()
                                 ]); ?>">
                                     Remove
                                 </a>
@@ -69,19 +69,19 @@ $recipe = $this->recipe;
             </div>
             <div class="card-body">
 
-                <form method="POST" action="<?= $this->url('recipe-ingredient', [
+                <form method="POST" action="<?= $this->url('recipe-item', [
                     'action' => 'add',
                     'recipe_id' => $recipe->getId()
                 ]); ?>">
 
                     <div class="form-group">
-                        <label for="ingredient_id">Select Ingredient</label>
-                        <select class="form-control" name="ingredient_id" id="ingredient_id">
+                        <label for="item_id">Select Item</label>
+                        <select class="form-control select2" name="item_id" id="item_id">
                             <?php
-                            /** @var Ingredient $ingredient */
-                            foreach ($this->ingredients as $ingredient) : ?>
-                                <option value="<?= $ingredient->getId(); ?>">
-                                    <?= $ingredient->getName(); ?> (<?= $ingredient->getUnit(); ?>)
+                            /** @var Item $item */
+                            foreach ($this->items as $item) : ?>
+                                <option value="<?= $item->getId(); ?>">
+                                    <?= $item->getName(); ?> (<?= $item->getUnit(); ?>)
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -96,7 +96,7 @@ $recipe = $this->recipe;
                     </div>
 
                     <button type="submit" class="btn btn-success float-right">
-                        Add Ingredient
+                        Add Item
                     </button>
 
                 </form>

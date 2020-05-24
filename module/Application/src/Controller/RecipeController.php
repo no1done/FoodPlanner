@@ -7,6 +7,7 @@ namespace Application\Controller;
 use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\Plugin\FlashMessenger\FlashMessenger;
+use Laminas\View\Model\ViewModel;
 use Lib\Recipe;
 use Lib\RecipeQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -103,7 +104,7 @@ class RecipeController extends AbstractActionController
 
             $this->flashMessenger()->addSuccessMessage('Recipe Saved.');
 
-            return $this->redirect()->toRoute('recipe-ingredient', [
+            return $this->redirect()->toRoute('recipe-item', [
                 'recipe_id' => $recipe->getId()
             ]);
 
@@ -111,6 +112,19 @@ class RecipeController extends AbstractActionController
             $this->flashMessenger()->addErrorMessage($e->getMessage());
             return $this->redirect()->toRoute('recipe');
         }
+    }
+
+    public function printAction()
+    {
+        $id = $this->params()->fromRoute('id');
+
+        $recipe = RecipeQuery::create()->findPk($id);
+
+        $view = new ViewModel([
+            'recipe' => $recipe
+        ]);
+        $view->setTerminal(true);
+        return $view;
     }
 
     /**
