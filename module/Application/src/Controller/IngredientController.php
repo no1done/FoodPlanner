@@ -72,7 +72,7 @@ class IngredientController extends AbstractActionController
                 ->setUnit($post['unit'])
                 ->save();
 
-            $this->flashMessenger()->addSuccessMessage('Ingredient Saved.');
+            $this->flashMessenger()->addSuccessMessage('Item Saved.');
 
         } catch (Exception $e) {
             $this->flashMessenger()->addErrorMessage($e->getMessage());
@@ -95,7 +95,7 @@ class IngredientController extends AbstractActionController
             $list = IngredientQuery::create()->findPk($id);
 
             if (!$list) throw new RuntimeException(
-                "Ingredient does not exist."
+                "Item does not exist."
             );
 
             $list->setRemoved(true)->save();
@@ -103,7 +103,7 @@ class IngredientController extends AbstractActionController
             $undoButton = "<a href=\"/ingredient/restore/{$id}\" class=\"alert-link\">Undo</a>";
 
             $this->flashMessenger()->addSuccessMessage(
-                "Ingredient Removed. {$undoButton}"
+                "Item Removed. {$undoButton}"
             );
 
         } catch (Exception $e) {
@@ -127,13 +127,13 @@ class IngredientController extends AbstractActionController
             $list = IngredientQuery::create()->findPk($id);
 
             if (!$list) throw new RuntimeException(
-                "Ingredient does not exist."
+                "Item does not exist."
             );
 
             $list->setRemoved(false)->save();
 
             $this->flashMessenger()->addSuccessMessage(
-                "Ingredient Restored."
+                "Item Restored."
             );
 
         } catch (Exception $e) {

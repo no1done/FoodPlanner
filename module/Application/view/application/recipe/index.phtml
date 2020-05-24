@@ -15,7 +15,7 @@ use Lib\Recipe;
 <div class="row">
     <div class="col-lg">
         <div class="table-responsive">
-            <table class="table">
+            <table class="table" id="recipeTable">
                 <thead>
                 <tr>
                     <th>Name</th>
@@ -66,3 +66,9 @@ use Lib\Recipe;
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    $(document).ready( function () {
+        $('#recipeTable').DataTable();
+    } );
+</script>
