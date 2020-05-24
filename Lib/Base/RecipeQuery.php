@@ -22,12 +22,14 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildRecipeQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildRecipeQuery orderByName($order = Criteria::ASC) Order by the name column
+ * @method     ChildRecipeQuery orderByInstructions($order = Criteria::ASC) Order by the instructions column
  * @method     ChildRecipeQuery orderByRemoved($order = Criteria::ASC) Order by the removed column
  * @method     ChildRecipeQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildRecipeQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildRecipeQuery groupById() Group by the id column
  * @method     ChildRecipeQuery groupByName() Group by the name column
+ * @method     ChildRecipeQuery groupByInstructions() Group by the instructions column
  * @method     ChildRecipeQuery groupByRemoved() Group by the removed column
  * @method     ChildRecipeQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildRecipeQuery groupByUpdatedAt() Group by the updated_at column
@@ -67,6 +69,7 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildRecipe findOneById(int $id) Return the first ChildRecipe filtered by the id column
  * @method     ChildRecipe findOneByName(string $name) Return the first ChildRecipe filtered by the name column
+ * @method     ChildRecipe findOneByInstructions(string $instructions) Return the first ChildRecipe filtered by the instructions column
  * @method     ChildRecipe findOneByRemoved(boolean $removed) Return the first ChildRecipe filtered by the removed column
  * @method     ChildRecipe findOneByCreatedAt(string $created_at) Return the first ChildRecipe filtered by the created_at column
  * @method     ChildRecipe findOneByUpdatedAt(string $updated_at) Return the first ChildRecipe filtered by the updated_at column *
@@ -76,6 +79,7 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildRecipe requireOneById(int $id) Return the first ChildRecipe filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildRecipe requireOneByName(string $name) Return the first ChildRecipe filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildRecipe requireOneByInstructions(string $instructions) Return the first ChildRecipe filtered by the instructions column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildRecipe requireOneByRemoved(boolean $removed) Return the first ChildRecipe filtered by the removed column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildRecipe requireOneByCreatedAt(string $created_at) Return the first ChildRecipe filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildRecipe requireOneByUpdatedAt(string $updated_at) Return the first ChildRecipe filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -83,6 +87,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildRecipe[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildRecipe objects based on current ModelCriteria
  * @method     ChildRecipe[]|ObjectCollection findById(int $id) Return ChildRecipe objects filtered by the id column
  * @method     ChildRecipe[]|ObjectCollection findByName(string $name) Return ChildRecipe objects filtered by the name column
+ * @method     ChildRecipe[]|ObjectCollection findByInstructions(string $instructions) Return ChildRecipe objects filtered by the instructions column
  * @method     ChildRecipe[]|ObjectCollection findByRemoved(boolean $removed) Return ChildRecipe objects filtered by the removed column
  * @method     ChildRecipe[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildRecipe objects filtered by the created_at column
  * @method     ChildRecipe[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildRecipe objects filtered by the updated_at column
@@ -184,7 +189,7 @@ abstract class RecipeQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, name, removed, created_at, updated_at FROM recipe WHERE id = :p0';
+        $sql = 'SELECT id, name, instructions, removed, created_at, updated_at FROM recipe WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -338,6 +343,31 @@ abstract class RecipeQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(RecipeTableMap::COL_NAME, $name, $comparison);
+    }
+
+    /**
+     * Filter the query on the instructions column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByInstructions('fooValue');   // WHERE instructions = 'fooValue'
+     * $query->filterByInstructions('%fooValue%', Criteria::LIKE); // WHERE instructions LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $instructions The value to use as filter.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildRecipeQuery The current query, for fluid interface
+     */
+    public function filterByInstructions($instructions = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($instructions)) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(RecipeTableMap::COL_INSTRUCTIONS, $instructions, $comparison);
     }
 
     /**

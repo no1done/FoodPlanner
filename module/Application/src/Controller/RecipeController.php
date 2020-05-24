@@ -38,7 +38,42 @@ class RecipeController extends AbstractActionController
 
     public function editAction()
     {
-        return [];
+        try {
+            $id = $this->params()->fromRoute('id');
+
+            $recipe = RecipeQuery::create()->findPk($id);
+
+            if (!$recipe) throw new RuntimeException(
+                "Recipe does not exist"
+            );
+
+            return [
+                'recipe' => $recipe
+            ];
+        } catch (Exception $e) {
+            $this->flashMessenger()->addErrorMessage($e->getMessage());
+            return $this->redirect()->toRoute('recipe');
+        }
+    }
+
+    public function viewAction()
+    {
+        try {
+            $id = $this->params()->fromRoute('id');
+
+            $recipe = RecipeQuery::create()->findPk($id);
+
+            if (!$recipe) throw new RuntimeException(
+                "Recipe does not exist"
+            );
+
+            return [
+                'recipe' => $recipe
+            ];
+        } catch (Exception $e) {
+            $this->flashMessenger()->addErrorMessage($e->getMessage());
+            return $this->redirect()->toRoute('recipe');
+        }
     }
 
     /**
@@ -58,8 +93,13 @@ class RecipeController extends AbstractActionController
                 $recipe = new Recipe();
             }
 
-            $recipe->setName($post['name'])
-                ->save();
+            $recipe->setName($post['name']);
+
+            if (isset($post['instructions'])) {
+                $recipe->setInstructions($post['instructions']);
+            }
+
+            $recipe->save();
 
             $this->flashMessenger()->addSuccessMessage('Recipe Saved.');
 

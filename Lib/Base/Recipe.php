@@ -84,6 +84,13 @@ abstract class Recipe implements ActiveRecordInterface
     protected $name;
 
     /**
+     * The value for the instructions field.
+     *
+     * @var        string
+     */
+    protected $instructions;
+
+    /**
      * The value for the removed field.
      *
      * Note: this column has a database default value of: false
@@ -396,6 +403,16 @@ abstract class Recipe implements ActiveRecordInterface
     }
 
     /**
+     * Get the [instructions] column value.
+     *
+     * @return string
+     */
+    public function getInstructions()
+    {
+        return $this->instructions;
+    }
+
+    /**
      * Get the [removed] column value.
      *
      * @return boolean
@@ -494,6 +511,26 @@ abstract class Recipe implements ActiveRecordInterface
 
         return $this;
     } // setName()
+
+    /**
+     * Set the value of [instructions] column.
+     *
+     * @param string $v new value
+     * @return $this|\Lib\Recipe The current object (for fluent API support)
+     */
+    public function setInstructions($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->instructions !== $v) {
+            $this->instructions = $v;
+            $this->modifiedColumns[RecipeTableMap::COL_INSTRUCTIONS] = true;
+        }
+
+        return $this;
+    } // setInstructions()
 
     /**
      * Sets the value of the [removed] column.
@@ -609,16 +646,19 @@ abstract class Recipe implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : RecipeTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
             $this->name = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : RecipeTableMap::translateFieldName('Removed', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : RecipeTableMap::translateFieldName('Instructions', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->instructions = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : RecipeTableMap::translateFieldName('Removed', TableMap::TYPE_PHPNAME, $indexType)];
             $this->removed = (null !== $col) ? (boolean) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : RecipeTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : RecipeTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : RecipeTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : RecipeTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -631,7 +671,7 @@ abstract class Recipe implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = RecipeTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = RecipeTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Lib\\Recipe'), 0, $e);
@@ -889,6 +929,9 @@ abstract class Recipe implements ActiveRecordInterface
         if ($this->isColumnModified(RecipeTableMap::COL_NAME)) {
             $modifiedColumns[':p' . $index++]  = 'name';
         }
+        if ($this->isColumnModified(RecipeTableMap::COL_INSTRUCTIONS)) {
+            $modifiedColumns[':p' . $index++]  = 'instructions';
+        }
         if ($this->isColumnModified(RecipeTableMap::COL_REMOVED)) {
             $modifiedColumns[':p' . $index++]  = 'removed';
         }
@@ -914,6 +957,9 @@ abstract class Recipe implements ActiveRecordInterface
                         break;
                     case 'name':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
+                        break;
+                    case 'instructions':
+                        $stmt->bindValue($identifier, $this->instructions, PDO::PARAM_STR);
                         break;
                     case 'removed':
                         $stmt->bindValue($identifier, (int) $this->removed, PDO::PARAM_INT);
@@ -993,12 +1039,15 @@ abstract class Recipe implements ActiveRecordInterface
                 return $this->getName();
                 break;
             case 2:
-                return $this->getRemoved();
+                return $this->getInstructions();
                 break;
             case 3:
-                return $this->getCreatedAt();
+                return $this->getRemoved();
                 break;
             case 4:
+                return $this->getCreatedAt();
+                break;
+            case 5:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1033,16 +1082,17 @@ abstract class Recipe implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
-            $keys[2] => $this->getRemoved(),
-            $keys[3] => $this->getCreatedAt(),
-            $keys[4] => $this->getUpdatedAt(),
+            $keys[2] => $this->getInstructions(),
+            $keys[3] => $this->getRemoved(),
+            $keys[4] => $this->getCreatedAt(),
+            $keys[5] => $this->getUpdatedAt(),
         );
-        if ($result[$keys[3]] instanceof \DateTimeInterface) {
-            $result[$keys[3]] = $result[$keys[3]]->format('c');
-        }
-
         if ($result[$keys[4]] instanceof \DateTimeInterface) {
             $result[$keys[4]] = $result[$keys[4]]->format('c');
+        }
+
+        if ($result[$keys[5]] instanceof \DateTimeInterface) {
+            $result[$keys[5]] = $result[$keys[5]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1122,12 +1172,15 @@ abstract class Recipe implements ActiveRecordInterface
                 $this->setName($value);
                 break;
             case 2:
-                $this->setRemoved($value);
+                $this->setInstructions($value);
                 break;
             case 3:
-                $this->setCreatedAt($value);
+                $this->setRemoved($value);
                 break;
             case 4:
+                $this->setCreatedAt($value);
+                break;
+            case 5:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1163,13 +1216,16 @@ abstract class Recipe implements ActiveRecordInterface
             $this->setName($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setRemoved($arr[$keys[2]]);
+            $this->setInstructions($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setCreatedAt($arr[$keys[3]]);
+            $this->setRemoved($arr[$keys[3]]);
         }
         if (array_key_exists($keys[4], $arr)) {
-            $this->setUpdatedAt($arr[$keys[4]]);
+            $this->setCreatedAt($arr[$keys[4]]);
+        }
+        if (array_key_exists($keys[5], $arr)) {
+            $this->setUpdatedAt($arr[$keys[5]]);
         }
     }
 
@@ -1217,6 +1273,9 @@ abstract class Recipe implements ActiveRecordInterface
         }
         if ($this->isColumnModified(RecipeTableMap::COL_NAME)) {
             $criteria->add(RecipeTableMap::COL_NAME, $this->name);
+        }
+        if ($this->isColumnModified(RecipeTableMap::COL_INSTRUCTIONS)) {
+            $criteria->add(RecipeTableMap::COL_INSTRUCTIONS, $this->instructions);
         }
         if ($this->isColumnModified(RecipeTableMap::COL_REMOVED)) {
             $criteria->add(RecipeTableMap::COL_REMOVED, $this->removed);
@@ -1314,6 +1373,7 @@ abstract class Recipe implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setName($this->getName());
+        $copyObj->setInstructions($this->getInstructions());
         $copyObj->setRemoved($this->getRemoved());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -1895,6 +1955,7 @@ abstract class Recipe implements ActiveRecordInterface
     {
         $this->id = null;
         $this->name = null;
+        $this->instructions = null;
         $this->removed = null;
         $this->created_at = null;
         $this->updated_at = null;

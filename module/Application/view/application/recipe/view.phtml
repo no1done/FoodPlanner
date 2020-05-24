@@ -1,0 +1,63 @@
+<?php
+
+use Lib\Recipe;
+
+/** @var Recipe $recipe */
+$recipe = $this->recipe;
+?>
+
+
+<h1>
+    <?= $recipe->getName(); ?>
+    <a class="btn btn-success" href="<?= $this->url('recipe', ['action' => 'edit', 'id' => $recipe->getId()]); ?>">
+        Edit
+    </a>
+</h1>
+
+<div class="row">
+
+    <!-- instructions -->
+    <div class="col-lg-8">
+        <div class="card mt-3">
+            <div class="card-header">
+                Instructions
+            </div>
+            <div class="card-body">
+                <?= $this->recipe->getInstructions(); ?>
+            </div>
+        </div>
+    </div>
+    <!-- /End instructions -->
+
+    <!-- Ingredients -->
+    <div class="col-lg-4">
+        <div class="card mt-3">
+            <div class="card-header">
+                Ingredients
+
+                <a href="<?= $this->url('recipe-ingredient', ['recipe_id' => $recipe->getId()]); ?>"
+                   class="btn btn-info btn-sm float-right">
+                    Edit
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <?php foreach ($recipe->getRecipeIngredients() as $recipeIngredient) : ?>
+                    <tr>
+                        <td><?= $recipeIngredient->getIngredient()->getName(); ?></td>
+                        <td>
+                            <?= $recipeIngredient->getQuantity(); ?>
+                            <?= $recipeIngredient->getIngredient()->getUnit(); ?>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- /End ingredients -->
+
+
+</div>
+
