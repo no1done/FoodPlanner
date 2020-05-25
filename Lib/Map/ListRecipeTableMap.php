@@ -158,7 +158,7 @@ class ListRecipeTableMap extends TableMap
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('shopping_list_id', 'ShoppingListId', 'INTEGER', 'shopping_list', 'id', true, null, null);
         $this->addForeignKey('recipe_id', 'RecipeId', 'INTEGER', 'recipe', 'id', true, null, null);
-        $this->addColumn('ref', 'Ref', 'VARCHAR', true, 20, null);
+        $this->addColumn('ref', 'Ref', 'VARCHAR', true, 100, null);
         $this->addColumn('serves', 'Serves', 'INTEGER', true, null, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);

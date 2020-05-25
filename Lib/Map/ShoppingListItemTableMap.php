@@ -164,7 +164,7 @@ class ShoppingListItemTableMap extends TableMap
         $this->addForeignKey('shopping_list_id', 'ShoppingListId', 'INTEGER', 'shopping_list', 'id', true, null, null);
         $this->addForeignKey('item_id', 'ItemId', 'INTEGER', 'item', 'id', true, null, null);
         $this->addColumn('quantity', 'Quantity', 'FLOAT', true, 10, null);
-        $this->addColumn('ref', 'Ref', 'VARCHAR', false, 20, null);
+        $this->addColumn('ref', 'Ref', 'VARCHAR', false, 100, null);
         $this->addColumn('purchased', 'Purchased', 'BOOLEAN', false, 1, false);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
