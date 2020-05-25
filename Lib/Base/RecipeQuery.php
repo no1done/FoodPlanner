@@ -62,7 +62,17 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildRecipeQuery rightJoinWithRecipeItem() Adds a RIGHT JOIN clause and with to the query using the RecipeItem relation
  * @method     ChildRecipeQuery innerJoinWithRecipeItem() Adds a INNER JOIN clause and with to the query using the RecipeItem relation
  *
- * @method     \Lib\ListRecipeQuery|\Lib\RecipeItemQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     ChildRecipeQuery leftJoinDayPlanRecipe($relationAlias = null) Adds a LEFT JOIN clause to the query using the DayPlanRecipe relation
+ * @method     ChildRecipeQuery rightJoinDayPlanRecipe($relationAlias = null) Adds a RIGHT JOIN clause to the query using the DayPlanRecipe relation
+ * @method     ChildRecipeQuery innerJoinDayPlanRecipe($relationAlias = null) Adds a INNER JOIN clause to the query using the DayPlanRecipe relation
+ *
+ * @method     ChildRecipeQuery joinWithDayPlanRecipe($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the DayPlanRecipe relation
+ *
+ * @method     ChildRecipeQuery leftJoinWithDayPlanRecipe() Adds a LEFT JOIN clause and with to the query using the DayPlanRecipe relation
+ * @method     ChildRecipeQuery rightJoinWithDayPlanRecipe() Adds a RIGHT JOIN clause and with to the query using the DayPlanRecipe relation
+ * @method     ChildRecipeQuery innerJoinWithDayPlanRecipe() Adds a INNER JOIN clause and with to the query using the DayPlanRecipe relation
+ *
+ * @method     \Lib\ListRecipeQuery|\Lib\RecipeItemQuery|\Lib\DayPlanRecipeQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildRecipe findOne(ConnectionInterface $con = null) Return the first ChildRecipe matching the query
  * @method     ChildRecipe findOneOrCreate(ConnectionInterface $con = null) Return the first ChildRecipe matching the query, or a new ChildRecipe object populated from the query conditions when no match is found
@@ -627,6 +637,79 @@ abstract class RecipeQuery extends ModelCriteria
         return $this
             ->joinRecipeItem($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'RecipeItem', '\Lib\RecipeItemQuery');
+    }
+
+    /**
+     * Filter the query by a related \Lib\DayPlanRecipe object
+     *
+     * @param \Lib\DayPlanRecipe|ObjectCollection $dayPlanRecipe the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildRecipeQuery The current query, for fluid interface
+     */
+    public function filterByDayPlanRecipe($dayPlanRecipe, $comparison = null)
+    {
+        if ($dayPlanRecipe instanceof \Lib\DayPlanRecipe) {
+            return $this
+                ->addUsingAlias(RecipeTableMap::COL_ID, $dayPlanRecipe->getRecipeId(), $comparison);
+        } elseif ($dayPlanRecipe instanceof ObjectCollection) {
+            return $this
+                ->useDayPlanRecipeQuery()
+                ->filterByPrimaryKeys($dayPlanRecipe->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByDayPlanRecipe() only accepts arguments of type \Lib\DayPlanRecipe or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the DayPlanRecipe relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildRecipeQuery The current query, for fluid interface
+     */
+    public function joinDayPlanRecipe($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('DayPlanRecipe');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'DayPlanRecipe');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the DayPlanRecipe relation DayPlanRecipe object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \Lib\DayPlanRecipeQuery A secondary query class using the current class as primary query
+     */
+    public function useDayPlanRecipeQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinDayPlanRecipe($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'DayPlanRecipe', '\Lib\DayPlanRecipeQuery');
     }
 
     /**

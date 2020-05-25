@@ -57,6 +57,16 @@ return [
                     ],
                 ],
             ],
+            'planner' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/planner/:list_id[/:action][/:id]',
+                    'defaults' => [
+                        'controller' => Controller\DayController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
 
             // Join Management Controller Routes
             'list-recipe' => [
@@ -111,6 +121,7 @@ return [
             Controller\ListController::class => Controller\Factory\ListRecipeControllerFactory::class,
             Controller\RecipeController::class => InvokableFactory::class,
             Controller\ItemController::class => InvokableFactory::class,
+            Controller\DayController::class => Controller\Factory\DayControllerFactory::class,
 
             // Management controllers
             Controller\ListRecipeController::class => Controller\Factory\ListRecipeControllerFactory::class,
@@ -129,7 +140,11 @@ return [
             'application/index/index' => __DIR__ . '/../view/application/index/index.phtml',
             'error/404'               => __DIR__ . '/../view/error/404.phtml',
             'error/index'             => __DIR__ . '/../view/error/index.phtml',
-            'shopping/list'           => __DIR__ . '/../view/application/list/partial/shopping-list.phtml'
+
+            // Partials
+            'shopping/list' => __DIR__ . '/../view/application/list/partial/shopping-list.phtml',
+            'planner/day' => __DIR__ . '/../view/application/day/partial/day-card.phtml',
+            'planner/meals' => __DIR__ . '/../view/application/day/partial/day-recipes.phtml',
         ],
         'template_path_stack' => [
             __DIR__ . '/../view',

@@ -171,6 +171,13 @@ class ShoppingListTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, 'ShoppingListItems', false);
+        $this->addRelation('DayPlan', '\\Lib\\DayPlan', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':shopping_list_id',
+    1 => ':id',
+  ),
+), null, null, 'DayPlans', false);
     } // buildRelations()
 
     /**

@@ -72,4 +72,38 @@
         </foreign-key>
     </table>
 
+    <table name="category" phpName="Category">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="name" type="varchar" size="50" required="true" />
+        <column name="key" type="varchar" size="20" required="true" />
+        <behavior name="timestampable" />
+    </table>
+
+    <table name="day_plan" phpName="DayPlan">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="shopping_list_id" type="integer" required="true" />
+        <behavior name="timestampable" />
+        <foreign-key foreignTable="shopping_list" name="fk_day_plan_1">
+            <reference local="shopping_list_id" foreign="id"/>
+        </foreign-key>
+    </table>
+
+    <table name="day_plan_recipe" phpName="DayPlanRecipe">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="day_plan_id" type="integer" required="true" />
+        <column name="recipe_id" type="integer" required="true" />
+        <column name="category_id" type="integer" required="true" />
+        <column name="servers" type="integer" required="true" />
+        <behavior name="timestampable" />
+        <foreign-key foreignTable="day_plan" name="fk_day_plan_recipe_1">
+            <reference local="day_plan_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="recipe" name="fk_day_plan_recipe_2">
+            <reference local="recipe_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="category" name="fk_day_plan_recipe_3">
+            <reference local="category_id" foreign="id"/>
+        </foreign-key>
+    </table>
+
 </database>

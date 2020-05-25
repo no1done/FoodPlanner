@@ -50,6 +50,14 @@ use Lib\ShoppingList;
                                     Manage Recipes
                                 </a>
 
+                                <!-- Meal Planner button -->
+                                <a class="btn btn-success btn-sm"
+                                   href="<?= $this->url('planner', [
+                                       'list_id' => $list->getId()
+                                   ]); ?>">
+                                    Meal Planner
+                                </a>
+
                                 <!-- delete button -->
                                 <a class="btn btn-danger btn-sm"
                                    href="<?= $this->url('list', [

@@ -6,7 +6,17 @@ use Lib\ShoppingListItem;
 
 <div class="row">
     <div class="col">
-        <h1><?= $this->list->getName(); ?></h1>
+        <h1>
+            <?= $this->list->getName(); ?>
+
+            <!-- Meal Planner button -->
+            <a class="btn btn-success btn-sm"
+               href="<?= $this->url('planner', [
+                   'list_id' => $this->list->getId()
+               ]); ?>">
+                Meal Planner
+            </a>
+        </h1>
     </div>
 </div>
 

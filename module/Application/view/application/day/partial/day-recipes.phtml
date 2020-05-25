@@ -1,0 +1,37 @@
+<?php
+
+use Lib\DayPlanRecipe;
+use Lib\RecipeQuery;
+
+?>
+
+<div class="row">
+    <div class="col-lg">
+        <h5><?= $this->title; ?></h5>
+
+        <div class="table-responsive">
+
+            <table class="table table-sm table-striped table-bordered">
+            <?php
+            /** @var DayPlanRecipe $recipe */
+            foreach ($this->recipes as $recipe) : ?>
+
+                <tr>
+                    <td>
+                    <a href="<?= $this->url('recipe', [
+                        'id' => $recipe->getRecipeId(),
+                        'action' => 'view'
+                    ]); ?>">
+                        <?= $recipe->getRecipe()->getName(); ?>
+                    </a>
+                    </td>
+                    <td>
+                        x <?= $recipe->getServers(); ?>
+                    </td>
+                </tr>
+
+            <?php endforeach; ?>
+            </table>
+        </div>
+    </div>
+</div>
