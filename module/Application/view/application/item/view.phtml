@@ -1,7 +1,14 @@
+<?php
+
+use Lib\Item;
+
+/** @var Item $item */
+$item = $this->item;
+?>
 
 <div class="row">
     <div class="col">
-        <h1><?= $this->item->getName(); ?></h1>
+        <h1><?= $item->getName(); ?> (<?= $item->getUnit(); ?>)</h1>
     </div>
 </div>
 
@@ -10,20 +17,35 @@
 
         <div class="card mt-3">
             <div class="card-header">
-                Part of Recipes
+                Used In
             </div>
             <div class="table-responsive">
 
                 <table class="table">
                     <thead>
                     <tr>
-                        <th>Name</th> <!-- link to recipe -->
-                        <th>Serves</th>
+                        <th>Recipe Name</th> <!-- link to recipe -->
+                        <th>Quantity</th>
                         <th></th>
                     </tr>
                     </thead>
                     <tbody>
+                        <?php foreach ($item->getRecipeItemsJoinRecipe() as $recipeItem) : ?>
+                            <tr>
+                                <td><?= $recipeItem->getRecipe()->getName(); ?></td>
+                                <td><?= $recipeItem->getQuantity(); ?> <?= $item->getUnit(); ?></td>
+                                <td>
+                                    <!-- go to recipe button -->
+                                    <a href="<?= $this->url('recipe', [
+                                        'action' => 'view',
+                                        'id' => $recipeItem->getRecipeId()
+                                    ]); ?>" class="btn btn-success">
+                                        Go To Recipe
+                                    </a>
 
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
 

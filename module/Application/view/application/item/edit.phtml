@@ -1,0 +1,26 @@
+<?php
+
+use Lib\Item;
+
+/** @var Item $item */
+$item = $this->item;
+?>
+
+<h2><?= $item->getName(); ?></h2>
+
+<form action="<?= $this->url('item', ['action' => 'save']); ?>" method="POST">
+
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" name="name" class="form-control" id="name" value="<?= $item->getName(); ?>"/>
+    </div>
+
+    <div class="form-group">
+        <label for="unit">Unit</label>
+        <input type="text" name="unit" class="form-control" id="unit" value="<?= $item->getUnit(); ?>"/>
+    </div>
+
+    <input type="hidden" name="id" value="<?= $item->getId(); ?>" />
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>

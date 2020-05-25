@@ -46,11 +46,28 @@ class ItemController extends AbstractActionController
     }
 
     /**
-     * @return array
+     * Edit an item
+     *
+     * @return array|Response
      */
     public function editAction()
     {
-        return [];
+        try {
+            $item_id = $this->params()->fromRoute('id');
+
+            $item = ItemQuery::create()->findPk($item_id);
+
+            if (!$item) throw new RuntimeException(
+                "Item does not exist"
+            );
+
+            return [
+                'item' => $item
+            ];
+        } catch (Exception $e) {
+            $this->flashMessenger()->addErrorMessage($e->getMessage());
+            return $this->redirect()->toRoute('item');
+        }
     }
 
     /**
@@ -58,9 +75,13 @@ class ItemController extends AbstractActionController
      */
     public function saveAction()
     {
-        $post = $this->params()->fromPost();
-
         try {
+
+            if (!$this->getRequest()->isPost()) throw new RuntimeException(
+                "Invalid request type"
+            );
+
+            $post = $this->params()->fromPost();
 
             if (isset($post['id'])) {
                 $item = ItemQuery::create()->findPk($post['id']);
@@ -79,6 +100,26 @@ class ItemController extends AbstractActionController
         }
 
         return $this->redirect()->toRoute('item');
+    }
+
+    public function viewAction()
+    {
+        try {
+            $item_id = $this->params()->fromRoute('id');
+
+            $item = ItemQuery::create()->findPk($item_id);
+
+            if (!$item) throw new RuntimeException(
+                "Item does not exist"
+            );
+
+            return [
+                'item' => $item
+            ];
+        } catch (Exception $e) {
+            $this->flashMessenger()->addErrorMessage($e->getMessage());
+            return $this->redirect()->toRoute('item');
+        }
     }
 
     /**
