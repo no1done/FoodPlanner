@@ -60,7 +60,17 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildShoppingListQuery rightJoinWithShoppingListItem() Adds a RIGHT JOIN clause and with to the query using the ShoppingListItem relation
  * @method     ChildShoppingListQuery innerJoinWithShoppingListItem() Adds a INNER JOIN clause and with to the query using the ShoppingListItem relation
  *
- * @method     \Lib\ListRecipeQuery|\Lib\ShoppingListItemQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     ChildShoppingListQuery leftJoinDayPlan($relationAlias = null) Adds a LEFT JOIN clause to the query using the DayPlan relation
+ * @method     ChildShoppingListQuery rightJoinDayPlan($relationAlias = null) Adds a RIGHT JOIN clause to the query using the DayPlan relation
+ * @method     ChildShoppingListQuery innerJoinDayPlan($relationAlias = null) Adds a INNER JOIN clause to the query using the DayPlan relation
+ *
+ * @method     ChildShoppingListQuery joinWithDayPlan($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the DayPlan relation
+ *
+ * @method     ChildShoppingListQuery leftJoinWithDayPlan() Adds a LEFT JOIN clause and with to the query using the DayPlan relation
+ * @method     ChildShoppingListQuery rightJoinWithDayPlan() Adds a RIGHT JOIN clause and with to the query using the DayPlan relation
+ * @method     ChildShoppingListQuery innerJoinWithDayPlan() Adds a INNER JOIN clause and with to the query using the DayPlan relation
+ *
+ * @method     \Lib\ListRecipeQuery|\Lib\ShoppingListItemQuery|\Lib\DayPlanQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildShoppingList findOne(ConnectionInterface $con = null) Return the first ChildShoppingList matching the query
  * @method     ChildShoppingList findOneOrCreate(ConnectionInterface $con = null) Return the first ChildShoppingList matching the query, or a new ChildShoppingList object populated from the query conditions when no match is found
@@ -597,6 +607,79 @@ abstract class ShoppingListQuery extends ModelCriteria
         return $this
             ->joinShoppingListItem($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'ShoppingListItem', '\Lib\ShoppingListItemQuery');
+    }
+
+    /**
+     * Filter the query by a related \Lib\DayPlan object
+     *
+     * @param \Lib\DayPlan|ObjectCollection $dayPlan the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildShoppingListQuery The current query, for fluid interface
+     */
+    public function filterByDayPlan($dayPlan, $comparison = null)
+    {
+        if ($dayPlan instanceof \Lib\DayPlan) {
+            return $this
+                ->addUsingAlias(ShoppingListTableMap::COL_ID, $dayPlan->getShoppingListId(), $comparison);
+        } elseif ($dayPlan instanceof ObjectCollection) {
+            return $this
+                ->useDayPlanQuery()
+                ->filterByPrimaryKeys($dayPlan->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByDayPlan() only accepts arguments of type \Lib\DayPlan or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the DayPlan relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildShoppingListQuery The current query, for fluid interface
+     */
+    public function joinDayPlan($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('DayPlan');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'DayPlan');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the DayPlan relation DayPlan object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \Lib\DayPlanQuery A secondary query class using the current class as primary query
+     */
+    public function useDayPlanQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinDayPlan($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'DayPlan', '\Lib\DayPlanQuery');
     }
 
     /**

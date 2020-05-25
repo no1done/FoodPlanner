@@ -5,12 +5,15 @@ namespace Lib\Base;
 use \DateTime;
 use \Exception;
 use \PDO;
+use Lib\DayPlanRecipe as ChildDayPlanRecipe;
+use Lib\DayPlanRecipeQuery as ChildDayPlanRecipeQuery;
 use Lib\ListRecipe as ChildListRecipe;
 use Lib\ListRecipeQuery as ChildListRecipeQuery;
 use Lib\Recipe as ChildRecipe;
 use Lib\RecipeItem as ChildRecipeItem;
 use Lib\RecipeItemQuery as ChildRecipeItemQuery;
 use Lib\RecipeQuery as ChildRecipeQuery;
+use Lib\Map\DayPlanRecipeTableMap;
 use Lib\Map\ListRecipeTableMap;
 use Lib\Map\RecipeItemTableMap;
 use Lib\Map\RecipeTableMap;
@@ -125,6 +128,12 @@ abstract class Recipe implements ActiveRecordInterface
     protected $collRecipeItemsPartial;
 
     /**
+     * @var        ObjectCollection|ChildDayPlanRecipe[] Collection to store aggregation of ChildDayPlanRecipe objects.
+     */
+    protected $collDayPlanRecipes;
+    protected $collDayPlanRecipesPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
@@ -143,6 +152,12 @@ abstract class Recipe implements ActiveRecordInterface
      * @var ObjectCollection|ChildRecipeItem[]
      */
     protected $recipeItemsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildDayPlanRecipe[]
+     */
+    protected $dayPlanRecipesScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -736,6 +751,8 @@ abstract class Recipe implements ActiveRecordInterface
 
             $this->collRecipeItems = null;
 
+            $this->collDayPlanRecipes = null;
+
         } // if (deep)
     }
 
@@ -891,6 +908,23 @@ abstract class Recipe implements ActiveRecordInterface
 
             if ($this->collRecipeItems !== null) {
                 foreach ($this->collRecipeItems as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->dayPlanRecipesScheduledForDeletion !== null) {
+                if (!$this->dayPlanRecipesScheduledForDeletion->isEmpty()) {
+                    \Lib\DayPlanRecipeQuery::create()
+                        ->filterByPrimaryKeys($this->dayPlanRecipesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->dayPlanRecipesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collDayPlanRecipes !== null) {
+                foreach ($this->collDayPlanRecipes as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1130,6 +1164,21 @@ abstract class Recipe implements ActiveRecordInterface
                 }
 
                 $result[$key] = $this->collRecipeItems->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collDayPlanRecipes) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'dayPlanRecipes';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'day_plan_recipes';
+                        break;
+                    default:
+                        $key = 'DayPlanRecipes';
+                }
+
+                $result[$key] = $this->collDayPlanRecipes->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1395,6 +1444,12 @@ abstract class Recipe implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getDayPlanRecipes() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addDayPlanRecipe($relObj->copy($deepCopy));
+                }
+            }
+
         } // if ($deepCopy)
 
         if ($makeNew) {
@@ -1442,6 +1497,10 @@ abstract class Recipe implements ActiveRecordInterface
         }
         if ('RecipeItem' == $relationName) {
             $this->initRecipeItems();
+            return;
+        }
+        if ('DayPlanRecipe' == $relationName) {
+            $this->initDayPlanRecipes();
             return;
         }
     }
@@ -1947,6 +2006,281 @@ abstract class Recipe implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collDayPlanRecipes collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addDayPlanRecipes()
+     */
+    public function clearDayPlanRecipes()
+    {
+        $this->collDayPlanRecipes = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collDayPlanRecipes collection loaded partially.
+     */
+    public function resetPartialDayPlanRecipes($v = true)
+    {
+        $this->collDayPlanRecipesPartial = $v;
+    }
+
+    /**
+     * Initializes the collDayPlanRecipes collection.
+     *
+     * By default this just sets the collDayPlanRecipes collection to an empty array (like clearcollDayPlanRecipes());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initDayPlanRecipes($overrideExisting = true)
+    {
+        if (null !== $this->collDayPlanRecipes && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = DayPlanRecipeTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collDayPlanRecipes = new $collectionClassName;
+        $this->collDayPlanRecipes->setModel('\Lib\DayPlanRecipe');
+    }
+
+    /**
+     * Gets an array of ChildDayPlanRecipe objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildRecipe is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildDayPlanRecipe[] List of ChildDayPlanRecipe objects
+     * @throws PropelException
+     */
+    public function getDayPlanRecipes(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collDayPlanRecipesPartial && !$this->isNew();
+        if (null === $this->collDayPlanRecipes || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collDayPlanRecipes) {
+                // return empty collection
+                $this->initDayPlanRecipes();
+            } else {
+                $collDayPlanRecipes = ChildDayPlanRecipeQuery::create(null, $criteria)
+                    ->filterByRecipe($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collDayPlanRecipesPartial && count($collDayPlanRecipes)) {
+                        $this->initDayPlanRecipes(false);
+
+                        foreach ($collDayPlanRecipes as $obj) {
+                            if (false == $this->collDayPlanRecipes->contains($obj)) {
+                                $this->collDayPlanRecipes->append($obj);
+                            }
+                        }
+
+                        $this->collDayPlanRecipesPartial = true;
+                    }
+
+                    return $collDayPlanRecipes;
+                }
+
+                if ($partial && $this->collDayPlanRecipes) {
+                    foreach ($this->collDayPlanRecipes as $obj) {
+                        if ($obj->isNew()) {
+                            $collDayPlanRecipes[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collDayPlanRecipes = $collDayPlanRecipes;
+                $this->collDayPlanRecipesPartial = false;
+            }
+        }
+
+        return $this->collDayPlanRecipes;
+    }
+
+    /**
+     * Sets a collection of ChildDayPlanRecipe objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $dayPlanRecipes A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildRecipe The current object (for fluent API support)
+     */
+    public function setDayPlanRecipes(Collection $dayPlanRecipes, ConnectionInterface $con = null)
+    {
+        /** @var ChildDayPlanRecipe[] $dayPlanRecipesToDelete */
+        $dayPlanRecipesToDelete = $this->getDayPlanRecipes(new Criteria(), $con)->diff($dayPlanRecipes);
+
+
+        $this->dayPlanRecipesScheduledForDeletion = $dayPlanRecipesToDelete;
+
+        foreach ($dayPlanRecipesToDelete as $dayPlanRecipeRemoved) {
+            $dayPlanRecipeRemoved->setRecipe(null);
+        }
+
+        $this->collDayPlanRecipes = null;
+        foreach ($dayPlanRecipes as $dayPlanRecipe) {
+            $this->addDayPlanRecipe($dayPlanRecipe);
+        }
+
+        $this->collDayPlanRecipes = $dayPlanRecipes;
+        $this->collDayPlanRecipesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related DayPlanRecipe objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related DayPlanRecipe objects.
+     * @throws PropelException
+     */
+    public function countDayPlanRecipes(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collDayPlanRecipesPartial && !$this->isNew();
+        if (null === $this->collDayPlanRecipes || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collDayPlanRecipes) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getDayPlanRecipes());
+            }
+
+            $query = ChildDayPlanRecipeQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByRecipe($this)
+                ->count($con);
+        }
+
+        return count($this->collDayPlanRecipes);
+    }
+
+    /**
+     * Method called to associate a ChildDayPlanRecipe object to this object
+     * through the ChildDayPlanRecipe foreign key attribute.
+     *
+     * @param  ChildDayPlanRecipe $l ChildDayPlanRecipe
+     * @return $this|\Lib\Recipe The current object (for fluent API support)
+     */
+    public function addDayPlanRecipe(ChildDayPlanRecipe $l)
+    {
+        if ($this->collDayPlanRecipes === null) {
+            $this->initDayPlanRecipes();
+            $this->collDayPlanRecipesPartial = true;
+        }
+
+        if (!$this->collDayPlanRecipes->contains($l)) {
+            $this->doAddDayPlanRecipe($l);
+
+            if ($this->dayPlanRecipesScheduledForDeletion and $this->dayPlanRecipesScheduledForDeletion->contains($l)) {
+                $this->dayPlanRecipesScheduledForDeletion->remove($this->dayPlanRecipesScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildDayPlanRecipe $dayPlanRecipe The ChildDayPlanRecipe object to add.
+     */
+    protected function doAddDayPlanRecipe(ChildDayPlanRecipe $dayPlanRecipe)
+    {
+        $this->collDayPlanRecipes[]= $dayPlanRecipe;
+        $dayPlanRecipe->setRecipe($this);
+    }
+
+    /**
+     * @param  ChildDayPlanRecipe $dayPlanRecipe The ChildDayPlanRecipe object to remove.
+     * @return $this|ChildRecipe The current object (for fluent API support)
+     */
+    public function removeDayPlanRecipe(ChildDayPlanRecipe $dayPlanRecipe)
+    {
+        if ($this->getDayPlanRecipes()->contains($dayPlanRecipe)) {
+            $pos = $this->collDayPlanRecipes->search($dayPlanRecipe);
+            $this->collDayPlanRecipes->remove($pos);
+            if (null === $this->dayPlanRecipesScheduledForDeletion) {
+                $this->dayPlanRecipesScheduledForDeletion = clone $this->collDayPlanRecipes;
+                $this->dayPlanRecipesScheduledForDeletion->clear();
+            }
+            $this->dayPlanRecipesScheduledForDeletion[]= clone $dayPlanRecipe;
+            $dayPlanRecipe->setRecipe(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Recipe is new, it will return
+     * an empty collection; or if this Recipe has previously
+     * been saved, it will retrieve related DayPlanRecipes from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Recipe.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildDayPlanRecipe[] List of ChildDayPlanRecipe objects
+     */
+    public function getDayPlanRecipesJoinDayPlan(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildDayPlanRecipeQuery::create(null, $criteria);
+        $query->joinWith('DayPlan', $joinBehavior);
+
+        return $this->getDayPlanRecipes($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Recipe is new, it will return
+     * an empty collection; or if this Recipe has previously
+     * been saved, it will retrieve related DayPlanRecipes from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Recipe.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildDayPlanRecipe[] List of ChildDayPlanRecipe objects
+     */
+    public function getDayPlanRecipesJoinCategory(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildDayPlanRecipeQuery::create(null, $criteria);
+        $query->joinWith('Category', $joinBehavior);
+
+        return $this->getDayPlanRecipes($query, $con);
+    }
+
+    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
@@ -1988,10 +2322,16 @@ abstract class Recipe implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collDayPlanRecipes) {
+                foreach ($this->collDayPlanRecipes as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
         $this->collListRecipes = null;
         $this->collRecipeItems = null;
+        $this->collDayPlanRecipes = null;
     }
 
     /**

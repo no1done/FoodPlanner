@@ -2,8 +2,8 @@
 
 namespace Lib\Map;
 
-use Lib\Recipe;
-use Lib\RecipeQuery;
+use Lib\DayPlanRecipe;
+use Lib\DayPlanRecipeQuery;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\InstancePoolTrait;
@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'recipe' table.
+ * This class defines the structure of the 'day_plan_recipe' table.
  *
  *
  *
@@ -25,7 +25,7 @@ use Propel\Runtime\Map\TableMapTrait;
  * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
  * (i.e. if it's a text column type).
  */
-class RecipeTableMap extends TableMap
+class DayPlanRecipeTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
@@ -33,7 +33,7 @@ class RecipeTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Lib.Map.RecipeTableMap';
+    const CLASS_NAME = 'Lib.Map.DayPlanRecipeTableMap';
 
     /**
      * The default database name for this class
@@ -43,22 +43,22 @@ class RecipeTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'recipe';
+    const TABLE_NAME = 'day_plan_recipe';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Lib\\Recipe';
+    const OM_CLASS = '\\Lib\\DayPlanRecipe';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Lib.Recipe';
+    const CLASS_DEFAULT = 'Lib.DayPlanRecipe';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 7;
 
     /**
      * The number of lazy-loaded columns
@@ -68,37 +68,42 @@ class RecipeTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /**
      * the column name for the id field
      */
-    const COL_ID = 'recipe.id';
+    const COL_ID = 'day_plan_recipe.id';
 
     /**
-     * the column name for the name field
+     * the column name for the day_plan_id field
      */
-    const COL_NAME = 'recipe.name';
+    const COL_DAY_PLAN_ID = 'day_plan_recipe.day_plan_id';
 
     /**
-     * the column name for the instructions field
+     * the column name for the recipe_id field
      */
-    const COL_INSTRUCTIONS = 'recipe.instructions';
+    const COL_RECIPE_ID = 'day_plan_recipe.recipe_id';
 
     /**
-     * the column name for the removed field
+     * the column name for the category_id field
      */
-    const COL_REMOVED = 'recipe.removed';
+    const COL_CATEGORY_ID = 'day_plan_recipe.category_id';
+
+    /**
+     * the column name for the servers field
+     */
+    const COL_SERVERS = 'day_plan_recipe.servers';
 
     /**
      * the column name for the created_at field
      */
-    const COL_CREATED_AT = 'recipe.created_at';
+    const COL_CREATED_AT = 'day_plan_recipe.created_at';
 
     /**
      * the column name for the updated_at field
      */
-    const COL_UPDATED_AT = 'recipe.updated_at';
+    const COL_UPDATED_AT = 'day_plan_recipe.updated_at';
 
     /**
      * The default string format for model objects of the related table
@@ -112,11 +117,11 @@ class RecipeTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'Instructions', 'Removed', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'name', 'instructions', 'removed', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(RecipeTableMap::COL_ID, RecipeTableMap::COL_NAME, RecipeTableMap::COL_INSTRUCTIONS, RecipeTableMap::COL_REMOVED, RecipeTableMap::COL_CREATED_AT, RecipeTableMap::COL_UPDATED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'name', 'instructions', 'removed', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id', 'DayPlanId', 'RecipeId', 'CategoryId', 'Servers', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'dayPlanId', 'recipeId', 'categoryId', 'servers', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(DayPlanRecipeTableMap::COL_ID, DayPlanRecipeTableMap::COL_DAY_PLAN_ID, DayPlanRecipeTableMap::COL_RECIPE_ID, DayPlanRecipeTableMap::COL_CATEGORY_ID, DayPlanRecipeTableMap::COL_SERVERS, DayPlanRecipeTableMap::COL_CREATED_AT, DayPlanRecipeTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'day_plan_id', 'recipe_id', 'category_id', 'servers', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -126,11 +131,11 @@ class RecipeTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Instructions' => 2, 'Removed' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'instructions' => 2, 'removed' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        self::TYPE_COLNAME       => array(RecipeTableMap::COL_ID => 0, RecipeTableMap::COL_NAME => 1, RecipeTableMap::COL_INSTRUCTIONS => 2, RecipeTableMap::COL_REMOVED => 3, RecipeTableMap::COL_CREATED_AT => 4, RecipeTableMap::COL_UPDATED_AT => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'instructions' => 2, 'removed' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'DayPlanId' => 1, 'RecipeId' => 2, 'CategoryId' => 3, 'Servers' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'dayPlanId' => 1, 'recipeId' => 2, 'categoryId' => 3, 'servers' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        self::TYPE_COLNAME       => array(DayPlanRecipeTableMap::COL_ID => 0, DayPlanRecipeTableMap::COL_DAY_PLAN_ID => 1, DayPlanRecipeTableMap::COL_RECIPE_ID => 2, DayPlanRecipeTableMap::COL_CATEGORY_ID => 3, DayPlanRecipeTableMap::COL_SERVERS => 4, DayPlanRecipeTableMap::COL_CREATED_AT => 5, DayPlanRecipeTableMap::COL_UPDATED_AT => 6, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'day_plan_id' => 1, 'recipe_id' => 2, 'category_id' => 3, 'servers' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -143,17 +148,18 @@ class RecipeTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('recipe');
-        $this->setPhpName('Recipe');
+        $this->setName('day_plan_recipe');
+        $this->setPhpName('DayPlanRecipe');
         $this->setIdentifierQuoting(false);
-        $this->setClassName('\\Lib\\Recipe');
+        $this->setClassName('\\Lib\\DayPlanRecipe');
         $this->setPackage('Lib');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('name', 'Name', 'VARCHAR', false, 150, null);
-        $this->addColumn('instructions', 'Instructions', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('removed', 'Removed', 'BOOLEAN', false, 1, false);
+        $this->addForeignKey('day_plan_id', 'DayPlanId', 'INTEGER', 'day_plan', 'id', true, null, null);
+        $this->addForeignKey('recipe_id', 'RecipeId', 'INTEGER', 'recipe', 'id', true, null, null);
+        $this->addForeignKey('category_id', 'CategoryId', 'INTEGER', 'category', 'id', true, null, null);
+        $this->addColumn('servers', 'Servers', 'INTEGER', true, null, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -163,27 +169,27 @@ class RecipeTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ListRecipe', '\\Lib\\ListRecipe', RelationMap::ONE_TO_MANY, array (
+        $this->addRelation('DayPlan', '\\Lib\\DayPlan', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':day_plan_id',
+    1 => ':id',
+  ),
+), null, null, null, false);
+        $this->addRelation('Recipe', '\\Lib\\Recipe', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
     0 => ':recipe_id',
     1 => ':id',
   ),
-), null, null, 'ListRecipes', false);
-        $this->addRelation('RecipeItem', '\\Lib\\RecipeItem', RelationMap::ONE_TO_MANY, array (
+), null, null, null, false);
+        $this->addRelation('Category', '\\Lib\\Category', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
-    0 => ':recipe_id',
+    0 => ':category_id',
     1 => ':id',
   ),
-), null, null, 'RecipeItems', false);
-        $this->addRelation('DayPlanRecipe', '\\Lib\\DayPlanRecipe', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':recipe_id',
-    1 => ':id',
-  ),
-), null, null, 'DayPlanRecipes', false);
+), null, null, null, false);
     } // buildRelations()
 
     /**
@@ -256,7 +262,7 @@ class RecipeTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? RecipeTableMap::CLASS_DEFAULT : RecipeTableMap::OM_CLASS;
+        return $withPrefix ? DayPlanRecipeTableMap::CLASS_DEFAULT : DayPlanRecipeTableMap::OM_CLASS;
     }
 
     /**
@@ -270,22 +276,22 @@ class RecipeTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (Recipe object, last column rank)
+     * @return array           (DayPlanRecipe object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = RecipeTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = RecipeTableMap::getInstanceFromPool($key))) {
+        $key = DayPlanRecipeTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = DayPlanRecipeTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + RecipeTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + DayPlanRecipeTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = RecipeTableMap::OM_CLASS;
-            /** @var Recipe $obj */
+            $cls = DayPlanRecipeTableMap::OM_CLASS;
+            /** @var DayPlanRecipe $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            RecipeTableMap::addInstanceToPool($obj, $key);
+            DayPlanRecipeTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -308,18 +314,18 @@ class RecipeTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = RecipeTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = RecipeTableMap::getInstanceFromPool($key))) {
+            $key = DayPlanRecipeTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = DayPlanRecipeTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var Recipe $obj */
+                /** @var DayPlanRecipe $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                RecipeTableMap::addInstanceToPool($obj, $key);
+                DayPlanRecipeTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -340,17 +346,19 @@ class RecipeTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(RecipeTableMap::COL_ID);
-            $criteria->addSelectColumn(RecipeTableMap::COL_NAME);
-            $criteria->addSelectColumn(RecipeTableMap::COL_INSTRUCTIONS);
-            $criteria->addSelectColumn(RecipeTableMap::COL_REMOVED);
-            $criteria->addSelectColumn(RecipeTableMap::COL_CREATED_AT);
-            $criteria->addSelectColumn(RecipeTableMap::COL_UPDATED_AT);
+            $criteria->addSelectColumn(DayPlanRecipeTableMap::COL_ID);
+            $criteria->addSelectColumn(DayPlanRecipeTableMap::COL_DAY_PLAN_ID);
+            $criteria->addSelectColumn(DayPlanRecipeTableMap::COL_RECIPE_ID);
+            $criteria->addSelectColumn(DayPlanRecipeTableMap::COL_CATEGORY_ID);
+            $criteria->addSelectColumn(DayPlanRecipeTableMap::COL_SERVERS);
+            $criteria->addSelectColumn(DayPlanRecipeTableMap::COL_CREATED_AT);
+            $criteria->addSelectColumn(DayPlanRecipeTableMap::COL_UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.name');
-            $criteria->addSelectColumn($alias . '.instructions');
-            $criteria->addSelectColumn($alias . '.removed');
+            $criteria->addSelectColumn($alias . '.day_plan_id');
+            $criteria->addSelectColumn($alias . '.recipe_id');
+            $criteria->addSelectColumn($alias . '.category_id');
+            $criteria->addSelectColumn($alias . '.servers');
             $criteria->addSelectColumn($alias . '.created_at');
             $criteria->addSelectColumn($alias . '.updated_at');
         }
@@ -365,7 +373,7 @@ class RecipeTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(RecipeTableMap::DATABASE_NAME)->getTable(RecipeTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(DayPlanRecipeTableMap::DATABASE_NAME)->getTable(DayPlanRecipeTableMap::TABLE_NAME);
     }
 
     /**
@@ -373,16 +381,16 @@ class RecipeTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(RecipeTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(RecipeTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new RecipeTableMap());
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(DayPlanRecipeTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(DayPlanRecipeTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new DayPlanRecipeTableMap());
         }
     }
 
     /**
-     * Performs a DELETE on the database, given a Recipe or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a DayPlanRecipe or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Recipe object or primary key or array of primary keys
+     * @param mixed               $values Criteria or DayPlanRecipe object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param  ConnectionInterface $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -393,27 +401,27 @@ class RecipeTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(RecipeTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(DayPlanRecipeTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Lib\Recipe) { // it's a model object
+        } elseif ($values instanceof \Lib\DayPlanRecipe) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(RecipeTableMap::DATABASE_NAME);
-            $criteria->add(RecipeTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(DayPlanRecipeTableMap::DATABASE_NAME);
+            $criteria->add(DayPlanRecipeTableMap::COL_ID, (array) $values, Criteria::IN);
         }
 
-        $query = RecipeQuery::create()->mergeWith($criteria);
+        $query = DayPlanRecipeQuery::create()->mergeWith($criteria);
 
         if ($values instanceof Criteria) {
-            RecipeTableMap::clearInstancePool();
+            DayPlanRecipeTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
             foreach ((array) $values as $singleval) {
-                RecipeTableMap::removeInstanceFromPool($singleval);
+                DayPlanRecipeTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -421,20 +429,20 @@ class RecipeTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the recipe table.
+     * Deletes all rows from the day_plan_recipe table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return RecipeQuery::create()->doDeleteAll($con);
+        return DayPlanRecipeQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Recipe or Criteria object.
+     * Performs an INSERT on the database, given a DayPlanRecipe or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Recipe object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or DayPlanRecipe object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -443,22 +451,22 @@ class RecipeTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(RecipeTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(DayPlanRecipeTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Recipe object
+            $criteria = $criteria->buildCriteria(); // build Criteria from DayPlanRecipe object
         }
 
-        if ($criteria->containsKey(RecipeTableMap::COL_ID) && $criteria->keyContainsValue(RecipeTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.RecipeTableMap::COL_ID.')');
+        if ($criteria->containsKey(DayPlanRecipeTableMap::COL_ID) && $criteria->keyContainsValue(DayPlanRecipeTableMap::COL_ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.DayPlanRecipeTableMap::COL_ID.')');
         }
 
 
         // Set the correct dbName
-        $query = RecipeQuery::create()->mergeWith($criteria);
+        $query = DayPlanRecipeQuery::create()->mergeWith($criteria);
 
         // use transaction because $criteria could contain info
         // for more than one table (I guess, conceivably)
@@ -467,7 +475,7 @@ class RecipeTableMap extends TableMap
         });
     }
 
-} // RecipeTableMap
+} // DayPlanRecipeTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-RecipeTableMap::buildTableMap();
+DayPlanRecipeTableMap::buildTableMap();
