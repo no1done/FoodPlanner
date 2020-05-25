@@ -141,10 +141,12 @@ class DayController extends AbstractActionController {
                 $recipe,
                 $servings
             );
-            
 
         } catch (Exception $e) {
-            $this->flashMessenger()->addErrorMessage($e->getMessage());
+            $this->flashMessenger()->addErrorMessage(
+                "{$e->getMessage()}: <br>{$e->getPrevious()}" .
+                "<br><br>{$e->getTraceAsString()}"
+            );
         }
 
         return $this->redirect()->toRoute('planner', [
