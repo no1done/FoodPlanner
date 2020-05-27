@@ -13,8 +13,10 @@ use Lib\CategoryQuery;
 use Lib\DayPlan;
 use Lib\DayPlanQuery;
 use Lib\DayPlanRecipeQuery;
+use Lib\ListRecipeQuery;
 use Lib\RecipeQuery;
 use Lib\ShoppingListQuery;
+use Propel\Runtime\ActiveQuery\Criteria;
 use RuntimeException;
 
 /**
@@ -147,6 +149,35 @@ class DayController extends AbstractActionController {
                 "{$e->getMessage()}: <br>{$e->getPrevious()}" .
                 "<br><br>{$e->getTraceAsString()}"
             );
+        }
+
+        return $this->redirect()->toRoute('planner', [
+            'list_id' => $list_id
+        ]);
+    }
+
+    public function removeRecipeAction()
+    {
+        $list_id = $this->params()->fromRoute('list_id');
+
+        try {
+            // Day plan recipe ID we want to delete.
+            $dayPlanRecipeId = $this->params()->fromRoute('id');
+
+            // Remove planner entry
+            $recipe_id = $this->dayService->removeMealFromPlan($dayPlanRecipeId);
+
+            // Find ListRecipe table entry and remove it?
+            $listRecipe = ListRecipeQuery::create()
+                ->filterByShoppingListId($list_id)
+                ->filterByRecipeId($recipe_id)
+                ->filterByRef(null, Criteria::ISNOTNULL)
+                ->findOne();
+
+            $this->listService->removeRecipe($listRecipe->getId());
+
+        } catch (Exception $e) {
+            $this->flashMessenger()->addErrorMessage($e->getMessage());
         }
 
         return $this->redirect()->toRoute('planner', [

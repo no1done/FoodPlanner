@@ -3,6 +3,7 @@
 namespace Application\Service;
 
 use Lib\DayPlanRecipe;
+use Lib\DayPlanRecipeQuery;
 use Propel\Runtime\Exception\PropelException;
 
 /**
@@ -31,8 +32,27 @@ class DayService {
             ->setDayPlanId($dayPlanId)
             ->setServers($servings)
             ->save();
-
-        // Add to shopping list using existing recipe functionality here?
     }
 
+    /**
+     * Remove meal from plan
+     *
+     * Return recipe ID so we can remove it from
+     * shopping list
+     *
+     * @param int $dprId
+     * @return int
+     * @throws PropelException
+     */
+    public function removeMealFromPlan(int $dprId): int
+    {
+        $dpr = DayPlanRecipeQuery::create()
+            ->findPk($dprId);
+
+        $recipeId = $dpr->getRecipeId();
+
+        $dpr->delete();
+
+        return $recipeId;
+    }
 }
