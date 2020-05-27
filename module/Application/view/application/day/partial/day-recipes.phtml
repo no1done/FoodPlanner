@@ -17,16 +17,26 @@ use Lib\RecipeQuery;
             foreach ($this->recipes as $recipe) : ?>
 
                 <tr>
-                    <td>
-                    <a href="<?= $this->url('recipe', [
-                        'id' => $recipe->getRecipeId(),
-                        'action' => 'view'
-                    ]); ?>">
-                        <?= $recipe->getRecipe()->getName(); ?>
-                    </a>
+                    <td style="width: 70%;">
+                        <a href="<?= $this->url('recipe', [
+                            'id' => $recipe->getRecipeId(),
+                            'action' => 'view'
+                        ]); ?>">
+                            <?= $recipe->getRecipe()->getName(); ?>
+                        </a>
                     </td>
-                    <td>
+                    <td style="width: 15%;">
                         x <?= $recipe->getServers(); ?>
+                    </td>
+                    <td style="width: 15%;">
+                        <!-- Delete button -->
+                        <a class="btn btn-sm btn-danger" href="<?= $this->url('planner', [
+                            'list_id' => $this->listId,
+                            'action' => 'removeRecipe',
+                            'id' => $recipe->getId()
+                        ]); ?>">
+                            X
+                        </a>
                     </td>
                 </tr>
 
