@@ -14,6 +14,19 @@ $recipe = $this->recipe;
     </a>
 </h1>
 
+<form id="servings-form">
+    <div class="form-group row">
+        <label for="servings" class="col-sm-2 col-form-label">Servings</label>
+        <div class="col-sm-10">
+            <select class="form-control" id="servings" name="servings">
+                <?php for ($i = 1; $i < 10; $i++) : ?>
+                    <option <?= $i == $this->servings ? 'selected':''; ?>><?= $i; ?></option>
+                <?php endfor; ?>
+            </select>
+        </div>
+    </div>
+</form>
+
 <div class="row">
 
     <!-- instructions -->
@@ -53,7 +66,7 @@ $recipe = $this->recipe;
                     <tr>
                         <td><?= $recipeItem->getItem()->getName(); ?></td>
                         <td>
-                            <?= $recipeItem->getQuantity(); ?>
+                            <?= $recipeItem->getQuantity() * $this->servings; ?>
                             <?= $recipeItem->getItem()->getUnit(); ?>
                         </td>
                     </tr>
@@ -67,3 +80,10 @@ $recipe = $this->recipe;
 
 </div>
 
+<script type="text/javascript">
+    $(function() {
+        $('#servings').on('change', function() {
+            $('#servings-form').submit();
+        })
+    })
+</script>

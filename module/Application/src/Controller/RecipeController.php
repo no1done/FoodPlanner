@@ -62,6 +62,8 @@ class RecipeController extends AbstractActionController
         try {
             $id = $this->params()->fromRoute('id');
 
+            $servings = (int) $this->params()->fromQuery('servings') ?: 1;
+
             $recipe = RecipeQuery::create()->findPk($id);
 
             if (!$recipe) throw new RuntimeException(
@@ -69,7 +71,8 @@ class RecipeController extends AbstractActionController
             );
 
             return [
-                'recipe' => $recipe
+                'recipe' => $recipe,
+                'servings' => $servings
             ];
         } catch (Exception $e) {
             $this->flashMessenger()->addErrorMessage($e->getMessage());
