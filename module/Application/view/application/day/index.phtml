@@ -7,7 +7,7 @@ $counter = 1;
 
 <h2>Meal Planner for <?= $this->list->getName(); ?></h2>
 
-<a class="btn btn-success" href="<?= $this->url('planner', [
+<a class="btn btn-success btn-block" href="<?= $this->url('planner', [
     'list_id' => $this->list->getId(),
     'action' => 'add'
 ]); ?>">
@@ -52,6 +52,17 @@ $counter = 1;
         </div>
     </div>
 </div>
+<hr>
+<div class="row">
+    <div class="col">
+        <p>
+            <i class="fa fa-burn"></i> Calories Per Person
+        </p>
+        <p>
+            <i class="fa fa-users"></i> Number of servings
+        </p>
+    </div>
+</div>
 
 <script type="text/javascript">
 
@@ -74,6 +85,94 @@ $counter = 1;
             form.submit();
         });
 
+        $('.remove-day').on('click', function() {
+
+            let dayPlanId = $(this).data('id');
+
+            console.log(dayPlanId);
+            $('#rm_dayplan_id').val(dayPlanId);
+
+            $('#removeDayModal').modal('show')
+        });
+
+        $('.remove-recipe').on('click', function() {
+
+            let dayRecipeId = $(this).data('id');
+            let name = $(this).data('name');
+
+            console.log(dayRecipeId,name);
+
+            // Set values on modal
+            $('#rm_recipe_id').val(dayRecipeId);
+            $('#rm_recipe_name').html(name);
+
+            // Show the modal
+            $('#removeRecipeModal').modal('show');
+        });
+
     });
 
 </script>
+
+
+<!-- Remove day Modal -->
+<div class="modal fade" id="removeDayModal" tabindex="-1" role="dialog" aria-labelledby="removeDayModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="removeDayModal">Remove Day</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="POST" action="<?= $this->url('planner', [
+                'list_id' => $this->list->getId(),
+                'action' => 'remove'
+            ]); ?>">
+                <div class="modal-body">
+                    <p>Are you sure you want to remove this day? This action cannot be undone.</p>
+
+                    <p>Marking the day as complete will also remove items from the list.</p>
+
+                    <input type="hidden" name="rm_day_plan_id" id="rm_dayplan_id" value=""/>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Nooo keep it!</button>
+                    <button type="submit" class="btn btn-danger">Delete it!</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Remove recipe Modal -->
+<div class="modal fade" id="removeRecipeModal" tabindex="-1" role="dialog" aria-labelledby="removeRecipeModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="removeDayModal">Remove Recipe: <span id="rm_recipe_name"></span></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="POST" action="<?= $this->url('planner', [
+                'list_id' => $this->list->getId(),
+                'action' => 'removeRecipe'
+            ]); ?>">
+                <div class="modal-body">
+                    <p>Are you sure you want to remove this recipe? This action cannot be undone.</p>
+
+                    <p>Marking the recipe as complete will also remove items from the list.</p>
+
+                    <input type="hidden" id="rm_recipe_id" name="rm_recipe_id" value="" />
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Nooo keep it!</button>
+                    <button type="submit" class="btn btn-danger">Delete it!</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

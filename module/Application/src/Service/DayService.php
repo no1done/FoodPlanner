@@ -55,4 +55,9 @@ class DayService {
 
         return $recipeId;
     }
+
+    public function removeDay(int $day_plan_id)
+    {
+
+    }
 }

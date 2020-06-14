@@ -8,6 +8,7 @@ use Exception;
 use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\Plugin\FlashMessenger\FlashMessenger;
+use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 use Lib\CategoryQuery;
 use Lib\DayPlan;
@@ -103,6 +104,54 @@ class DayController extends AbstractActionController {
     }
 
     /**
+     * Delete a day
+     */
+    public function removeAction()
+    {
+        $list_id = $this->params()->fromRoute('list_id');
+
+        try {
+
+            if (!$this->getRequest()->isPost()) throw new RuntimeException(
+                "Invalid request."
+            );
+
+            $day_plan_id = (int) $this->params()->fromPost('rm_day_plan_id');
+
+            $dayPlan = DayPlanQuery::create()->findPk($day_plan_id);
+
+            foreach ($dayPlan->getDayPlanRecipes() as $planRecipe) {
+
+                // Remove planner entry
+                $recipe_id = $this->dayService->removeMealFromPlan(
+                    $planRecipe->getId()
+                );
+
+                // Find ListRecipe table entry and remove it
+                $listRecipe = ListRecipeQuery::create()
+                    ->filterByShoppingListId($list_id)
+                    ->filterByRecipeId($recipe_id)
+                    ->filterByRef(null, Criteria::ISNOTNULL)
+                    ->findOne();
+
+                $this->listService->removeRecipe($listRecipe->getId());
+            }
+
+            // Remove day
+            $dayPlan->delete();
+
+            $this->flashMessenger()->addSuccessMessage('Day removed.');
+
+        } catch (Exception $e) {
+            $this->flashMessenger()->addErrorMessage($e->getMessage());
+        }
+
+        return $this->redirect()->toRoute('planner', [
+            'list_id' => $list_id
+        ]);
+    }
+
+    /**
      * Add Recipe
      *
      * @return Response
@@ -156,18 +205,27 @@ class DayController extends AbstractActionController {
         ]);
     }
 
+    /**
+     * POST method catch to remove recipe
+     *
+     * @return Response
+     */
     public function removeRecipeAction()
     {
         $list_id = $this->params()->fromRoute('list_id');
 
         try {
+            if (!$this->getRequest()->isPost()) throw new RuntimeException(
+                "Invalid request."
+            );
+
             // Day plan recipe ID we want to delete.
-            $dayPlanRecipeId = $this->params()->fromRoute('id');
+            $dayPlanRecipeId = $this->params()->fromPost('rm_recipe_id');
 
             // Remove planner entry
             $recipe_id = $this->dayService->removeMealFromPlan($dayPlanRecipeId);
 
-            // Find ListRecipe table entry and remove it?
+            // Find ListRecipe table entry and remove it
             $listRecipe = ListRecipeQuery::create()
                 ->filterByShoppingListId($list_id)
                 ->filterByRecipeId($recipe_id)

@@ -19,3 +19,7 @@ td {
     height: 30px;
     width: 30px;
 }
+
+.table-condensed > tbody > tr > td, th{
+    font-size: 12px;
+}

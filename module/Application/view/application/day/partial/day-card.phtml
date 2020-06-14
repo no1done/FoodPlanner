@@ -9,10 +9,10 @@ use Lib\RecipeQuery;
 $day = $this->day;
 
 $meals = [
-    'Breakfasts' => Categories::BREAKFAST_KEY,
-    'Lunches' => Categories::LUNCH_KEY,
-    'Dinners' => Categories::DINNER_KEY,
-    'Snacks' => Categories::SNACK_KEY
+    'Breakfast' => Categories::BREAKFAST_KEY,
+    'Lunch' => Categories::LUNCH_KEY,
+    'Dinner' => Categories::DINNER_KEY,
+    'Snack' => Categories::SNACK_KEY
 ];
 
 $allRecipes = RecipeQuery::create()->findByRemoved(false);
@@ -29,8 +29,34 @@ $totalCal = DayPlanRecipeQuery::create()
 
 <div class="card mt-1 mb-1">
 
-    <div class="card-header text-center">
-        Day #<?= $this->dayNumber; ?> (<?= $totalCal; ?> Kcal)
+    <div class="card-header">
+        <div class="row text-center align-items-center">
+
+            <div class="col-2 text-left">
+                <!-- Button mark day done -->
+                <button type="button"
+                        class="btn btn-sm btn-outline-success float-right day-done"
+                        data-id="<?= $day->getId(); ?>"
+                >
+                    <i class="fa fa-check"></i>
+                </button>
+
+            </div>
+
+            <div class="col-8">
+                Day #<?= $this->dayNumber; ?> - <?= $totalCal; ?> <i class="fa fa-fire"></i>
+            </div>
+
+            <div class="col-2">
+                <!-- Button Delete day -->
+                <button type="button"
+                        class="btn btn-sm btn-outline-danger float-right remove-day"
+                        data-id="<?= $day->getId(); ?>"
+                >
+                    <i class="fa fa-trash"></i>
+                </button>
+            </div>
+        </div>
     </div>
 
     <div class="card-body">
