@@ -97,7 +97,8 @@ class RecipeController extends AbstractActionController
                 $recipe = new Recipe();
             }
 
-            $recipe->setName($post['name']);
+            $recipe->setName($post['name'])
+                ->setCalories($post['calories']);
 
             if (isset($post['instructions'])) {
                 $recipe->setInstructions($post['instructions']);

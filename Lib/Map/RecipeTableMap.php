@@ -58,7 +58,7 @@ class RecipeTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 7;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class RecipeTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /**
      * the column name for the id field
@@ -79,6 +79,11 @@ class RecipeTableMap extends TableMap
      * the column name for the name field
      */
     const COL_NAME = 'recipe.name';
+
+    /**
+     * the column name for the calories field
+     */
+    const COL_CALORIES = 'recipe.calories';
 
     /**
      * the column name for the instructions field
@@ -112,11 +117,11 @@ class RecipeTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'Instructions', 'Removed', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'name', 'instructions', 'removed', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(RecipeTableMap::COL_ID, RecipeTableMap::COL_NAME, RecipeTableMap::COL_INSTRUCTIONS, RecipeTableMap::COL_REMOVED, RecipeTableMap::COL_CREATED_AT, RecipeTableMap::COL_UPDATED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'name', 'instructions', 'removed', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id', 'Name', 'Calories', 'Instructions', 'Removed', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'name', 'calories', 'instructions', 'removed', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(RecipeTableMap::COL_ID, RecipeTableMap::COL_NAME, RecipeTableMap::COL_CALORIES, RecipeTableMap::COL_INSTRUCTIONS, RecipeTableMap::COL_REMOVED, RecipeTableMap::COL_CREATED_AT, RecipeTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'name', 'calories', 'instructions', 'removed', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -126,11 +131,11 @@ class RecipeTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Instructions' => 2, 'Removed' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'instructions' => 2, 'removed' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        self::TYPE_COLNAME       => array(RecipeTableMap::COL_ID => 0, RecipeTableMap::COL_NAME => 1, RecipeTableMap::COL_INSTRUCTIONS => 2, RecipeTableMap::COL_REMOVED => 3, RecipeTableMap::COL_CREATED_AT => 4, RecipeTableMap::COL_UPDATED_AT => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'instructions' => 2, 'removed' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Calories' => 2, 'Instructions' => 3, 'Removed' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'calories' => 2, 'instructions' => 3, 'removed' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        self::TYPE_COLNAME       => array(RecipeTableMap::COL_ID => 0, RecipeTableMap::COL_NAME => 1, RecipeTableMap::COL_CALORIES => 2, RecipeTableMap::COL_INSTRUCTIONS => 3, RecipeTableMap::COL_REMOVED => 4, RecipeTableMap::COL_CREATED_AT => 5, RecipeTableMap::COL_UPDATED_AT => 6, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'calories' => 2, 'instructions' => 3, 'removed' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -152,6 +157,7 @@ class RecipeTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'VARCHAR', false, 150, null);
+        $this->addColumn('calories', 'Calories', 'INTEGER', false, null, null);
         $this->addColumn('instructions', 'Instructions', 'LONGVARCHAR', false, null, null);
         $this->addColumn('removed', 'Removed', 'BOOLEAN', false, 1, false);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
@@ -342,6 +348,7 @@ class RecipeTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(RecipeTableMap::COL_ID);
             $criteria->addSelectColumn(RecipeTableMap::COL_NAME);
+            $criteria->addSelectColumn(RecipeTableMap::COL_CALORIES);
             $criteria->addSelectColumn(RecipeTableMap::COL_INSTRUCTIONS);
             $criteria->addSelectColumn(RecipeTableMap::COL_REMOVED);
             $criteria->addSelectColumn(RecipeTableMap::COL_CREATED_AT);
@@ -349,6 +356,7 @@ class RecipeTableMap extends TableMap
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
+            $criteria->addSelectColumn($alias . '.calories');
             $criteria->addSelectColumn($alias . '.instructions');
             $criteria->addSelectColumn($alias . '.removed');
             $criteria->addSelectColumn($alias . '.created_at');

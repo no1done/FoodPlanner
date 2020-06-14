@@ -16,19 +16,26 @@ $meals = [
 ];
 
 $allRecipes = RecipeQuery::create()->findByRemoved(false);
+
+// Get total cals for day
+$totalCal = DayPlanRecipeQuery::create()
+    ->select(['TotalCal'])
+    ->filterByDayPlan($day)
+    ->useRecipeQuery()
+        ->withColumn('SUM(recipe.calories)', 'TotalCal')
+    ->endUse()
+    ->findOne();
 ?>
 
 <div class="card mt-1 mb-1">
 
     <div class="card-header text-center">
-        Day #<?= $this->dayNumber; ?>
+        Day #<?= $this->dayNumber; ?> (<?= $totalCal; ?> Kcal)
     </div>
 
     <div class="card-body">
 
         <?php foreach ($meals as $title => $key) : ?>
-
-
 
             <?php
             $recipes = DayPlanRecipeQuery::create()

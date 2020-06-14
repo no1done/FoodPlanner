@@ -14,6 +14,7 @@
     <table name="recipe" phpName="Recipe">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="name" type="varchar" size="150" />
+        <column name="calories" type="integer" required="false"/>
         <column name="instructions" type="LONGVARCHAR" required="false"/>
         <column name="removed" type="boolean" size="1" defaultValue="false"/>
         <behavior name="timestampable" />

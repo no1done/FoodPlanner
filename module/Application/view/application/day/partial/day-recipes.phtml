@@ -1,7 +1,6 @@
 <?php
 
 use Lib\DayPlanRecipe;
-use Lib\RecipeQuery;
 
 ?>
 
@@ -17,7 +16,7 @@ use Lib\RecipeQuery;
             foreach ($this->recipes as $recipe) : ?>
 
                 <tr>
-                    <td style="width: 70%;">
+                    <td style="width: 64%;">
                         <a href="<?= $this->url('recipe', [
                             'id' => $recipe->getRecipeId(),
                             'action' => 'view'
@@ -25,10 +24,17 @@ use Lib\RecipeQuery;
                             <?= $recipe->getRecipe()->getName(); ?>
                         </a>
                     </td>
-                    <td style="width: 15%;">
+
+                    <td style="width: 12%;">
+                        <?php if ($recipe->getRecipe()->getCalories()) : ?>
+                            <?= $recipe->getRecipe()->getCalories(); ?>
+                        <?php endif; ?>
+                    </td>
+
+                    <td style="width: 12%;">
                         x <?= $recipe->getServers(); ?>
                     </td>
-                    <td style="width: 15%;">
+                    <td style="width: 12%;">
                         <!-- Delete button -->
                         <a class="btn btn-sm btn-danger" href="<?= $this->url('planner', [
                             'list_id' => $this->listId,
