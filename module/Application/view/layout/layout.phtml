@@ -80,6 +80,9 @@
                             <a class="nav-link" href="<?= $this->url('item') ?>">Items</a>
                         </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?= $this->url('admin') ?>">Admin</a>
+                        </li>
                         
                     </ul>
                 </div>
@@ -98,7 +101,7 @@
                 <p>&copy; <?= date('Y') ?> Food Planner</p>
             </footer>
         </div>
-        <?= $this->inlineScript() ?>
+        <?= $this->inlineScript()->prependFile($this->basePath('js/app.js')) ?>
 
         <script type="text/javascript">
             $(document).ready(function() {

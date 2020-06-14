@@ -25,26 +25,23 @@ $totalCal = DayPlanRecipeQuery::create()
         ->withColumn('SUM(recipe.calories)', 'TotalCal')
     ->endUse()
     ->findOne();
+
+$dayDoneClass = "text-white bg-success ";
+$dayClass = "";
 ?>
 
-<div class="card mt-1 mb-1">
+<div class="card <?= $day->isComplete() ? $dayDoneClass : ''; ?>mt-1 mb-1"
+     id="day_card_<?= $day->getId(); ?>">
 
     <div class="card-header">
         <div class="row text-center align-items-center">
 
-            <div class="col-2 text-left">
-                <!-- Button mark day done -->
-                <button type="button"
-                        class="btn btn-sm btn-outline-success float-right day-done"
-                        data-id="<?= $day->getId(); ?>"
-                >
-                    <i class="fa fa-check"></i>
-                </button>
 
-            </div>
-
-            <div class="col-8">
-                Day #<?= $this->dayNumber; ?> - <?= $totalCal; ?> <i class="fa fa-fire"></i>
+            <div class="col-8 offset-2">
+                <a id="day_title_<?= $day->getId(); ?>"
+                   class="text-decoration-none d-block <?= $day->isComplete() ? 'text-white' : 'text-dark'; ?>" data-toggle="collapse" href="#day_card_body_<?= $day->getId(); ?>">
+                    Day #<?= $this->dayNumber; ?> - <?= $totalCal; ?> <i class="fa fa-fire"></i>
+                </a>
             </div>
 
             <div class="col-2">
@@ -59,7 +56,7 @@ $totalCal = DayPlanRecipeQuery::create()
         </div>
     </div>
 
-    <div class="card-body">
+    <div class="card-body collapse <?= $day->isComplete() ? '' : 'show'; ?>" id="day_card_body_<?= $day->getId(); ?>">
 
         <?php foreach ($meals as $title => $key) : ?>
 
@@ -72,6 +69,7 @@ $totalCal = DayPlanRecipeQuery::create()
                 ->find();
 
             echo $this->partial('planner/meals', [
+                'dayId' => $day->getId(),
                 'listId' => $day->getShoppingListId(),
                 'recipes' => $recipes,
                 'title' => $title,

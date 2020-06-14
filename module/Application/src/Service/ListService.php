@@ -92,6 +92,9 @@ class ListService {
             ->filterByShoppingList($list)
             ->innerJoinWithItem()
             ->withColumn('SUM(quantity)', 'total')
+            ->useListRecipeQuery()
+                ->filterByComplete(false)
+            ->endUse()
             ->groupByPurchased()
             ->groupByItemId()
             ->find();

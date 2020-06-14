@@ -22,11 +22,13 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildDayPlanQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildDayPlanQuery orderByShoppingListId($order = Criteria::ASC) Order by the shopping_list_id column
+ * @method     ChildDayPlanQuery orderByComplete($order = Criteria::ASC) Order by the complete column
  * @method     ChildDayPlanQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildDayPlanQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildDayPlanQuery groupById() Group by the id column
  * @method     ChildDayPlanQuery groupByShoppingListId() Group by the shopping_list_id column
+ * @method     ChildDayPlanQuery groupByComplete() Group by the complete column
  * @method     ChildDayPlanQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildDayPlanQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -65,6 +67,7 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildDayPlan findOneById(int $id) Return the first ChildDayPlan filtered by the id column
  * @method     ChildDayPlan findOneByShoppingListId(int $shopping_list_id) Return the first ChildDayPlan filtered by the shopping_list_id column
+ * @method     ChildDayPlan findOneByComplete(boolean $complete) Return the first ChildDayPlan filtered by the complete column
  * @method     ChildDayPlan findOneByCreatedAt(string $created_at) Return the first ChildDayPlan filtered by the created_at column
  * @method     ChildDayPlan findOneByUpdatedAt(string $updated_at) Return the first ChildDayPlan filtered by the updated_at column *
 
@@ -73,12 +76,14 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildDayPlan requireOneById(int $id) Return the first ChildDayPlan filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildDayPlan requireOneByShoppingListId(int $shopping_list_id) Return the first ChildDayPlan filtered by the shopping_list_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildDayPlan requireOneByComplete(boolean $complete) Return the first ChildDayPlan filtered by the complete column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildDayPlan requireOneByCreatedAt(string $created_at) Return the first ChildDayPlan filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildDayPlan requireOneByUpdatedAt(string $updated_at) Return the first ChildDayPlan filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildDayPlan[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildDayPlan objects based on current ModelCriteria
  * @method     ChildDayPlan[]|ObjectCollection findById(int $id) Return ChildDayPlan objects filtered by the id column
  * @method     ChildDayPlan[]|ObjectCollection findByShoppingListId(int $shopping_list_id) Return ChildDayPlan objects filtered by the shopping_list_id column
+ * @method     ChildDayPlan[]|ObjectCollection findByComplete(boolean $complete) Return ChildDayPlan objects filtered by the complete column
  * @method     ChildDayPlan[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildDayPlan objects filtered by the created_at column
  * @method     ChildDayPlan[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildDayPlan objects filtered by the updated_at column
  * @method     ChildDayPlan[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
@@ -179,7 +184,7 @@ abstract class DayPlanQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, shopping_list_id, created_at, updated_at FROM day_plan WHERE id = :p0';
+        $sql = 'SELECT id, shopping_list_id, complete, created_at, updated_at FROM day_plan WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -351,6 +356,33 @@ abstract class DayPlanQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(DayPlanTableMap::COL_SHOPPING_LIST_ID, $shoppingListId, $comparison);
+    }
+
+    /**
+     * Filter the query on the complete column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByComplete(true); // WHERE complete = true
+     * $query->filterByComplete('yes'); // WHERE complete = true
+     * </code>
+     *
+     * @param     boolean|string $complete The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildDayPlanQuery The current query, for fluid interface
+     */
+    public function filterByComplete($complete = null, $comparison = null)
+    {
+        if (is_string($complete)) {
+            $complete = in_array(strtolower($complete), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(DayPlanTableMap::COL_COMPLETE, $complete, $comparison);
     }
 
     /**

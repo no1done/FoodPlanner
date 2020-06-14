@@ -104,6 +104,14 @@ abstract class DayPlanRecipe implements ActiveRecordInterface
     protected $servers;
 
     /**
+     * The value for the complete field.
+     *
+     * Note: this column has a database default value of: false
+     * @var        boolean
+     */
+    protected $complete;
+
+    /**
      * The value for the created_at field.
      *
      * @var        DateTime
@@ -141,10 +149,23 @@ abstract class DayPlanRecipe implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->complete = false;
+    }
+
+    /**
      * Initializes internal state of Lib\Base\DayPlanRecipe object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -416,6 +437,26 @@ abstract class DayPlanRecipe implements ActiveRecordInterface
     }
 
     /**
+     * Get the [complete] column value.
+     *
+     * @return boolean
+     */
+    public function getComplete()
+    {
+        return $this->complete;
+    }
+
+    /**
+     * Get the [complete] column value.
+     *
+     * @return boolean
+     */
+    public function isComplete()
+    {
+        return $this->getComplete();
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -568,6 +609,34 @@ abstract class DayPlanRecipe implements ActiveRecordInterface
     } // setServers()
 
     /**
+     * Sets the value of the [complete] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param  boolean|integer|string $v The new value
+     * @return $this|\Lib\DayPlanRecipe The current object (for fluent API support)
+     */
+    public function setComplete($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->complete !== $v) {
+            $this->complete = $v;
+            $this->modifiedColumns[DayPlanRecipeTableMap::COL_COMPLETE] = true;
+        }
+
+        return $this;
+    } // setComplete()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
@@ -617,6 +686,10 @@ abstract class DayPlanRecipe implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->complete !== false) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -658,13 +731,16 @@ abstract class DayPlanRecipe implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : DayPlanRecipeTableMap::translateFieldName('Servers', TableMap::TYPE_PHPNAME, $indexType)];
             $this->servers = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : DayPlanRecipeTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : DayPlanRecipeTableMap::translateFieldName('Complete', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->complete = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : DayPlanRecipeTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : DayPlanRecipeTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : DayPlanRecipeTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -677,7 +753,7 @@ abstract class DayPlanRecipe implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = DayPlanRecipeTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = DayPlanRecipeTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Lib\\DayPlanRecipe'), 0, $e);
@@ -944,6 +1020,9 @@ abstract class DayPlanRecipe implements ActiveRecordInterface
         if ($this->isColumnModified(DayPlanRecipeTableMap::COL_SERVERS)) {
             $modifiedColumns[':p' . $index++]  = 'servers';
         }
+        if ($this->isColumnModified(DayPlanRecipeTableMap::COL_COMPLETE)) {
+            $modifiedColumns[':p' . $index++]  = 'complete';
+        }
         if ($this->isColumnModified(DayPlanRecipeTableMap::COL_CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'created_at';
         }
@@ -975,6 +1054,9 @@ abstract class DayPlanRecipe implements ActiveRecordInterface
                         break;
                     case 'servers':
                         $stmt->bindValue($identifier, $this->servers, PDO::PARAM_INT);
+                        break;
+                    case 'complete':
+                        $stmt->bindValue($identifier, (int) $this->complete, PDO::PARAM_INT);
                         break;
                     case 'created_at':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
@@ -1060,9 +1142,12 @@ abstract class DayPlanRecipe implements ActiveRecordInterface
                 return $this->getServers();
                 break;
             case 5:
-                return $this->getCreatedAt();
+                return $this->getComplete();
                 break;
             case 6:
+                return $this->getCreatedAt();
+                break;
+            case 7:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1100,15 +1185,16 @@ abstract class DayPlanRecipe implements ActiveRecordInterface
             $keys[2] => $this->getRecipeId(),
             $keys[3] => $this->getCategoryId(),
             $keys[4] => $this->getServers(),
-            $keys[5] => $this->getCreatedAt(),
-            $keys[6] => $this->getUpdatedAt(),
+            $keys[5] => $this->getComplete(),
+            $keys[6] => $this->getCreatedAt(),
+            $keys[7] => $this->getUpdatedAt(),
         );
-        if ($result[$keys[5]] instanceof \DateTimeInterface) {
-            $result[$keys[5]] = $result[$keys[5]]->format('c');
-        }
-
         if ($result[$keys[6]] instanceof \DateTimeInterface) {
             $result[$keys[6]] = $result[$keys[6]]->format('c');
+        }
+
+        if ($result[$keys[7]] instanceof \DateTimeInterface) {
+            $result[$keys[7]] = $result[$keys[7]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1212,9 +1298,12 @@ abstract class DayPlanRecipe implements ActiveRecordInterface
                 $this->setServers($value);
                 break;
             case 5:
-                $this->setCreatedAt($value);
+                $this->setComplete($value);
                 break;
             case 6:
+                $this->setCreatedAt($value);
+                break;
+            case 7:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1259,10 +1348,13 @@ abstract class DayPlanRecipe implements ActiveRecordInterface
             $this->setServers($arr[$keys[4]]);
         }
         if (array_key_exists($keys[5], $arr)) {
-            $this->setCreatedAt($arr[$keys[5]]);
+            $this->setComplete($arr[$keys[5]]);
         }
         if (array_key_exists($keys[6], $arr)) {
-            $this->setUpdatedAt($arr[$keys[6]]);
+            $this->setCreatedAt($arr[$keys[6]]);
+        }
+        if (array_key_exists($keys[7], $arr)) {
+            $this->setUpdatedAt($arr[$keys[7]]);
         }
     }
 
@@ -1319,6 +1411,9 @@ abstract class DayPlanRecipe implements ActiveRecordInterface
         }
         if ($this->isColumnModified(DayPlanRecipeTableMap::COL_SERVERS)) {
             $criteria->add(DayPlanRecipeTableMap::COL_SERVERS, $this->servers);
+        }
+        if ($this->isColumnModified(DayPlanRecipeTableMap::COL_COMPLETE)) {
+            $criteria->add(DayPlanRecipeTableMap::COL_COMPLETE, $this->complete);
         }
         if ($this->isColumnModified(DayPlanRecipeTableMap::COL_CREATED_AT)) {
             $criteria->add(DayPlanRecipeTableMap::COL_CREATED_AT, $this->created_at);
@@ -1416,6 +1511,7 @@ abstract class DayPlanRecipe implements ActiveRecordInterface
         $copyObj->setRecipeId($this->getRecipeId());
         $copyObj->setCategoryId($this->getCategoryId());
         $copyObj->setServers($this->getServers());
+        $copyObj->setComplete($this->getComplete());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1620,10 +1716,12 @@ abstract class DayPlanRecipe implements ActiveRecordInterface
         $this->recipe_id = null;
         $this->category_id = null;
         $this->servers = null;
+        $this->complete = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);

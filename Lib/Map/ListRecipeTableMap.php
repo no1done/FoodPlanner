@@ -58,7 +58,7 @@ class ListRecipeTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 8;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class ListRecipeTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 8;
 
     /**
      * the column name for the id field
@@ -96,6 +96,11 @@ class ListRecipeTableMap extends TableMap
     const COL_SERVES = 'list_recipe.serves';
 
     /**
+     * the column name for the complete field
+     */
+    const COL_COMPLETE = 'list_recipe.complete';
+
+    /**
      * the column name for the created_at field
      */
     const COL_CREATED_AT = 'list_recipe.created_at';
@@ -117,11 +122,11 @@ class ListRecipeTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'ShoppingListId', 'RecipeId', 'Ref', 'Serves', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'shoppingListId', 'recipeId', 'ref', 'serves', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ListRecipeTableMap::COL_ID, ListRecipeTableMap::COL_SHOPPING_LIST_ID, ListRecipeTableMap::COL_RECIPE_ID, ListRecipeTableMap::COL_REF, ListRecipeTableMap::COL_SERVES, ListRecipeTableMap::COL_CREATED_AT, ListRecipeTableMap::COL_UPDATED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'shopping_list_id', 'recipe_id', 'ref', 'serves', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id', 'ShoppingListId', 'RecipeId', 'Ref', 'Serves', 'Complete', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'shoppingListId', 'recipeId', 'ref', 'serves', 'complete', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ListRecipeTableMap::COL_ID, ListRecipeTableMap::COL_SHOPPING_LIST_ID, ListRecipeTableMap::COL_RECIPE_ID, ListRecipeTableMap::COL_REF, ListRecipeTableMap::COL_SERVES, ListRecipeTableMap::COL_COMPLETE, ListRecipeTableMap::COL_CREATED_AT, ListRecipeTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'shopping_list_id', 'recipe_id', 'ref', 'serves', 'complete', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -131,11 +136,11 @@ class ListRecipeTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'ShoppingListId' => 1, 'RecipeId' => 2, 'Ref' => 3, 'Serves' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'shoppingListId' => 1, 'recipeId' => 2, 'ref' => 3, 'serves' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        self::TYPE_COLNAME       => array(ListRecipeTableMap::COL_ID => 0, ListRecipeTableMap::COL_SHOPPING_LIST_ID => 1, ListRecipeTableMap::COL_RECIPE_ID => 2, ListRecipeTableMap::COL_REF => 3, ListRecipeTableMap::COL_SERVES => 4, ListRecipeTableMap::COL_CREATED_AT => 5, ListRecipeTableMap::COL_UPDATED_AT => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'shopping_list_id' => 1, 'recipe_id' => 2, 'ref' => 3, 'serves' => 4, 'created_at' => 5, 'updated_at' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ShoppingListId' => 1, 'RecipeId' => 2, 'Ref' => 3, 'Serves' => 4, 'Complete' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'shoppingListId' => 1, 'recipeId' => 2, 'ref' => 3, 'serves' => 4, 'complete' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
+        self::TYPE_COLNAME       => array(ListRecipeTableMap::COL_ID => 0, ListRecipeTableMap::COL_SHOPPING_LIST_ID => 1, ListRecipeTableMap::COL_RECIPE_ID => 2, ListRecipeTableMap::COL_REF => 3, ListRecipeTableMap::COL_SERVES => 4, ListRecipeTableMap::COL_COMPLETE => 5, ListRecipeTableMap::COL_CREATED_AT => 6, ListRecipeTableMap::COL_UPDATED_AT => 7, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'shopping_list_id' => 1, 'recipe_id' => 2, 'ref' => 3, 'serves' => 4, 'complete' => 5, 'created_at' => 6, 'updated_at' => 7, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -158,8 +163,9 @@ class ListRecipeTableMap extends TableMap
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('shopping_list_id', 'ShoppingListId', 'INTEGER', 'shopping_list', 'id', true, null, null);
         $this->addForeignKey('recipe_id', 'RecipeId', 'INTEGER', 'recipe', 'id', true, null, null);
-        $this->addColumn('ref', 'Ref', 'VARCHAR', true, 100, null);
+        $this->addColumn('ref', 'Ref', 'VARCHAR', false, 100, null);
         $this->addColumn('serves', 'Serves', 'INTEGER', true, null, null);
+        $this->addColumn('complete', 'Complete', 'BOOLEAN', false, 1, false);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -183,6 +189,13 @@ class ListRecipeTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, null, false);
+        $this->addRelation('ShoppingListItem', '\\Lib\\ShoppingListItem', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':ref',
+    1 => ':ref',
+  ),
+), null, null, 'ShoppingListItems', false);
     } // buildRelations()
 
     /**
@@ -344,6 +357,7 @@ class ListRecipeTableMap extends TableMap
             $criteria->addSelectColumn(ListRecipeTableMap::COL_RECIPE_ID);
             $criteria->addSelectColumn(ListRecipeTableMap::COL_REF);
             $criteria->addSelectColumn(ListRecipeTableMap::COL_SERVES);
+            $criteria->addSelectColumn(ListRecipeTableMap::COL_COMPLETE);
             $criteria->addSelectColumn(ListRecipeTableMap::COL_CREATED_AT);
             $criteria->addSelectColumn(ListRecipeTableMap::COL_UPDATED_AT);
         } else {
@@ -352,6 +366,7 @@ class ListRecipeTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.recipe_id');
             $criteria->addSelectColumn($alias . '.ref');
             $criteria->addSelectColumn($alias . '.serves');
+            $criteria->addSelectColumn($alias . '.complete');
             $criteria->addSelectColumn($alias . '.created_at');
             $criteria->addSelectColumn($alias . '.updated_at');
         }

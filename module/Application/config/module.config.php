@@ -112,7 +112,52 @@ return [
                         'action'     => 'check',
                     ],
                 ],
-            ]
+            ],
+
+            'toggleRecipeStatus' => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route'    => '/planner/recipe/status/update',
+                    'defaults' => [
+                        'controller' => Controller\DayController::class,
+                        'action'     => 'updateRecipeStatus',
+                    ],
+                ],
+            ],
+
+            'toggleDayStatus' => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route'    => '/planner/day/status/update',
+                    'defaults' => [
+                        'controller' => Controller\DayController::class,
+                        'action'     => 'updateDayStatus',
+                    ],
+                ],
+            ],
+            'admin' => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route'    => '/admin',
+                    'defaults' => [
+                        'controller' => Controller\AdminController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
+
+            // Reset recipe status resetAllCompleted
+            'admin-reset-recipe' => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route'    => '/admin/recipes/resetstatus',
+                    'defaults' => [
+                        'controller' => Controller\AdminController::class,
+                        'action'     => 'resetAllCompleted',
+                    ],
+                ],
+            ],
+
         ],
     ],
     'controllers' => [
@@ -122,6 +167,7 @@ return [
             Controller\RecipeController::class => InvokableFactory::class,
             Controller\ItemController::class => InvokableFactory::class,
             Controller\DayController::class => Controller\Factory\DayControllerFactory::class,
+            Controller\AdminController::class => InvokableFactory::class,
 
             // Management controllers
             Controller\ListRecipeController::class => Controller\Factory\ListRecipeControllerFactory::class,

@@ -25,6 +25,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildDayPlanRecipeQuery orderByRecipeId($order = Criteria::ASC) Order by the recipe_id column
  * @method     ChildDayPlanRecipeQuery orderByCategoryId($order = Criteria::ASC) Order by the category_id column
  * @method     ChildDayPlanRecipeQuery orderByServers($order = Criteria::ASC) Order by the servers column
+ * @method     ChildDayPlanRecipeQuery orderByComplete($order = Criteria::ASC) Order by the complete column
  * @method     ChildDayPlanRecipeQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildDayPlanRecipeQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -33,6 +34,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildDayPlanRecipeQuery groupByRecipeId() Group by the recipe_id column
  * @method     ChildDayPlanRecipeQuery groupByCategoryId() Group by the category_id column
  * @method     ChildDayPlanRecipeQuery groupByServers() Group by the servers column
+ * @method     ChildDayPlanRecipeQuery groupByComplete() Group by the complete column
  * @method     ChildDayPlanRecipeQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildDayPlanRecipeQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -84,6 +86,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildDayPlanRecipe findOneByRecipeId(int $recipe_id) Return the first ChildDayPlanRecipe filtered by the recipe_id column
  * @method     ChildDayPlanRecipe findOneByCategoryId(int $category_id) Return the first ChildDayPlanRecipe filtered by the category_id column
  * @method     ChildDayPlanRecipe findOneByServers(int $servers) Return the first ChildDayPlanRecipe filtered by the servers column
+ * @method     ChildDayPlanRecipe findOneByComplete(boolean $complete) Return the first ChildDayPlanRecipe filtered by the complete column
  * @method     ChildDayPlanRecipe findOneByCreatedAt(string $created_at) Return the first ChildDayPlanRecipe filtered by the created_at column
  * @method     ChildDayPlanRecipe findOneByUpdatedAt(string $updated_at) Return the first ChildDayPlanRecipe filtered by the updated_at column *
 
@@ -95,6 +98,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildDayPlanRecipe requireOneByRecipeId(int $recipe_id) Return the first ChildDayPlanRecipe filtered by the recipe_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildDayPlanRecipe requireOneByCategoryId(int $category_id) Return the first ChildDayPlanRecipe filtered by the category_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildDayPlanRecipe requireOneByServers(int $servers) Return the first ChildDayPlanRecipe filtered by the servers column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildDayPlanRecipe requireOneByComplete(boolean $complete) Return the first ChildDayPlanRecipe filtered by the complete column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildDayPlanRecipe requireOneByCreatedAt(string $created_at) Return the first ChildDayPlanRecipe filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildDayPlanRecipe requireOneByUpdatedAt(string $updated_at) Return the first ChildDayPlanRecipe filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
@@ -104,6 +108,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildDayPlanRecipe[]|ObjectCollection findByRecipeId(int $recipe_id) Return ChildDayPlanRecipe objects filtered by the recipe_id column
  * @method     ChildDayPlanRecipe[]|ObjectCollection findByCategoryId(int $category_id) Return ChildDayPlanRecipe objects filtered by the category_id column
  * @method     ChildDayPlanRecipe[]|ObjectCollection findByServers(int $servers) Return ChildDayPlanRecipe objects filtered by the servers column
+ * @method     ChildDayPlanRecipe[]|ObjectCollection findByComplete(boolean $complete) Return ChildDayPlanRecipe objects filtered by the complete column
  * @method     ChildDayPlanRecipe[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildDayPlanRecipe objects filtered by the created_at column
  * @method     ChildDayPlanRecipe[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildDayPlanRecipe objects filtered by the updated_at column
  * @method     ChildDayPlanRecipe[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
@@ -204,7 +209,7 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, day_plan_id, recipe_id, category_id, servers, created_at, updated_at FROM day_plan_recipe WHERE id = :p0';
+        $sql = 'SELECT id, day_plan_id, recipe_id, category_id, servers, complete, created_at, updated_at FROM day_plan_recipe WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -503,6 +508,33 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(DayPlanRecipeTableMap::COL_SERVERS, $servers, $comparison);
+    }
+
+    /**
+     * Filter the query on the complete column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByComplete(true); // WHERE complete = true
+     * $query->filterByComplete('yes'); // WHERE complete = true
+     * </code>
+     *
+     * @param     boolean|string $complete The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     */
+    public function filterByComplete($complete = null, $comparison = null)
+    {
+        if (is_string($complete)) {
+            $complete = in_array(strtolower($complete), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(DayPlanRecipeTableMap::COL_COMPLETE, $complete, $comparison);
     }
 
     /**

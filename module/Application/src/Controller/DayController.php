@@ -10,7 +10,7 @@ use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\Plugin\FlashMessenger\FlashMessenger;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
-use Lib\CategoryQuery;
+use Laminas\View\Renderer\PhpRenderer;
 use Lib\DayPlan;
 use Lib\DayPlanQuery;
 use Lib\DayPlanRecipeQuery;
@@ -33,17 +33,23 @@ class DayController extends AbstractActionController {
     /** @var ListService */
     protected ListService $listService;
 
+    /** @var PhpRenderer  */
+    protected PhpRenderer $renderer;
+
     /**
      * DayController constructor.
      * @param DayService $dayService
      * @param ListService $listService
+     * @param PhpRenderer $renderer
      */
     public function __construct(
         DayService $dayService,
-        ListService $listService
+        ListService $listService,
+        PhpRenderer $renderer
     ) {
         $this->dayService = $dayService;
         $this->listService = $listService;
+        $this->renderer = $renderer;
     }
 
     /**
@@ -242,4 +248,94 @@ class DayController extends AbstractActionController {
             'list_id' => $list_id
         ]);
     }
+
+    /**
+     * Ajax request to toggle recipe status
+     *
+     * @return JsonModel
+     */
+    public function updateRecipeStatusAction()
+    {
+        try {
+            if (!$this->getRequest()->isPost()) throw new RuntimeException(
+                "Invalid request"
+            );
+
+            $dayplan_recipe_id = (int) $this->params()->fromPost('id');
+
+            $result = $this->dayService->markRecipeComplete(
+                $dayplan_recipe_id
+            );
+
+            // Build view for basket replacement on ajax update
+            $view = new ViewModel([
+                'list' => $result['listRecipe']->getShoppingList(),
+                'items' => $this->listService->getShopList(
+                    $result['listRecipe']->getShoppingList()
+                )
+            ]);
+            $view->setTerminal('true')
+                ->setTemplate('shopping/list');
+
+            $res = [
+                'status' => 'ok',
+                'isComplete' => $result['dayPlanRecipe']->isComplete(),
+                'new_list' => $this->renderer->render($view),
+                'dayId' => $result['dayPlanRecipe']->getDayPlan()->getId(),
+                'dayComplete' => $result['dayPlanRecipe']->getDayPlan()->isComplete()
+            ];
+
+        } catch (Exception $e) {
+            $res = [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return new JsonModel($res);
+    }
+
+    /**
+     * Update day status
+     *
+     * @return JsonModel
+     */
+//    public function updateDayStatusAction()
+//    {
+//        try {
+//            if (!$this->getRequest()->isPost()) throw new RuntimeException(
+//                "Invalid request"
+//            );
+//
+//            $day_id = (int) $this->params()->fromPost('id');
+//
+//            $day = $this->dayService->updateDayStatus(
+//                $day_id
+//            );
+//
+//            // Build view for basket replacement on ajax update
+//            $view = new ViewModel([
+//                'list' => $day->getShoppingList(),
+//                'items' => $this->listService->getShopList(
+//                    $day->getShoppingList()
+//                )
+//            ]);
+//            $view->setTerminal('true')
+//                ->setTemplate('shopping/list');
+//
+//            $res = [
+//                'status' => 'ok',
+//                'isComplete' => $day->isComplete(),
+//                'new_list' => $this->renderer->render($view)
+//            ];
+//
+//        } catch (Exception $e) {
+//            $res = [
+//                'status' => 'error',
+//                'message' => $e->getMessage()
+//            ];
+//        }
+//
+//        return new JsonModel($res);
+//    }
 }

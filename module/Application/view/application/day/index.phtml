@@ -43,7 +43,7 @@ $counter = 1;
             <div class="card-header">
                 Full Shopping List
             </div>
-            <div class="table-responsive" style="max-height: 600px; overflow: auto;">
+            <div id="shopping-list-holder" class="table-responsive" style="max-height: 600px; overflow: auto;">
                 <?= $this->partial('shopping/list', [
                     'items' => $this->shoppingList,
                     'list' => $this->list
@@ -63,56 +63,6 @@ $counter = 1;
         </p>
     </div>
 </div>
-
-<script type="text/javascript">
-
-    $(function() {
-
-        $('.add_to_meal_btn').on('click', function() {
-
-            let id = $(this).data('id');
-
-            // Show the form
-            $('#hidden-add-form-' + id).show();
-        });
-
-        $('.submit-meal-to-planner').on('click', function() {
-
-            let id = $(this).data('id');
-
-            let form = $('#add_recipe_' + id);
-
-            form.submit();
-        });
-
-        $('.remove-day').on('click', function() {
-
-            let dayPlanId = $(this).data('id');
-
-            console.log(dayPlanId);
-            $('#rm_dayplan_id').val(dayPlanId);
-
-            $('#removeDayModal').modal('show')
-        });
-
-        $('.remove-recipe').on('click', function() {
-
-            let dayRecipeId = $(this).data('id');
-            let name = $(this).data('name');
-
-            console.log(dayRecipeId,name);
-
-            // Set values on modal
-            $('#rm_recipe_id').val(dayRecipeId);
-            $('#rm_recipe_name').html(name);
-
-            // Show the modal
-            $('#removeRecipeModal').modal('show');
-        });
-
-    });
-
-</script>
 
 
 <!-- Remove day Modal -->

@@ -7,6 +7,8 @@ use \Exception;
 use \PDO;
 use Lib\Item as ChildItem;
 use Lib\ItemQuery as ChildItemQuery;
+use Lib\ListRecipe as ChildListRecipe;
+use Lib\ListRecipeQuery as ChildListRecipeQuery;
 use Lib\ShoppingList as ChildShoppingList;
 use Lib\ShoppingListItem as ChildShoppingListItem;
 use Lib\ShoppingListItemQuery as ChildShoppingListItemQuery;
@@ -132,6 +134,11 @@ abstract class ShoppingListItem implements ActiveRecordInterface
      * @var        ChildItem
      */
     protected $aItem;
+
+    /**
+     * @var        ChildListRecipe
+     */
+    protected $aListRecipe;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -594,6 +601,10 @@ abstract class ShoppingListItem implements ActiveRecordInterface
             $this->modifiedColumns[ShoppingListItemTableMap::COL_REF] = true;
         }
 
+        if ($this->aListRecipe !== null && $this->aListRecipe->getRef() !== $v) {
+            $this->aListRecipe = null;
+        }
+
         return $this;
     } // setRef()
 
@@ -770,6 +781,9 @@ abstract class ShoppingListItem implements ActiveRecordInterface
         if ($this->aItem !== null && $this->item_id !== $this->aItem->getId()) {
             $this->aItem = null;
         }
+        if ($this->aListRecipe !== null && $this->ref !== $this->aListRecipe->getRef()) {
+            $this->aListRecipe = null;
+        }
     } // ensureConsistency
 
     /**
@@ -811,6 +825,7 @@ abstract class ShoppingListItem implements ActiveRecordInterface
 
             $this->aShoppingList = null;
             $this->aItem = null;
+            $this->aListRecipe = null;
         } // if (deep)
     }
 
@@ -944,6 +959,13 @@ abstract class ShoppingListItem implements ActiveRecordInterface
                     $affectedRows += $this->aItem->save($con);
                 }
                 $this->setItem($this->aItem);
+            }
+
+            if ($this->aListRecipe !== null) {
+                if ($this->aListRecipe->isModified() || $this->aListRecipe->isNew()) {
+                    $affectedRows += $this->aListRecipe->save($con);
+                }
+                $this->setListRecipe($this->aListRecipe);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -1210,6 +1232,21 @@ abstract class ShoppingListItem implements ActiveRecordInterface
                 }
 
                 $result[$key] = $this->aItem->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aListRecipe) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'listRecipe';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'list_recipe';
+                        break;
+                    default:
+                        $key = 'ListRecipe';
+                }
+
+                $result[$key] = $this->aListRecipe->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1608,6 +1645,59 @@ abstract class ShoppingListItem implements ActiveRecordInterface
     }
 
     /**
+     * Declares an association between this object and a ChildListRecipe object.
+     *
+     * @param  ChildListRecipe $v
+     * @return $this|\Lib\ShoppingListItem The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setListRecipe(ChildListRecipe $v = null)
+    {
+        if ($v === null) {
+            $this->setRef(NULL);
+        } else {
+            $this->setRef($v->getRef());
+        }
+
+        $this->aListRecipe = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildListRecipe object, it will not be re-added.
+        if ($v !== null) {
+            $v->addShoppingListItem($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildListRecipe object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildListRecipe The associated ChildListRecipe object.
+     * @throws PropelException
+     */
+    public function getListRecipe(ConnectionInterface $con = null)
+    {
+        if ($this->aListRecipe === null && (($this->ref !== "" && $this->ref !== null))) {
+            $this->aListRecipe = ChildListRecipeQuery::create()
+                ->filterByShoppingListItem($this) // here
+                ->findOne($con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aListRecipe->addShoppingListItems($this);
+             */
+        }
+
+        return $this->aListRecipe;
+    }
+
+    /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
@@ -1619,6 +1709,9 @@ abstract class ShoppingListItem implements ActiveRecordInterface
         }
         if (null !== $this->aItem) {
             $this->aItem->removeShoppingListItem($this);
+        }
+        if (null !== $this->aListRecipe) {
+            $this->aListRecipe->removeShoppingListItem($this);
         }
         $this->id = null;
         $this->shopping_list_id = null;
@@ -1651,6 +1744,7 @@ abstract class ShoppingListItem implements ActiveRecordInterface
 
         $this->aShoppingList = null;
         $this->aItem = null;
+        $this->aListRecipe = null;
     }
 
     /**

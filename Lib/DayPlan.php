@@ -3,6 +3,7 @@
 namespace Lib;
 
 use Lib\Base\DayPlan as BaseDayPlan;
+use Propel\Runtime\Exception\PropelException;
 
 /**
  * Skeleton subclass for representing a row from the 'day_plan' table.
@@ -15,5 +16,26 @@ use Lib\Base\DayPlan as BaseDayPlan;
  */
 class DayPlan extends BaseDayPlan
 {
+    /**
+     * Manage day status
+     *
+     * @return DayPlan
+     * @throws PropelException
+     */
+    public function checkIfComplete(): DayPlan
+    {
+        $incompleteCount = DayPlanRecipeQuery::create()
+            ->filterByDayPlan($this)
+            ->filterByComplete(false)
+            ->count();
 
+        // Update day if required.
+        if ($incompleteCount == 0 && !$this->isComplete()) {
+            $this->setComplete(true)->save();
+        } elseif ($incompleteCount > 0 && $this->isComplete()) {
+            $this->setComplete(false)->save();
+        }
+
+        return $this;
+    }
 }

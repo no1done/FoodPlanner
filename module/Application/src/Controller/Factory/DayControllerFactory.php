@@ -20,7 +20,10 @@ class DayControllerFactory implements FactoryInterface {
         /** @var ListService $listService */
         $listService = $container->get('Application\Service\ListService');
 
-        return new $requestedName($dayService, $listService);
+        // Renderer
+        $renderer = $container->get('Laminas\View\Renderer\PhpRenderer');
+
+        return new $requestedName($dayService, $listService, $renderer);
     }
 
 }

@@ -58,7 +58,7 @@ class DayPlanTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class DayPlanTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the id field
@@ -79,6 +79,11 @@ class DayPlanTableMap extends TableMap
      * the column name for the shopping_list_id field
      */
     const COL_SHOPPING_LIST_ID = 'day_plan.shopping_list_id';
+
+    /**
+     * the column name for the complete field
+     */
+    const COL_COMPLETE = 'day_plan.complete';
 
     /**
      * the column name for the created_at field
@@ -102,11 +107,11 @@ class DayPlanTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'ShoppingListId', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'shoppingListId', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(DayPlanTableMap::COL_ID, DayPlanTableMap::COL_SHOPPING_LIST_ID, DayPlanTableMap::COL_CREATED_AT, DayPlanTableMap::COL_UPDATED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'shopping_list_id', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id', 'ShoppingListId', 'Complete', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'shoppingListId', 'complete', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(DayPlanTableMap::COL_ID, DayPlanTableMap::COL_SHOPPING_LIST_ID, DayPlanTableMap::COL_COMPLETE, DayPlanTableMap::COL_CREATED_AT, DayPlanTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'shopping_list_id', 'complete', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -116,11 +121,11 @@ class DayPlanTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'ShoppingListId' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'shoppingListId' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
-        self::TYPE_COLNAME       => array(DayPlanTableMap::COL_ID => 0, DayPlanTableMap::COL_SHOPPING_LIST_ID => 1, DayPlanTableMap::COL_CREATED_AT => 2, DayPlanTableMap::COL_UPDATED_AT => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'shopping_list_id' => 1, 'created_at' => 2, 'updated_at' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ShoppingListId' => 1, 'Complete' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'shoppingListId' => 1, 'complete' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        self::TYPE_COLNAME       => array(DayPlanTableMap::COL_ID => 0, DayPlanTableMap::COL_SHOPPING_LIST_ID => 1, DayPlanTableMap::COL_COMPLETE => 2, DayPlanTableMap::COL_CREATED_AT => 3, DayPlanTableMap::COL_UPDATED_AT => 4, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'shopping_list_id' => 1, 'complete' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -142,6 +147,7 @@ class DayPlanTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('shopping_list_id', 'ShoppingListId', 'INTEGER', 'shopping_list', 'id', true, null, null);
+        $this->addColumn('complete', 'Complete', 'BOOLEAN', false, 1, false);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -323,11 +329,13 @@ class DayPlanTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(DayPlanTableMap::COL_ID);
             $criteria->addSelectColumn(DayPlanTableMap::COL_SHOPPING_LIST_ID);
+            $criteria->addSelectColumn(DayPlanTableMap::COL_COMPLETE);
             $criteria->addSelectColumn(DayPlanTableMap::COL_CREATED_AT);
             $criteria->addSelectColumn(DayPlanTableMap::COL_UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.shopping_list_id');
+            $criteria->addSelectColumn($alias . '.complete');
             $criteria->addSelectColumn($alias . '.created_at');
             $criteria->addSelectColumn($alias . '.updated_at');
         }

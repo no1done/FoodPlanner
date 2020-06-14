@@ -25,6 +25,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildListRecipeQuery orderByRecipeId($order = Criteria::ASC) Order by the recipe_id column
  * @method     ChildListRecipeQuery orderByRef($order = Criteria::ASC) Order by the ref column
  * @method     ChildListRecipeQuery orderByServes($order = Criteria::ASC) Order by the serves column
+ * @method     ChildListRecipeQuery orderByComplete($order = Criteria::ASC) Order by the complete column
  * @method     ChildListRecipeQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildListRecipeQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -33,6 +34,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildListRecipeQuery groupByRecipeId() Group by the recipe_id column
  * @method     ChildListRecipeQuery groupByRef() Group by the ref column
  * @method     ChildListRecipeQuery groupByServes() Group by the serves column
+ * @method     ChildListRecipeQuery groupByComplete() Group by the complete column
  * @method     ChildListRecipeQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildListRecipeQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -64,7 +66,17 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildListRecipeQuery rightJoinWithRecipe() Adds a RIGHT JOIN clause and with to the query using the Recipe relation
  * @method     ChildListRecipeQuery innerJoinWithRecipe() Adds a INNER JOIN clause and with to the query using the Recipe relation
  *
- * @method     \Lib\ShoppingListQuery|\Lib\RecipeQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     ChildListRecipeQuery leftJoinShoppingListItem($relationAlias = null) Adds a LEFT JOIN clause to the query using the ShoppingListItem relation
+ * @method     ChildListRecipeQuery rightJoinShoppingListItem($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ShoppingListItem relation
+ * @method     ChildListRecipeQuery innerJoinShoppingListItem($relationAlias = null) Adds a INNER JOIN clause to the query using the ShoppingListItem relation
+ *
+ * @method     ChildListRecipeQuery joinWithShoppingListItem($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the ShoppingListItem relation
+ *
+ * @method     ChildListRecipeQuery leftJoinWithShoppingListItem() Adds a LEFT JOIN clause and with to the query using the ShoppingListItem relation
+ * @method     ChildListRecipeQuery rightJoinWithShoppingListItem() Adds a RIGHT JOIN clause and with to the query using the ShoppingListItem relation
+ * @method     ChildListRecipeQuery innerJoinWithShoppingListItem() Adds a INNER JOIN clause and with to the query using the ShoppingListItem relation
+ *
+ * @method     \Lib\ShoppingListQuery|\Lib\RecipeQuery|\Lib\ShoppingListItemQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildListRecipe findOne(ConnectionInterface $con = null) Return the first ChildListRecipe matching the query
  * @method     ChildListRecipe findOneOrCreate(ConnectionInterface $con = null) Return the first ChildListRecipe matching the query, or a new ChildListRecipe object populated from the query conditions when no match is found
@@ -74,6 +86,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildListRecipe findOneByRecipeId(int $recipe_id) Return the first ChildListRecipe filtered by the recipe_id column
  * @method     ChildListRecipe findOneByRef(string $ref) Return the first ChildListRecipe filtered by the ref column
  * @method     ChildListRecipe findOneByServes(int $serves) Return the first ChildListRecipe filtered by the serves column
+ * @method     ChildListRecipe findOneByComplete(boolean $complete) Return the first ChildListRecipe filtered by the complete column
  * @method     ChildListRecipe findOneByCreatedAt(string $created_at) Return the first ChildListRecipe filtered by the created_at column
  * @method     ChildListRecipe findOneByUpdatedAt(string $updated_at) Return the first ChildListRecipe filtered by the updated_at column *
 
@@ -85,6 +98,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildListRecipe requireOneByRecipeId(int $recipe_id) Return the first ChildListRecipe filtered by the recipe_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildListRecipe requireOneByRef(string $ref) Return the first ChildListRecipe filtered by the ref column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildListRecipe requireOneByServes(int $serves) Return the first ChildListRecipe filtered by the serves column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildListRecipe requireOneByComplete(boolean $complete) Return the first ChildListRecipe filtered by the complete column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildListRecipe requireOneByCreatedAt(string $created_at) Return the first ChildListRecipe filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildListRecipe requireOneByUpdatedAt(string $updated_at) Return the first ChildListRecipe filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
@@ -94,6 +108,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildListRecipe[]|ObjectCollection findByRecipeId(int $recipe_id) Return ChildListRecipe objects filtered by the recipe_id column
  * @method     ChildListRecipe[]|ObjectCollection findByRef(string $ref) Return ChildListRecipe objects filtered by the ref column
  * @method     ChildListRecipe[]|ObjectCollection findByServes(int $serves) Return ChildListRecipe objects filtered by the serves column
+ * @method     ChildListRecipe[]|ObjectCollection findByComplete(boolean $complete) Return ChildListRecipe objects filtered by the complete column
  * @method     ChildListRecipe[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildListRecipe objects filtered by the created_at column
  * @method     ChildListRecipe[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildListRecipe objects filtered by the updated_at column
  * @method     ChildListRecipe[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
@@ -194,7 +209,7 @@ abstract class ListRecipeQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, shopping_list_id, recipe_id, ref, serves, created_at, updated_at FROM list_recipe WHERE id = :p0';
+        $sql = 'SELECT id, shopping_list_id, recipe_id, ref, serves, complete, created_at, updated_at FROM list_recipe WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -478,6 +493,33 @@ abstract class ListRecipeQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the complete column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByComplete(true); // WHERE complete = true
+     * $query->filterByComplete('yes'); // WHERE complete = true
+     * </code>
+     *
+     * @param     boolean|string $complete The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildListRecipeQuery The current query, for fluid interface
+     */
+    public function filterByComplete($complete = null, $comparison = null)
+    {
+        if (is_string($complete)) {
+            $complete = in_array(strtolower($complete), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(ListRecipeTableMap::COL_COMPLETE, $complete, $comparison);
+    }
+
+    /**
      * Filter the query on the created_at column
      *
      * Example usage:
@@ -715,6 +757,79 @@ abstract class ListRecipeQuery extends ModelCriteria
         return $this
             ->joinRecipe($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Recipe', '\Lib\RecipeQuery');
+    }
+
+    /**
+     * Filter the query by a related \Lib\ShoppingListItem object
+     *
+     * @param \Lib\ShoppingListItem|ObjectCollection $shoppingListItem the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildListRecipeQuery The current query, for fluid interface
+     */
+    public function filterByShoppingListItem($shoppingListItem, $comparison = null)
+    {
+        if ($shoppingListItem instanceof \Lib\ShoppingListItem) {
+            return $this
+                ->addUsingAlias(ListRecipeTableMap::COL_REF, $shoppingListItem->getRef(), $comparison);
+        } elseif ($shoppingListItem instanceof ObjectCollection) {
+            return $this
+                ->useShoppingListItemQuery()
+                ->filterByPrimaryKeys($shoppingListItem->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByShoppingListItem() only accepts arguments of type \Lib\ShoppingListItem or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ShoppingListItem relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildListRecipeQuery The current query, for fluid interface
+     */
+    public function joinShoppingListItem($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ShoppingListItem');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ShoppingListItem');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ShoppingListItem relation ShoppingListItem object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \Lib\ShoppingListItemQuery A secondary query class using the current class as primary query
+     */
+    public function useShoppingListItemQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinShoppingListItem($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ShoppingListItem', '\Lib\ShoppingListItemQuery');
     }
 
     /**

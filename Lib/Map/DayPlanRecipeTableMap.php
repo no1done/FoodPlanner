@@ -58,7 +58,7 @@ class DayPlanRecipeTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 8;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class DayPlanRecipeTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 8;
 
     /**
      * the column name for the id field
@@ -96,6 +96,11 @@ class DayPlanRecipeTableMap extends TableMap
     const COL_SERVERS = 'day_plan_recipe.servers';
 
     /**
+     * the column name for the complete field
+     */
+    const COL_COMPLETE = 'day_plan_recipe.complete';
+
+    /**
      * the column name for the created_at field
      */
     const COL_CREATED_AT = 'day_plan_recipe.created_at';
@@ -117,11 +122,11 @@ class DayPlanRecipeTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'DayPlanId', 'RecipeId', 'CategoryId', 'Servers', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'dayPlanId', 'recipeId', 'categoryId', 'servers', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(DayPlanRecipeTableMap::COL_ID, DayPlanRecipeTableMap::COL_DAY_PLAN_ID, DayPlanRecipeTableMap::COL_RECIPE_ID, DayPlanRecipeTableMap::COL_CATEGORY_ID, DayPlanRecipeTableMap::COL_SERVERS, DayPlanRecipeTableMap::COL_CREATED_AT, DayPlanRecipeTableMap::COL_UPDATED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'day_plan_id', 'recipe_id', 'category_id', 'servers', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id', 'DayPlanId', 'RecipeId', 'CategoryId', 'Servers', 'Complete', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('id', 'dayPlanId', 'recipeId', 'categoryId', 'servers', 'complete', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(DayPlanRecipeTableMap::COL_ID, DayPlanRecipeTableMap::COL_DAY_PLAN_ID, DayPlanRecipeTableMap::COL_RECIPE_ID, DayPlanRecipeTableMap::COL_CATEGORY_ID, DayPlanRecipeTableMap::COL_SERVERS, DayPlanRecipeTableMap::COL_COMPLETE, DayPlanRecipeTableMap::COL_CREATED_AT, DayPlanRecipeTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('id', 'day_plan_id', 'recipe_id', 'category_id', 'servers', 'complete', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -131,11 +136,11 @@ class DayPlanRecipeTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'DayPlanId' => 1, 'RecipeId' => 2, 'CategoryId' => 3, 'Servers' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'dayPlanId' => 1, 'recipeId' => 2, 'categoryId' => 3, 'servers' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        self::TYPE_COLNAME       => array(DayPlanRecipeTableMap::COL_ID => 0, DayPlanRecipeTableMap::COL_DAY_PLAN_ID => 1, DayPlanRecipeTableMap::COL_RECIPE_ID => 2, DayPlanRecipeTableMap::COL_CATEGORY_ID => 3, DayPlanRecipeTableMap::COL_SERVERS => 4, DayPlanRecipeTableMap::COL_CREATED_AT => 5, DayPlanRecipeTableMap::COL_UPDATED_AT => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'day_plan_id' => 1, 'recipe_id' => 2, 'category_id' => 3, 'servers' => 4, 'created_at' => 5, 'updated_at' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'DayPlanId' => 1, 'RecipeId' => 2, 'CategoryId' => 3, 'Servers' => 4, 'Complete' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'dayPlanId' => 1, 'recipeId' => 2, 'categoryId' => 3, 'servers' => 4, 'complete' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
+        self::TYPE_COLNAME       => array(DayPlanRecipeTableMap::COL_ID => 0, DayPlanRecipeTableMap::COL_DAY_PLAN_ID => 1, DayPlanRecipeTableMap::COL_RECIPE_ID => 2, DayPlanRecipeTableMap::COL_CATEGORY_ID => 3, DayPlanRecipeTableMap::COL_SERVERS => 4, DayPlanRecipeTableMap::COL_COMPLETE => 5, DayPlanRecipeTableMap::COL_CREATED_AT => 6, DayPlanRecipeTableMap::COL_UPDATED_AT => 7, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'day_plan_id' => 1, 'recipe_id' => 2, 'category_id' => 3, 'servers' => 4, 'complete' => 5, 'created_at' => 6, 'updated_at' => 7, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -160,6 +165,7 @@ class DayPlanRecipeTableMap extends TableMap
         $this->addForeignKey('recipe_id', 'RecipeId', 'INTEGER', 'recipe', 'id', true, null, null);
         $this->addForeignKey('category_id', 'CategoryId', 'INTEGER', 'category', 'id', true, null, null);
         $this->addColumn('servers', 'Servers', 'INTEGER', true, null, null);
+        $this->addColumn('complete', 'Complete', 'BOOLEAN', false, 1, false);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -351,6 +357,7 @@ class DayPlanRecipeTableMap extends TableMap
             $criteria->addSelectColumn(DayPlanRecipeTableMap::COL_RECIPE_ID);
             $criteria->addSelectColumn(DayPlanRecipeTableMap::COL_CATEGORY_ID);
             $criteria->addSelectColumn(DayPlanRecipeTableMap::COL_SERVERS);
+            $criteria->addSelectColumn(DayPlanRecipeTableMap::COL_COMPLETE);
             $criteria->addSelectColumn(DayPlanRecipeTableMap::COL_CREATED_AT);
             $criteria->addSelectColumn(DayPlanRecipeTableMap::COL_UPDATED_AT);
         } else {
@@ -359,6 +366,7 @@ class DayPlanRecipeTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.recipe_id');
             $criteria->addSelectColumn($alias . '.category_id');
             $criteria->addSelectColumn($alias . '.servers');
+            $criteria->addSelectColumn($alias . '.complete');
             $criteria->addSelectColumn($alias . '.created_at');
             $criteria->addSelectColumn($alias . '.updated_at');
         }

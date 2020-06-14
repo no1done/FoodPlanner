@@ -29,7 +29,9 @@ use Lib\DayPlanRecipe;
                 /** @var DayPlanRecipe $recipe */
                 foreach ($this->recipes as $recipe) : ?>
 
-                    <tr>
+                    <tr id="dpr_row_<?= $recipe->getId(); ?>"
+                        class="<?= $recipe->isComplete() ? 'table-success':''; ?> day_row_<?= $this->dayId; ?>"
+                    >
                         <td style="width: 55%;">
                             <a href="<?= $this->url('recipe', [
                                 'id' => $recipe->getRecipeId(),
@@ -58,11 +60,12 @@ use Lib\DayPlanRecipe;
                             </button>
 
                             <!-- "Done" button -->
-                            <button class="btn btn-sm btn-success recipe-done"
+                            <button class="btn btn-sm <?= $recipe->isComplete() ? 'btn-success':'btn-outline-success'; ?> recipe-done day_btn_<?= $this->dayId; ?>"
                                     data-id="<?= $recipe->getId(); ?>"
-                                    data-name="<?= $recipe->getRecipe()->getName(); ?>"
+                                    data-complete="<?= $recipe->getComplete() ? 'true' : 'false'; ?>"
+                                    id="dpr_done_btn_<?= $recipe->getId(); ?>"
                             >
-                                <i class="fa fa-sm fa-check"></i>
+                                <i class="fa fa-sm <?= $recipe->isComplete() ? 'fa-times':'fa-check'; ?>"></i>
                             </button>
                         </td>
                     </tr>

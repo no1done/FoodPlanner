@@ -83,6 +83,14 @@ abstract class DayPlan implements ActiveRecordInterface
     protected $shopping_list_id;
 
     /**
+     * The value for the complete field.
+     *
+     * Note: this column has a database default value of: false
+     * @var        boolean
+     */
+    protected $complete;
+
+    /**
      * The value for the created_at field.
      *
      * @var        DateTime
@@ -122,10 +130,23 @@ abstract class DayPlan implements ActiveRecordInterface
     protected $dayPlanRecipesScheduledForDeletion = null;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->complete = false;
+    }
+
+    /**
      * Initializes internal state of Lib\Base\DayPlan object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -367,6 +388,26 @@ abstract class DayPlan implements ActiveRecordInterface
     }
 
     /**
+     * Get the [complete] column value.
+     *
+     * @return boolean
+     */
+    public function getComplete()
+    {
+        return $this->complete;
+    }
+
+    /**
+     * Get the [complete] column value.
+     *
+     * @return boolean
+     */
+    public function isComplete()
+    {
+        return $this->getComplete();
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -451,6 +492,34 @@ abstract class DayPlan implements ActiveRecordInterface
     } // setShoppingListId()
 
     /**
+     * Sets the value of the [complete] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param  boolean|integer|string $v The new value
+     * @return $this|\Lib\DayPlan The current object (for fluent API support)
+     */
+    public function setComplete($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->complete !== $v) {
+            $this->complete = $v;
+            $this->modifiedColumns[DayPlanTableMap::COL_COMPLETE] = true;
+        }
+
+        return $this;
+    } // setComplete()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
@@ -500,6 +569,10 @@ abstract class DayPlan implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->complete !== false) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -532,13 +605,16 @@ abstract class DayPlan implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : DayPlanTableMap::translateFieldName('ShoppingListId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->shopping_list_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : DayPlanTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : DayPlanTableMap::translateFieldName('Complete', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->complete = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : DayPlanTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : DayPlanTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : DayPlanTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -551,7 +627,7 @@ abstract class DayPlan implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = DayPlanTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = DayPlanTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Lib\\DayPlan'), 0, $e);
@@ -806,6 +882,9 @@ abstract class DayPlan implements ActiveRecordInterface
         if ($this->isColumnModified(DayPlanTableMap::COL_SHOPPING_LIST_ID)) {
             $modifiedColumns[':p' . $index++]  = 'shopping_list_id';
         }
+        if ($this->isColumnModified(DayPlanTableMap::COL_COMPLETE)) {
+            $modifiedColumns[':p' . $index++]  = 'complete';
+        }
         if ($this->isColumnModified(DayPlanTableMap::COL_CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'created_at';
         }
@@ -828,6 +907,9 @@ abstract class DayPlan implements ActiveRecordInterface
                         break;
                     case 'shopping_list_id':
                         $stmt->bindValue($identifier, $this->shopping_list_id, PDO::PARAM_INT);
+                        break;
+                    case 'complete':
+                        $stmt->bindValue($identifier, (int) $this->complete, PDO::PARAM_INT);
                         break;
                     case 'created_at':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
@@ -904,9 +986,12 @@ abstract class DayPlan implements ActiveRecordInterface
                 return $this->getShoppingListId();
                 break;
             case 2:
-                return $this->getCreatedAt();
+                return $this->getComplete();
                 break;
             case 3:
+                return $this->getCreatedAt();
+                break;
+            case 4:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -941,15 +1026,16 @@ abstract class DayPlan implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getShoppingListId(),
-            $keys[2] => $this->getCreatedAt(),
-            $keys[3] => $this->getUpdatedAt(),
+            $keys[2] => $this->getComplete(),
+            $keys[3] => $this->getCreatedAt(),
+            $keys[4] => $this->getUpdatedAt(),
         );
-        if ($result[$keys[2]] instanceof \DateTimeInterface) {
-            $result[$keys[2]] = $result[$keys[2]]->format('c');
-        }
-
         if ($result[$keys[3]] instanceof \DateTimeInterface) {
             $result[$keys[3]] = $result[$keys[3]]->format('c');
+        }
+
+        if ($result[$keys[4]] instanceof \DateTimeInterface) {
+            $result[$keys[4]] = $result[$keys[4]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1029,9 +1115,12 @@ abstract class DayPlan implements ActiveRecordInterface
                 $this->setShoppingListId($value);
                 break;
             case 2:
-                $this->setCreatedAt($value);
+                $this->setComplete($value);
                 break;
             case 3:
+                $this->setCreatedAt($value);
+                break;
+            case 4:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1067,10 +1156,13 @@ abstract class DayPlan implements ActiveRecordInterface
             $this->setShoppingListId($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setCreatedAt($arr[$keys[2]]);
+            $this->setComplete($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setUpdatedAt($arr[$keys[3]]);
+            $this->setCreatedAt($arr[$keys[3]]);
+        }
+        if (array_key_exists($keys[4], $arr)) {
+            $this->setUpdatedAt($arr[$keys[4]]);
         }
     }
 
@@ -1118,6 +1210,9 @@ abstract class DayPlan implements ActiveRecordInterface
         }
         if ($this->isColumnModified(DayPlanTableMap::COL_SHOPPING_LIST_ID)) {
             $criteria->add(DayPlanTableMap::COL_SHOPPING_LIST_ID, $this->shopping_list_id);
+        }
+        if ($this->isColumnModified(DayPlanTableMap::COL_COMPLETE)) {
+            $criteria->add(DayPlanTableMap::COL_COMPLETE, $this->complete);
         }
         if ($this->isColumnModified(DayPlanTableMap::COL_CREATED_AT)) {
             $criteria->add(DayPlanTableMap::COL_CREATED_AT, $this->created_at);
@@ -1212,6 +1307,7 @@ abstract class DayPlan implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setShoppingListId($this->getShoppingListId());
+        $copyObj->setComplete($this->getComplete());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1611,10 +1707,12 @@ abstract class DayPlan implements ActiveRecordInterface
         }
         $this->id = null;
         $this->shopping_list_id = null;
+        $this->complete = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
