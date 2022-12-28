@@ -1,0 +1,79 @@
+<?php
+
+use Lib\DayPlanRecipe;
+
+?>
+
+<?php if ($this->recipes->count() > 0) : ?>
+<div class="row">
+    <div class="col-lg">
+        <h5><?= $this->title; ?></h5>
+
+        <div class="table-responsive">
+
+            <table class="table table-sm table-condensed">
+                <thead>
+                    <tr>
+                        <th>Recipe</th>
+                        <th class="text-center">
+                            <i class="fa fa-fire"></i>
+                        </th>
+                        <th class="text-center">
+                            <i class="fa fa-users"></i>
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php
+                /** @var DayPlanRecipe $recipe */
+                foreach ($this->recipes as $recipe) : ?>
+
+                    <tr id="dpr_row_<?= $recipe->getId(); ?>"
+                        class="<?= $recipe->isComplete() ? 'table-success':''; ?> day_row_<?= $this->dayId; ?>"
+                    >
+                        <td style="width: 55%;">
+                            <a href="<?= $this->url('recipe', [
+                                'id' => $recipe->getRecipeId(),
+                                'action' => 'view'
+                            ]); ?>">
+                                <?= $recipe->getRecipe()->getName(); ?>
+                            </a>
+                        </td>
+
+                        <td class="text-center" style="width: 10%;">
+                            <?php if ($recipe->getRecipe()->getCalories()) : ?>
+                                <?= $recipe->getRecipe()->getCalories(); ?>
+                            <?php endif; ?>
+                        </td>
+
+                        <td class="text-center" style="width: 10%;">
+                            <?= $recipe->getServers(); ?>
+                        </td>
+                        <td style="width: 25%; white-space: nowrap;">
+                            <!-- Delete button -->
+                            <button class="btn btn-sm btn-danger remove-recipe"
+                                    data-id="<?= $recipe->getId(); ?>"
+                                    data-name="<?= $recipe->getRecipe()->getName(); ?>"
+                            >
+                                <i class="fa fa-sm fa-trash-alt"></i>
+                            </button>
+
+                            <!-- "Done" button -->
+                            <button class="btn btn-sm <?= $recipe->isComplete() ? 'btn-success':'btn-outline-success'; ?> recipe-done day_btn_<?= $this->dayId; ?>"
+                                    data-id="<?= $recipe->getId(); ?>"
+                                    data-complete="<?= $recipe->getComplete() ? 'true' : 'false'; ?>"
+                                    id="dpr_done_btn_<?= $recipe->getId(); ?>"
+                            >
+                                <i class="fa fa-sm <?= $recipe->isComplete() ? 'fa-times':'fa-check'; ?>"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<?php endif; ?>

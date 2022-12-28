@@ -10,3 +10,16 @@
     background-color: var(--brand-color);
     border-color: var(--brand-color);
 }
+
+td {
+    vertical-align: middle!important;
+}
+
+.big-checkbox {
+    height: 30px;
+    width: 30px;
+}
+
+.table-condensed > tbody > tr > td, th{
+    font-size: 14px;
+}

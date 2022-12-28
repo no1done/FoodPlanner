@@ -26,6 +26,11 @@ $this->headScript()->appendFile('//cdn.quilljs.com/1.3.6/quill.min.js', 'text/ja
                         <input type="text" id="name" class="form-control" name="name" value="<?= $recipe->getName(); ?>"/>
                     </div>
 
+                    <div class="form-group">
+                        <label for="calories">Kcal per serving</label>
+                        <input type="number" id="calories" class="form-control" name="calories" value="<?= $recipe->getCalories(); ?>"/>
+                    </div>
+
                     <input type="hidden" id="instructionsHiddenField" name="instructions" value="" />
 
                     <label>Recipe Instructions</label>
@@ -43,13 +48,13 @@ $this->headScript()->appendFile('//cdn.quilljs.com/1.3.6/quill.min.js', 'text/ja
         </div>
     </div>
 
-    <!-- Ingredients -->
+    <!-- Items -->
     <div class="col-lg-4">
         <div class="card mt-3">
             <div class="card-header">
-                Ingredients
+                Items
 
-                <a href="<?= $this->url('recipe-ingredient', ['recipe_id' => $recipe->getId()]); ?>"
+                <a href="<?= $this->url('recipe-item', ['recipe_id' => $recipe->getId()]); ?>"
                    class="btn text-info btn-sm float-right">
                     Edit
                 </a>
@@ -58,12 +63,12 @@ $this->headScript()->appendFile('//cdn.quilljs.com/1.3.6/quill.min.js', 'text/ja
 
             <div class="table-responsive">
                 <table class="table">
-                    <?php foreach ($recipe->getRecipeIngredients() as $recipeIngredient) : ?>
+                    <?php foreach ($recipe->getRecipeItems() as $recipeItem) : ?>
                         <tr>
-                            <td><?= $recipeIngredient->getIngredient()->getName(); ?></td>
+                            <td><?= $recipeItem->getItem()->getName(); ?></td>
                             <td>
-                                <?= $recipeIngredient->getQuantity(); ?>
-                                <?= $recipeIngredient->getIngredient()->getUnit(); ?>
+                                <?= $recipeItem->getQuantity(); ?>
+                                <?= $recipeItem->getItem()->getUnit(); ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -71,7 +76,7 @@ $this->headScript()->appendFile('//cdn.quilljs.com/1.3.6/quill.min.js', 'text/ja
             </div>
         </div>
     </div>
-    <!-- /End ingredients -->
+    <!-- /End items -->
 </div>
 
 

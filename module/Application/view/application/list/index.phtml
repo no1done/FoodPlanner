@@ -19,7 +19,7 @@ use Lib\ShoppingList;
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>#</th>
+                        <th>Days Planned</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -30,7 +30,7 @@ use Lib\ShoppingList;
                     foreach ($this->lists as $list) : ?>
                         <tr>
                             <td><?= $list->getName(); ?></td>
-                            <td><?= $list->getListRecipes()->count(); ?></td>
+                            <td><?= $list->getDayPlans()->count(); ?></td>
                             <td nowrap="whitespace">
 
                                 <!-- view button -->
@@ -47,7 +47,15 @@ use Lib\ShoppingList;
                                    href="<?= $this->url('list-recipe', [
                                        'list_id' => $list->getId()
                                    ]); ?>">
-                                    Edit
+                                    Manage Recipes
+                                </a>
+
+                                <!-- Meal Planner button -->
+                                <a class="btn btn-success btn-sm"
+                                   href="<?= $this->url('planner', [
+                                       'list_id' => $list->getId()
+                                   ]); ?>">
+                                    Meal Planner
                                 </a>
 
                                 <!-- delete button -->

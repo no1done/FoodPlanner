@@ -47,12 +47,22 @@ return [
                     ],
                 ],
             ],
-            'ingredient' => [
+            'item' => [
                 'type'    => Segment::class,
                 'options' => [
-                    'route'    => '/ingredient[/:action][/:id]',
+                    'route'    => '/item[/:action][/:id]',
                     'defaults' => [
-                        'controller' => Controller\IngredientController::class,
+                        'controller' => Controller\ItemController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
+            'planner' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/planner/:list_id[/:action][/:id]',
+                    'defaults' => [
+                        'controller' => Controller\DayController::class,
                         'action'     => 'index',
                     ],
                 ],
@@ -70,28 +80,99 @@ return [
                 ],
             ],
 
-            'recipe-ingredient' => [
+            'recipe-item' => [
                 'type'    => Segment::class,
                 'options' => [
-                    'route'    => '/recipe/:recipe_id/ingredients[/:action][/:id]',
+                    'route'    => '/recipe/:recipe_id/items[/:action][/:id]',
                     'defaults' => [
-                        'controller' => Controller\RecipeIngredientController::class,
+                        'controller' => Controller\RecipeItemController::class,
                         'action'     => 'index',
                     ],
                 ],
             ],
+
+            // Static AJAX route for removing item
+            'list-item-remove' => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route'    => '/shopping/item/remove',
+                    'defaults' => [
+                        'controller' => Controller\ListItemController::class,
+                        'action'     => 'remove',
+                    ],
+                ],
+            ],
+
+            'list-item-check' => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route'    => '/shopping/item/checked',
+                    'defaults' => [
+                        'controller' => Controller\ListItemController::class,
+                        'action'     => 'check',
+                    ],
+                ],
+            ],
+
+            'toggleRecipeStatus' => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route'    => '/planner/recipe/status/update',
+                    'defaults' => [
+                        'controller' => Controller\DayController::class,
+                        'action'     => 'updateRecipeStatus',
+                    ],
+                ],
+            ],
+
+            'toggleDayStatus' => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route'    => '/planner/day/status/update',
+                    'defaults' => [
+                        'controller' => Controller\DayController::class,
+                        'action'     => 'updateDayStatus',
+                    ],
+                ],
+            ],
+            'admin' => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route'    => '/admin',
+                    'defaults' => [
+                        'controller' => Controller\AdminController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
+
+            // Reset recipe status resetAllCompleted
+            'admin-reset-recipe' => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route'    => '/admin/recipes/resetstatus',
+                    'defaults' => [
+                        'controller' => Controller\AdminController::class,
+                        'action'     => 'resetAllCompleted',
+                    ],
+                ],
+            ],
+
         ],
     ],
     'controllers' => [
         'factories' => [
             Controller\IndexController::class => InvokableFactory::class,
-            Controller\ListController::class => InvokableFactory::class,
+            Controller\ListController::class => Controller\Factory\ListRecipeControllerFactory::class,
             Controller\RecipeController::class => InvokableFactory::class,
-            Controller\IngredientController::class => InvokableFactory::class,
+            Controller\ItemController::class => InvokableFactory::class,
+            Controller\DayController::class => Controller\Factory\DayControllerFactory::class,
+            Controller\AdminController::class => InvokableFactory::class,
 
             // Management controllers
-            Controller\ListRecipeController::class => InvokableFactory::class,
-            Controller\RecipeIngredientController::class => InvokableFactory::class,
+            Controller\ListRecipeController::class => Controller\Factory\ListRecipeControllerFactory::class,
+            Controller\RecipeItemController::class => InvokableFactory::class,
+            Controller\ListItemController::class => Controller\Factory\ListRecipeControllerFactory::class
         ],
     ],
     'view_manager' => [
@@ -105,9 +186,17 @@ return [
             'application/index/index' => __DIR__ . '/../view/application/index/index.phtml',
             'error/404'               => __DIR__ . '/../view/error/404.phtml',
             'error/index'             => __DIR__ . '/../view/error/index.phtml',
+
+            // Partials
+            'shopping/list' => __DIR__ . '/../view/application/list/partial/shopping-list.phtml',
+            'planner/day' => __DIR__ . '/../view/application/day/partial/day-card.phtml',
+            'planner/meals' => __DIR__ . '/../view/application/day/partial/day-recipes.phtml',
         ],
         'template_path_stack' => [
             __DIR__ . '/../view',
+        ],
+        'strategies' => [
+            'ViewJsonStrategy'
         ],
     ],
 ];

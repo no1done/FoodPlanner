@@ -14,12 +14,13 @@
     <table name="recipe" phpName="Recipe">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="name" type="varchar" size="150" />
+        <column name="calories" type="integer" required="false"/>
         <column name="instructions" type="LONGVARCHAR" required="false"/>
         <column name="removed" type="boolean" size="1" defaultValue="false"/>
         <behavior name="timestampable" />
     </table>
 
-    <table name="ingredient" phpName="Ingredient">
+    <table name="item" phpName="Item">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="name" type="varchar" size="150" />
         <column name="unit" type="varchar" size="150" />
@@ -31,7 +32,9 @@
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="shopping_list_id" type="integer" required="true"/>
         <column name="recipe_id" type="integer" required="true"/>
+        <column name="ref" type="varchar" required="false" size="100" />
         <column name="serves"  type="integer" required="true"/>
+        <column name="complete" type="boolean" size="1" defaultValue="false" />
         <behavior name="timestampable" />
         <foreign-key foreignTable="shopping_list" name="fk_list_recipe_1">
             <reference local="shopping_list_id" foreign="id"/>
@@ -41,17 +44,72 @@
         </foreign-key>
     </table>
 
-    <table name="recipe_ingredient" phpName="RecipeIngredient">
+    <table name="recipe_item" phpName="RecipeItem">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
         <column name="recipe_id" type="integer" required="true" />
-        <column name="ingredient_id" type="integer" required="true"/>
+        <column name="item_id" type="integer" required="true"/>
         <column name="quantity" type="float" size="10" scale="2" required="true"/>
         <behavior name="timestampable" />
-        <foreign-key foreignTable="recipe" name="fk_recipe_ingredient_1">
+        <foreign-key foreignTable="recipe" name="fk_recipe_item_1">
             <reference local="recipe_id" foreign="id"/>
         </foreign-key>
-        <foreign-key foreignTable="ingredient" name="fk_recipe_ingredient_2">
-            <reference local="ingredient_id" foreign="id"/>
+        <foreign-key foreignTable="item" name="fk_recipe_item_2">
+            <reference local="item_id" foreign="id"/>
+        </foreign-key>
+    </table>
+
+    <table name="shopping_list_item" phpName="ShoppingListItem">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="shopping_list_id" type="integer" required="true" />
+        <column name="item_id" type="integer" required="true" />
+        <column name="quantity" type="float" size="10" scale="2" required="true" />
+        <column name="ref" type="varchar" size="100" required="false" />
+        <column name="purchased" type="boolean" size="1" defaultValue="false" />
+        <behavior name="timestampable" />
+        <foreign-key foreignTable="shopping_list" name="fk_shopping_list_item_1">
+            <reference local="shopping_list_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="item" name="fk_shopping_list_item_2">
+            <reference local="item_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="list_recipe" name="fk_shopping_list_item_3">
+            <reference local="ref" foreign="ref"/>
+        </foreign-key>
+    </table>
+
+    <table name="category" phpName="Category">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="name" type="varchar" size="50" required="true" />
+        <column name="key" type="varchar" size="20" required="true" />
+        <behavior name="timestampable" />
+    </table>
+
+    <table name="day_plan" phpName="DayPlan">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="shopping_list_id" type="integer" required="true" />
+        <column name="complete" type="boolean" size="1" defaultValue="false" />
+        <behavior name="timestampable" />
+        <foreign-key foreignTable="shopping_list" name="fk_day_plan_1">
+            <reference local="shopping_list_id" foreign="id"/>
+        </foreign-key>
+    </table>
+
+    <table name="day_plan_recipe" phpName="DayPlanRecipe">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="day_plan_id" type="integer" required="true" />
+        <column name="recipe_id" type="integer" required="true" />
+        <column name="category_id" type="integer" required="true" />
+        <column name="servers" type="integer" required="true" />
+        <column name="complete" type="boolean" size="1" defaultValue="false" />
+        <behavior name="timestampable" />
+        <foreign-key foreignTable="day_plan" name="fk_day_plan_recipe_1">
+            <reference local="day_plan_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="recipe" name="fk_day_plan_recipe_2">
+            <reference local="recipe_id" foreign="id"/>
+        </foreign-key>
+        <foreign-key foreignTable="category" name="fk_day_plan_recipe_3">
+            <reference local="category_id" foreign="id"/>
         </foreign-key>
     </table>
 

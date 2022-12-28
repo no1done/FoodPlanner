@@ -7,6 +7,7 @@ namespace Application\Controller;
 use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\Plugin\FlashMessenger\FlashMessenger;
+use Laminas\View\Model\ViewModel;
 use Lib\Recipe;
 use Lib\RecipeQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -61,6 +62,8 @@ class RecipeController extends AbstractActionController
         try {
             $id = $this->params()->fromRoute('id');
 
+            $servings = (int) $this->params()->fromQuery('servings') ?: 1;
+
             $recipe = RecipeQuery::create()->findPk($id);
 
             if (!$recipe) throw new RuntimeException(
@@ -68,7 +71,8 @@ class RecipeController extends AbstractActionController
             );
 
             return [
-                'recipe' => $recipe
+                'recipe' => $recipe,
+                'servings' => $servings
             ];
         } catch (Exception $e) {
             $this->flashMessenger()->addErrorMessage($e->getMessage());
@@ -93,7 +97,8 @@ class RecipeController extends AbstractActionController
                 $recipe = new Recipe();
             }
 
-            $recipe->setName($post['name']);
+            $recipe->setName($post['name'])
+                ->setCalories($post['calories']);
 
             if (isset($post['instructions'])) {
                 $recipe->setInstructions($post['instructions']);
@@ -103,7 +108,7 @@ class RecipeController extends AbstractActionController
 
             $this->flashMessenger()->addSuccessMessage('Recipe Saved.');
 
-            return $this->redirect()->toRoute('recipe-ingredient', [
+            return $this->redirect()->toRoute('recipe-item', [
                 'recipe_id' => $recipe->getId()
             ]);
 
@@ -111,6 +116,19 @@ class RecipeController extends AbstractActionController
             $this->flashMessenger()->addErrorMessage($e->getMessage());
             return $this->redirect()->toRoute('recipe');
         }
+    }
+
+    public function printAction()
+    {
+        $id = $this->params()->fromRoute('id');
+
+        $recipe = RecipeQuery::create()->findPk($id);
+
+        $view = new ViewModel([
+            'recipe' => $recipe
+        ]);
+        $view->setTerminal(true);
+        return $view;
     }
 
     /**

@@ -1,0 +1,151 @@
+<?php
+
+use Application\Helper\Categories;
+use Lib\DayPlan;
+use Lib\DayPlanRecipeQuery;
+use Lib\RecipeQuery;
+
+/** @var DayPlan $day */
+$day = $this->day;
+
+$meals = [
+    'Breakfast' => Categories::BREAKFAST_KEY,
+    'Lunch' => Categories::LUNCH_KEY,
+    'Dinner' => Categories::DINNER_KEY,
+    'Snack' => Categories::SNACK_KEY
+];
+
+$allRecipes = RecipeQuery::create()->findByRemoved(false);
+
+// Get total cals for day
+$totalCal = DayPlanRecipeQuery::create()
+    ->select(['TotalCal'])
+    ->filterByDayPlan($day)
+    ->useRecipeQuery()
+        ->withColumn('SUM(recipe.calories)', 'TotalCal')
+    ->endUse()
+    ->findOne();
+
+$dayDoneClass = "text-white bg-success ";
+$dayClass = "";
+?>
+
+<div class="card <?= $day->isComplete() ? $dayDoneClass : ''; ?>mt-1 mb-1"
+     id="day_card_<?= $day->getId(); ?>">
+
+    <div class="card-header">
+        <div class="row text-center align-items-center">
+
+
+            <div class="col-8 offset-2">
+                <a id="day_title_<?= $day->getId(); ?>"
+                   class="text-decoration-none d-block <?= $day->isComplete() ? 'text-white' : 'text-dark'; ?>" data-toggle="collapse" href="#day_card_body_<?= $day->getId(); ?>">
+                    Day #<?= $this->dayNumber; ?> - <?= $totalCal; ?> <i class="fa fa-fire"></i>
+                </a>
+            </div>
+
+            <div class="col-2">
+                <!-- Button Delete day -->
+                <button type="button"
+                        class="btn btn-sm btn-outline-danger float-right remove-day"
+                        data-id="<?= $day->getId(); ?>"
+                >
+                    <i class="fa fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body collapse <?= $day->isComplete() ? '' : 'show'; ?>" id="day_card_body_<?= $day->getId(); ?>">
+
+        <?php foreach ($meals as $title => $key) : ?>
+
+            <?php
+            $recipes = DayPlanRecipeQuery::create()
+                ->filterByDayPlan($day)
+                ->useCategoryQuery()
+                    ->filterByKey($key)
+                ->endUse()
+                ->find();
+
+            echo $this->partial('planner/meals', [
+                'dayId' => $day->getId(),
+                'listId' => $day->getShoppingListId(),
+                'recipes' => $recipes,
+                'title' => $title,
+                'key' => $key
+            ]);
+            ?>
+
+        <?php endforeach; ?>
+
+        <button type="button" class="btn btn-dark btn-sm float-right" data-toggle="modal" data-target="#add-to-plan-<?= $day->getId(); ?>">Add to Plan</button>
+
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="add-to-plan-<?= $day->getId(); ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Add to Plan</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <form id="add_recipe_<?= $day->getId(); ?>" action="<?= $this->url('planner', [
+                    'list_id' => $day->getShoppingListId(),
+                    'action' => 'addRecipe'
+                ]); ?>" method="POST">
+
+                    <div class="form-group">
+                        <label for="add_recipe_id_<?= $day->getId(); ?>">Recipe</label>
+                        <select class="form-control select2"
+                                style="width: 100%;"
+                                name="recipe_id"
+                                id="add_recipe_id_<?= $day->getId(); ?>">
+                            <?php foreach ($allRecipes as $r) : ?>
+                                <option value="<?= $r->getId(); ?>">
+                                    <?= $r->getName(); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category_meal_<?= $day->getId(); ?>">For</label>
+                        <select class="form-control" name="category_id" id="category_meal_<?= $day->getId(); ?>">
+                            <?php foreach (Categories::getAll() as $category) : ?>
+                                <option value="<?= $category->getId(); ?>">
+                                    <?= $category->getName(); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="servings">Servings</label>
+                        <input type="number" class="form-control" id="servings" name="servings"/>
+                    </div>
+
+                    <input type="hidden" name="day_plan_id" value="<?= $day->getId(); ?>" />
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button"
+                        class="btn btn-primary submit-meal-to-planner"
+                        data-id="<?= $day->getId(); ?>"
+                >
+                    Add to Planner
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>

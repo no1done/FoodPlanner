@@ -15,31 +15,5 @@ use Lib\Base\ShoppingList as BaseShoppingList;
  */
 class ShoppingList extends BaseShoppingList
 {
-    public function getFullIngredientList()
-    {
-        $recipes = $this->getListRecipesJoinRecipe();
 
-        $ingredients = [];
-
-        /** @var ListRecipe $recipe */
-        foreach ($recipes as $recipe) {
-            $recipeIngredients = $recipe->getRecipe()->getRecipeIngredients();
-
-            /** @var  $ingredient */
-            foreach ($recipeIngredients as $recipeIngredient) {
-
-
-                if (!isset($ingredients[$recipeIngredient->getIngredient()->getId()])) {
-                    $ingredients[$recipeIngredient->getIngredient()->getId()] =
-                        $recipeIngredient->getIngredient()->toArray();
-                }
-
-                $ingredients[
-                $recipeIngredient->getIngredient()->getId()
-                ]['total'] += $recipeIngredient->getQuantity() * $recipe->getServes();
-            }
-        }
-
-        return $ingredients;
-    }
 }

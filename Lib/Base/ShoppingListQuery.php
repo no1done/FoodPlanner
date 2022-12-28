@@ -11,14 +11,13 @@ use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\ModelJoin;
+use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 
 /**
- * Base class that represents a query for the 'shopping_list' table.
- *
- *
+ * Base class that represents a query for the `shopping_list` table.
  *
  * @method     ChildShoppingListQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildShoppingListQuery orderByName($order = Criteria::ASC) Order by the name column
@@ -50,19 +49,39 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildShoppingListQuery rightJoinWithListRecipe() Adds a RIGHT JOIN clause and with to the query using the ListRecipe relation
  * @method     ChildShoppingListQuery innerJoinWithListRecipe() Adds a INNER JOIN clause and with to the query using the ListRecipe relation
  *
- * @method     \Lib\ListRecipeQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     ChildShoppingListQuery leftJoinShoppingListItem($relationAlias = null) Adds a LEFT JOIN clause to the query using the ShoppingListItem relation
+ * @method     ChildShoppingListQuery rightJoinShoppingListItem($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ShoppingListItem relation
+ * @method     ChildShoppingListQuery innerJoinShoppingListItem($relationAlias = null) Adds a INNER JOIN clause to the query using the ShoppingListItem relation
  *
- * @method     ChildShoppingList findOne(ConnectionInterface $con = null) Return the first ChildShoppingList matching the query
- * @method     ChildShoppingList findOneOrCreate(ConnectionInterface $con = null) Return the first ChildShoppingList matching the query, or a new ChildShoppingList object populated from the query conditions when no match is found
+ * @method     ChildShoppingListQuery joinWithShoppingListItem($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the ShoppingListItem relation
  *
- * @method     ChildShoppingList findOneById(int $id) Return the first ChildShoppingList filtered by the id column
- * @method     ChildShoppingList findOneByName(string $name) Return the first ChildShoppingList filtered by the name column
- * @method     ChildShoppingList findOneByRemoved(boolean $removed) Return the first ChildShoppingList filtered by the removed column
- * @method     ChildShoppingList findOneByCreatedAt(string $created_at) Return the first ChildShoppingList filtered by the created_at column
- * @method     ChildShoppingList findOneByUpdatedAt(string $updated_at) Return the first ChildShoppingList filtered by the updated_at column *
-
- * @method     ChildShoppingList requirePk($key, ConnectionInterface $con = null) Return the ChildShoppingList by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildShoppingList requireOne(ConnectionInterface $con = null) Return the first ChildShoppingList matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildShoppingListQuery leftJoinWithShoppingListItem() Adds a LEFT JOIN clause and with to the query using the ShoppingListItem relation
+ * @method     ChildShoppingListQuery rightJoinWithShoppingListItem() Adds a RIGHT JOIN clause and with to the query using the ShoppingListItem relation
+ * @method     ChildShoppingListQuery innerJoinWithShoppingListItem() Adds a INNER JOIN clause and with to the query using the ShoppingListItem relation
+ *
+ * @method     ChildShoppingListQuery leftJoinDayPlan($relationAlias = null) Adds a LEFT JOIN clause to the query using the DayPlan relation
+ * @method     ChildShoppingListQuery rightJoinDayPlan($relationAlias = null) Adds a RIGHT JOIN clause to the query using the DayPlan relation
+ * @method     ChildShoppingListQuery innerJoinDayPlan($relationAlias = null) Adds a INNER JOIN clause to the query using the DayPlan relation
+ *
+ * @method     ChildShoppingListQuery joinWithDayPlan($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the DayPlan relation
+ *
+ * @method     ChildShoppingListQuery leftJoinWithDayPlan() Adds a LEFT JOIN clause and with to the query using the DayPlan relation
+ * @method     ChildShoppingListQuery rightJoinWithDayPlan() Adds a RIGHT JOIN clause and with to the query using the DayPlan relation
+ * @method     ChildShoppingListQuery innerJoinWithDayPlan() Adds a INNER JOIN clause and with to the query using the DayPlan relation
+ *
+ * @method     \Lib\ListRecipeQuery|\Lib\ShoppingListItemQuery|\Lib\DayPlanQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ *
+ * @method     ChildShoppingList|null findOne(?ConnectionInterface $con = null) Return the first ChildShoppingList matching the query
+ * @method     ChildShoppingList findOneOrCreate(?ConnectionInterface $con = null) Return the first ChildShoppingList matching the query, or a new ChildShoppingList object populated from the query conditions when no match is found
+ *
+ * @method     ChildShoppingList|null findOneById(int $id) Return the first ChildShoppingList filtered by the id column
+ * @method     ChildShoppingList|null findOneByName(string $name) Return the first ChildShoppingList filtered by the name column
+ * @method     ChildShoppingList|null findOneByRemoved(boolean $removed) Return the first ChildShoppingList filtered by the removed column
+ * @method     ChildShoppingList|null findOneByCreatedAt(string $created_at) Return the first ChildShoppingList filtered by the created_at column
+ * @method     ChildShoppingList|null findOneByUpdatedAt(string $updated_at) Return the first ChildShoppingList filtered by the updated_at column
+ *
+ * @method     ChildShoppingList requirePk($key, ?ConnectionInterface $con = null) Return the ChildShoppingList by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildShoppingList requireOne(?ConnectionInterface $con = null) Return the first ChildShoppingList matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildShoppingList requireOneById(int $id) Return the first ChildShoppingList filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildShoppingList requireOneByName(string $name) Return the first ChildShoppingList filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -70,14 +89,22 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildShoppingList requireOneByCreatedAt(string $created_at) Return the first ChildShoppingList filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildShoppingList requireOneByUpdatedAt(string $updated_at) Return the first ChildShoppingList filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildShoppingList[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildShoppingList objects based on current ModelCriteria
- * @method     ChildShoppingList[]|ObjectCollection findById(int $id) Return ChildShoppingList objects filtered by the id column
- * @method     ChildShoppingList[]|ObjectCollection findByName(string $name) Return ChildShoppingList objects filtered by the name column
- * @method     ChildShoppingList[]|ObjectCollection findByRemoved(boolean $removed) Return ChildShoppingList objects filtered by the removed column
- * @method     ChildShoppingList[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildShoppingList objects filtered by the created_at column
- * @method     ChildShoppingList[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildShoppingList objects filtered by the updated_at column
- * @method     ChildShoppingList[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
+ * @method     ChildShoppingList[]|Collection find(?ConnectionInterface $con = null) Return ChildShoppingList objects based on current ModelCriteria
+ * @psalm-method Collection&\Traversable<ChildShoppingList> find(?ConnectionInterface $con = null) Return ChildShoppingList objects based on current ModelCriteria
  *
+ * @method     ChildShoppingList[]|Collection findById(int|array<int> $id) Return ChildShoppingList objects filtered by the id column
+ * @psalm-method Collection&\Traversable<ChildShoppingList> findById(int|array<int> $id) Return ChildShoppingList objects filtered by the id column
+ * @method     ChildShoppingList[]|Collection findByName(string|array<string> $name) Return ChildShoppingList objects filtered by the name column
+ * @psalm-method Collection&\Traversable<ChildShoppingList> findByName(string|array<string> $name) Return ChildShoppingList objects filtered by the name column
+ * @method     ChildShoppingList[]|Collection findByRemoved(boolean|array<boolean> $removed) Return ChildShoppingList objects filtered by the removed column
+ * @psalm-method Collection&\Traversable<ChildShoppingList> findByRemoved(boolean|array<boolean> $removed) Return ChildShoppingList objects filtered by the removed column
+ * @method     ChildShoppingList[]|Collection findByCreatedAt(string|array<string> $created_at) Return ChildShoppingList objects filtered by the created_at column
+ * @psalm-method Collection&\Traversable<ChildShoppingList> findByCreatedAt(string|array<string> $created_at) Return ChildShoppingList objects filtered by the created_at column
+ * @method     ChildShoppingList[]|Collection findByUpdatedAt(string|array<string> $updated_at) Return ChildShoppingList objects filtered by the updated_at column
+ * @psalm-method Collection&\Traversable<ChildShoppingList> findByUpdatedAt(string|array<string> $updated_at) Return ChildShoppingList objects filtered by the updated_at column
+ *
+ * @method     ChildShoppingList[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ?ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
+ * @psalm-method \Propel\Runtime\Util\PropelModelPager&\Traversable<ChildShoppingList> paginate($page = 1, $maxPerPage = 10, ?ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  */
 abstract class ShoppingListQuery extends ModelCriteria
 {
@@ -86,9 +113,9 @@ abstract class ShoppingListQuery extends ModelCriteria
     /**
      * Initializes internal state of \Lib\Base\ShoppingListQuery object.
      *
-     * @param     string $dbName The database name
-     * @param     string $modelName The phpName of a model, e.g. 'Book'
-     * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
+     * @param string $dbName The database name
+     * @param string $modelName The phpName of a model, e.g. 'Book'
+     * @param string $modelAlias The alias for the model in this query, e.g. 'b'
      */
     public function __construct($dbName = 'default', $modelName = '\\Lib\\ShoppingList', $modelAlias = null)
     {
@@ -98,12 +125,12 @@ abstract class ShoppingListQuery extends ModelCriteria
     /**
      * Returns a new ChildShoppingListQuery object.
      *
-     * @param     string $modelAlias The alias of a model in the query
-     * @param     Criteria $criteria Optional Criteria to build the query from
+     * @param string $modelAlias The alias of a model in the query
+     * @param Criteria $criteria Optional Criteria to build the query from
      *
      * @return ChildShoppingListQuery
      */
-    public static function create($modelAlias = null, Criteria $criteria = null)
+    public static function create(?string $modelAlias = null, ?Criteria $criteria = null): Criteria
     {
         if ($criteria instanceof ChildShoppingListQuery) {
             return $criteria;
@@ -133,7 +160,7 @@ abstract class ShoppingListQuery extends ModelCriteria
      *
      * @return ChildShoppingList|array|mixed the result, formatted by the current formatter
      */
-    public function findPk($key, ConnectionInterface $con = null)
+    public function findPk($key, ?ConnectionInterface $con = null)
     {
         if ($key === null) {
             return null;
@@ -165,8 +192,8 @@ abstract class ShoppingListQuery extends ModelCriteria
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
      * @throws \Propel\Runtime\Exception\PropelException
      *
@@ -198,8 +225,8 @@ abstract class ShoppingListQuery extends ModelCriteria
     /**
      * Find object by primary key.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
      * @return ChildShoppingList|array|mixed the result, formatted by the current formatter
      */
@@ -219,12 +246,12 @@ abstract class ShoppingListQuery extends ModelCriteria
      * <code>
      * $objs = $c->findPks(array(12, 56, 832), $con);
      * </code>
-     * @param     array $keys Primary keys to use for the query
-     * @param     ConnectionInterface $con an optional connection object
+     * @param array $keys Primary keys to use for the query
+     * @param ConnectionInterface $con an optional connection object
      *
-     * @return ObjectCollection|array|mixed the list of results, formatted by the current formatter
+     * @return Collection|array|mixed the list of results, formatted by the current formatter
      */
-    public function findPks($keys, ConnectionInterface $con = null)
+    public function findPks($keys, ?ConnectionInterface $con = null)
     {
         if (null === $con) {
             $con = Propel::getServiceContainer()->getReadConnection($this->getDbName());
@@ -241,27 +268,31 @@ abstract class ShoppingListQuery extends ModelCriteria
     /**
      * Filter the query by primary key
      *
-     * @param     mixed $key Primary key to use for the query
+     * @param mixed $key Primary key to use for the query
      *
-     * @return $this|ChildShoppingListQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(ShoppingListTableMap::COL_ID, $key, Criteria::EQUAL);
+        $this->addUsingAlias(ShoppingListTableMap::COL_ID, $key, Criteria::EQUAL);
+
+        return $this;
     }
 
     /**
      * Filter the query by a list of primary keys
      *
-     * @param     array $keys The list of primary key to use for the query
+     * @param array|int $keys The list of primary key to use for the query
      *
-     * @return $this|ChildShoppingListQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(ShoppingListTableMap::COL_ID, $keys, Criteria::IN);
+        $this->addUsingAlias(ShoppingListTableMap::COL_ID, $keys, Criteria::IN);
+
+        return $this;
     }
 
     /**
@@ -274,15 +305,15 @@ abstract class ShoppingListQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @param     mixed $id The value to use as filter.
+     * @param mixed $id The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildShoppingListQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function filterById($id = null, $comparison = null)
+    public function filterById($id = null, ?string $comparison = null)
     {
         if (is_array($id)) {
             $useMinMax = false;
@@ -302,7 +333,9 @@ abstract class ShoppingListQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ShoppingListTableMap::COL_ID, $id, $comparison);
+        $this->addUsingAlias(ShoppingListTableMap::COL_ID, $id, $comparison);
+
+        return $this;
     }
 
     /**
@@ -312,14 +345,15 @@ abstract class ShoppingListQuery extends ModelCriteria
      * <code>
      * $query->filterByName('fooValue');   // WHERE name = 'fooValue'
      * $query->filterByName('%fooValue%', Criteria::LIKE); // WHERE name LIKE '%fooValue%'
+     * $query->filterByName(['foo', 'bar']); // WHERE name IN ('foo', 'bar')
      * </code>
      *
-     * @param     string $name The value to use as filter.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string|string[] $name The value to use as filter.
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildShoppingListQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function filterByName($name = null, $comparison = null)
+    public function filterByName($name = null, ?string $comparison = null)
     {
         if (null === $comparison) {
             if (is_array($name)) {
@@ -327,7 +361,9 @@ abstract class ShoppingListQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ShoppingListTableMap::COL_NAME, $name, $comparison);
+        $this->addUsingAlias(ShoppingListTableMap::COL_NAME, $name, $comparison);
+
+        return $this;
     }
 
     /**
@@ -339,22 +375,24 @@ abstract class ShoppingListQuery extends ModelCriteria
      * $query->filterByRemoved('yes'); // WHERE removed = true
      * </code>
      *
-     * @param     boolean|string $removed The value to use as filter.
+     * @param bool|string $removed The value to use as filter.
      *              Non-boolean arguments are converted using the following rules:
      *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
      *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
      *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildShoppingListQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function filterByRemoved($removed = null, $comparison = null)
+    public function filterByRemoved($removed = null, ?string $comparison = null)
     {
         if (is_string($removed)) {
             $removed = in_array(strtolower($removed), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
         }
 
-        return $this->addUsingAlias(ShoppingListTableMap::COL_REMOVED, $removed, $comparison);
+        $this->addUsingAlias(ShoppingListTableMap::COL_REMOVED, $removed, $comparison);
+
+        return $this;
     }
 
     /**
@@ -367,17 +405,17 @@ abstract class ShoppingListQuery extends ModelCriteria
      * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $createdAt The value to use as filter.
+     * @param mixed $createdAt The value to use as filter.
      *              Values can be integers (unix timestamps), DateTime objects, or strings.
      *              Empty strings are treated as NULL.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildShoppingListQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    public function filterByCreatedAt($createdAt = null, ?string $comparison = null)
     {
         if (is_array($createdAt)) {
             $useMinMax = false;
@@ -397,7 +435,9 @@ abstract class ShoppingListQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ShoppingListTableMap::COL_CREATED_AT, $createdAt, $comparison);
+        $this->addUsingAlias(ShoppingListTableMap::COL_CREATED_AT, $createdAt, $comparison);
+
+        return $this;
     }
 
     /**
@@ -410,17 +450,17 @@ abstract class ShoppingListQuery extends ModelCriteria
      * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $updatedAt The value to use as filter.
+     * @param mixed $updatedAt The value to use as filter.
      *              Values can be integers (unix timestamps), DateTime objects, or strings.
      *              Empty strings are treated as NULL.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildShoppingListQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    public function filterByUpdatedAt($updatedAt = null, ?string $comparison = null)
     {
         if (is_array($updatedAt)) {
             $useMinMax = false;
@@ -440,27 +480,33 @@ abstract class ShoppingListQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ShoppingListTableMap::COL_UPDATED_AT, $updatedAt, $comparison);
+        $this->addUsingAlias(ShoppingListTableMap::COL_UPDATED_AT, $updatedAt, $comparison);
+
+        return $this;
     }
 
     /**
      * Filter the query by a related \Lib\ListRecipe object
      *
      * @param \Lib\ListRecipe|ObjectCollection $listRecipe the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildShoppingListQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function filterByListRecipe($listRecipe, $comparison = null)
+    public function filterByListRecipe($listRecipe, ?string $comparison = null)
     {
         if ($listRecipe instanceof \Lib\ListRecipe) {
-            return $this
+            $this
                 ->addUsingAlias(ShoppingListTableMap::COL_ID, $listRecipe->getShoppingListId(), $comparison);
+
+            return $this;
         } elseif ($listRecipe instanceof ObjectCollection) {
-            return $this
+            $this
                 ->useListRecipeQuery()
                 ->filterByPrimaryKeys($listRecipe->getPrimaryKeys())
                 ->endUse();
+
+            return $this;
         } else {
             throw new PropelException('filterByListRecipe() only accepts arguments of type \Lib\ListRecipe or Collection');
         }
@@ -469,12 +515,12 @@ abstract class ShoppingListQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the ListRecipe relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string|null $relationAlias Optional alias for the relation
+     * @param string|null $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return $this|ChildShoppingListQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function joinListRecipe($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinListRecipe(?string $relationAlias = null, ?string $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('ListRecipe');
@@ -503,9 +549,9 @@ abstract class ShoppingListQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
+     * @param string $relationAlias optional alias for the relation,
      *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return \Lib\ListRecipeQuery A secondary query class using the current class as primary query
      */
@@ -517,11 +563,453 @@ abstract class ShoppingListQuery extends ModelCriteria
     }
 
     /**
+     * Use the ListRecipe relation ListRecipe object
+     *
+     * @param callable(\Lib\ListRecipeQuery):\Lib\ListRecipeQuery $callable A function working on the related query
+     *
+     * @param string|null $relationAlias optional alias for the relation
+     *
+     * @param string|null $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this
+     */
+    public function withListRecipeQuery(
+        callable $callable,
+        string $relationAlias = null,
+        ?string $joinType = Criteria::INNER_JOIN
+    ) {
+        $relatedQuery = $this->useListRecipeQuery(
+            $relationAlias,
+            $joinType
+        );
+        $callable($relatedQuery);
+        $relatedQuery->endUse();
+
+        return $this;
+    }
+
+    /**
+     * Use the relation to ListRecipe table for an EXISTS query.
+     *
+     * @see \Propel\Runtime\ActiveQuery\ModelCriteria::useExistsQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the exists query, like ExtendedBookQuery::class
+     * @param string $typeOfExists Either ExistsQueryCriterion::TYPE_EXISTS or ExistsQueryCriterion::TYPE_NOT_EXISTS
+     *
+     * @return \Lib\ListRecipeQuery The inner query object of the EXISTS statement
+     */
+    public function useListRecipeExistsQuery($modelAlias = null, $queryClass = null, $typeOfExists = 'EXISTS')
+    {
+        /** @var $q \Lib\ListRecipeQuery */
+        $q = $this->useExistsQuery('ListRecipe', $modelAlias, $queryClass, $typeOfExists);
+        return $q;
+    }
+
+    /**
+     * Use the relation to ListRecipe table for a NOT EXISTS query.
+     *
+     * @see useListRecipeExistsQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the exists query, like ExtendedBookQuery::class
+     *
+     * @return \Lib\ListRecipeQuery The inner query object of the NOT EXISTS statement
+     */
+    public function useListRecipeNotExistsQuery($modelAlias = null, $queryClass = null)
+    {
+        /** @var $q \Lib\ListRecipeQuery */
+        $q = $this->useExistsQuery('ListRecipe', $modelAlias, $queryClass, 'NOT EXISTS');
+        return $q;
+    }
+
+    /**
+     * Use the relation to ListRecipe table for an IN query.
+     *
+     * @see \Propel\Runtime\ActiveQuery\ModelCriteria::useInQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the IN query, like ExtendedBookQuery::class
+     * @param string $typeOfIn Criteria::IN or Criteria::NOT_IN
+     *
+     * @return \Lib\ListRecipeQuery The inner query object of the IN statement
+     */
+    public function useInListRecipeQuery($modelAlias = null, $queryClass = null, $typeOfIn = 'IN')
+    {
+        /** @var $q \Lib\ListRecipeQuery */
+        $q = $this->useInQuery('ListRecipe', $modelAlias, $queryClass, $typeOfIn);
+        return $q;
+    }
+
+    /**
+     * Use the relation to ListRecipe table for a NOT IN query.
+     *
+     * @see useListRecipeInQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the NOT IN query, like ExtendedBookQuery::class
+     *
+     * @return \Lib\ListRecipeQuery The inner query object of the NOT IN statement
+     */
+    public function useNotInListRecipeQuery($modelAlias = null, $queryClass = null)
+    {
+        /** @var $q \Lib\ListRecipeQuery */
+        $q = $this->useInQuery('ListRecipe', $modelAlias, $queryClass, 'NOT IN');
+        return $q;
+    }
+
+    /**
+     * Filter the query by a related \Lib\ShoppingListItem object
+     *
+     * @param \Lib\ShoppingListItem|ObjectCollection $shoppingListItem the related object to use as filter
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this The current query, for fluid interface
+     */
+    public function filterByShoppingListItem($shoppingListItem, ?string $comparison = null)
+    {
+        if ($shoppingListItem instanceof \Lib\ShoppingListItem) {
+            $this
+                ->addUsingAlias(ShoppingListTableMap::COL_ID, $shoppingListItem->getShoppingListId(), $comparison);
+
+            return $this;
+        } elseif ($shoppingListItem instanceof ObjectCollection) {
+            $this
+                ->useShoppingListItemQuery()
+                ->filterByPrimaryKeys($shoppingListItem->getPrimaryKeys())
+                ->endUse();
+
+            return $this;
+        } else {
+            throw new PropelException('filterByShoppingListItem() only accepts arguments of type \Lib\ShoppingListItem or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ShoppingListItem relation
+     *
+     * @param string|null $relationAlias Optional alias for the relation
+     * @param string|null $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this The current query, for fluid interface
+     */
+    public function joinShoppingListItem(?string $relationAlias = null, ?string $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ShoppingListItem');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ShoppingListItem');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ShoppingListItem relation ShoppingListItem object
+     *
+     * @see useQuery()
+     *
+     * @param string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \Lib\ShoppingListItemQuery A secondary query class using the current class as primary query
+     */
+    public function useShoppingListItemQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinShoppingListItem($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ShoppingListItem', '\Lib\ShoppingListItemQuery');
+    }
+
+    /**
+     * Use the ShoppingListItem relation ShoppingListItem object
+     *
+     * @param callable(\Lib\ShoppingListItemQuery):\Lib\ShoppingListItemQuery $callable A function working on the related query
+     *
+     * @param string|null $relationAlias optional alias for the relation
+     *
+     * @param string|null $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this
+     */
+    public function withShoppingListItemQuery(
+        callable $callable,
+        string $relationAlias = null,
+        ?string $joinType = Criteria::INNER_JOIN
+    ) {
+        $relatedQuery = $this->useShoppingListItemQuery(
+            $relationAlias,
+            $joinType
+        );
+        $callable($relatedQuery);
+        $relatedQuery->endUse();
+
+        return $this;
+    }
+
+    /**
+     * Use the relation to ShoppingListItem table for an EXISTS query.
+     *
+     * @see \Propel\Runtime\ActiveQuery\ModelCriteria::useExistsQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the exists query, like ExtendedBookQuery::class
+     * @param string $typeOfExists Either ExistsQueryCriterion::TYPE_EXISTS or ExistsQueryCriterion::TYPE_NOT_EXISTS
+     *
+     * @return \Lib\ShoppingListItemQuery The inner query object of the EXISTS statement
+     */
+    public function useShoppingListItemExistsQuery($modelAlias = null, $queryClass = null, $typeOfExists = 'EXISTS')
+    {
+        /** @var $q \Lib\ShoppingListItemQuery */
+        $q = $this->useExistsQuery('ShoppingListItem', $modelAlias, $queryClass, $typeOfExists);
+        return $q;
+    }
+
+    /**
+     * Use the relation to ShoppingListItem table for a NOT EXISTS query.
+     *
+     * @see useShoppingListItemExistsQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the exists query, like ExtendedBookQuery::class
+     *
+     * @return \Lib\ShoppingListItemQuery The inner query object of the NOT EXISTS statement
+     */
+    public function useShoppingListItemNotExistsQuery($modelAlias = null, $queryClass = null)
+    {
+        /** @var $q \Lib\ShoppingListItemQuery */
+        $q = $this->useExistsQuery('ShoppingListItem', $modelAlias, $queryClass, 'NOT EXISTS');
+        return $q;
+    }
+
+    /**
+     * Use the relation to ShoppingListItem table for an IN query.
+     *
+     * @see \Propel\Runtime\ActiveQuery\ModelCriteria::useInQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the IN query, like ExtendedBookQuery::class
+     * @param string $typeOfIn Criteria::IN or Criteria::NOT_IN
+     *
+     * @return \Lib\ShoppingListItemQuery The inner query object of the IN statement
+     */
+    public function useInShoppingListItemQuery($modelAlias = null, $queryClass = null, $typeOfIn = 'IN')
+    {
+        /** @var $q \Lib\ShoppingListItemQuery */
+        $q = $this->useInQuery('ShoppingListItem', $modelAlias, $queryClass, $typeOfIn);
+        return $q;
+    }
+
+    /**
+     * Use the relation to ShoppingListItem table for a NOT IN query.
+     *
+     * @see useShoppingListItemInQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the NOT IN query, like ExtendedBookQuery::class
+     *
+     * @return \Lib\ShoppingListItemQuery The inner query object of the NOT IN statement
+     */
+    public function useNotInShoppingListItemQuery($modelAlias = null, $queryClass = null)
+    {
+        /** @var $q \Lib\ShoppingListItemQuery */
+        $q = $this->useInQuery('ShoppingListItem', $modelAlias, $queryClass, 'NOT IN');
+        return $q;
+    }
+
+    /**
+     * Filter the query by a related \Lib\DayPlan object
+     *
+     * @param \Lib\DayPlan|ObjectCollection $dayPlan the related object to use as filter
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this The current query, for fluid interface
+     */
+    public function filterByDayPlan($dayPlan, ?string $comparison = null)
+    {
+        if ($dayPlan instanceof \Lib\DayPlan) {
+            $this
+                ->addUsingAlias(ShoppingListTableMap::COL_ID, $dayPlan->getShoppingListId(), $comparison);
+
+            return $this;
+        } elseif ($dayPlan instanceof ObjectCollection) {
+            $this
+                ->useDayPlanQuery()
+                ->filterByPrimaryKeys($dayPlan->getPrimaryKeys())
+                ->endUse();
+
+            return $this;
+        } else {
+            throw new PropelException('filterByDayPlan() only accepts arguments of type \Lib\DayPlan or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the DayPlan relation
+     *
+     * @param string|null $relationAlias Optional alias for the relation
+     * @param string|null $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this The current query, for fluid interface
+     */
+    public function joinDayPlan(?string $relationAlias = null, ?string $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('DayPlan');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'DayPlan');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the DayPlan relation DayPlan object
+     *
+     * @see useQuery()
+     *
+     * @param string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \Lib\DayPlanQuery A secondary query class using the current class as primary query
+     */
+    public function useDayPlanQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinDayPlan($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'DayPlan', '\Lib\DayPlanQuery');
+    }
+
+    /**
+     * Use the DayPlan relation DayPlan object
+     *
+     * @param callable(\Lib\DayPlanQuery):\Lib\DayPlanQuery $callable A function working on the related query
+     *
+     * @param string|null $relationAlias optional alias for the relation
+     *
+     * @param string|null $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this
+     */
+    public function withDayPlanQuery(
+        callable $callable,
+        string $relationAlias = null,
+        ?string $joinType = Criteria::INNER_JOIN
+    ) {
+        $relatedQuery = $this->useDayPlanQuery(
+            $relationAlias,
+            $joinType
+        );
+        $callable($relatedQuery);
+        $relatedQuery->endUse();
+
+        return $this;
+    }
+
+    /**
+     * Use the relation to DayPlan table for an EXISTS query.
+     *
+     * @see \Propel\Runtime\ActiveQuery\ModelCriteria::useExistsQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the exists query, like ExtendedBookQuery::class
+     * @param string $typeOfExists Either ExistsQueryCriterion::TYPE_EXISTS or ExistsQueryCriterion::TYPE_NOT_EXISTS
+     *
+     * @return \Lib\DayPlanQuery The inner query object of the EXISTS statement
+     */
+    public function useDayPlanExistsQuery($modelAlias = null, $queryClass = null, $typeOfExists = 'EXISTS')
+    {
+        /** @var $q \Lib\DayPlanQuery */
+        $q = $this->useExistsQuery('DayPlan', $modelAlias, $queryClass, $typeOfExists);
+        return $q;
+    }
+
+    /**
+     * Use the relation to DayPlan table for a NOT EXISTS query.
+     *
+     * @see useDayPlanExistsQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the exists query, like ExtendedBookQuery::class
+     *
+     * @return \Lib\DayPlanQuery The inner query object of the NOT EXISTS statement
+     */
+    public function useDayPlanNotExistsQuery($modelAlias = null, $queryClass = null)
+    {
+        /** @var $q \Lib\DayPlanQuery */
+        $q = $this->useExistsQuery('DayPlan', $modelAlias, $queryClass, 'NOT EXISTS');
+        return $q;
+    }
+
+    /**
+     * Use the relation to DayPlan table for an IN query.
+     *
+     * @see \Propel\Runtime\ActiveQuery\ModelCriteria::useInQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the IN query, like ExtendedBookQuery::class
+     * @param string $typeOfIn Criteria::IN or Criteria::NOT_IN
+     *
+     * @return \Lib\DayPlanQuery The inner query object of the IN statement
+     */
+    public function useInDayPlanQuery($modelAlias = null, $queryClass = null, $typeOfIn = 'IN')
+    {
+        /** @var $q \Lib\DayPlanQuery */
+        $q = $this->useInQuery('DayPlan', $modelAlias, $queryClass, $typeOfIn);
+        return $q;
+    }
+
+    /**
+     * Use the relation to DayPlan table for a NOT IN query.
+     *
+     * @see useDayPlanInQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the NOT IN query, like ExtendedBookQuery::class
+     *
+     * @return \Lib\DayPlanQuery The inner query object of the NOT IN statement
+     */
+    public function useNotInDayPlanQuery($modelAlias = null, $queryClass = null)
+    {
+        /** @var $q \Lib\DayPlanQuery */
+        $q = $this->useInQuery('DayPlan', $modelAlias, $queryClass, 'NOT IN');
+        return $q;
+    }
+
+    /**
      * Exclude object from result
      *
-     * @param   ChildShoppingList $shoppingList Object to remove from the list of results
+     * @param ChildShoppingList $shoppingList Object to remove from the list of results
      *
-     * @return $this|ChildShoppingListQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
     public function prune($shoppingList = null)
     {
@@ -538,7 +1026,7 @@ abstract class ShoppingListQuery extends ModelCriteria
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
-    public function doDeleteAll(ConnectionInterface $con = null)
+    public function doDeleteAll(?ConnectionInterface $con = null): int
     {
         if (null === $con) {
             $con = Propel::getServiceContainer()->getWriteConnection(ShoppingListTableMap::DATABASE_NAME);
@@ -563,12 +1051,12 @@ abstract class ShoppingListQuery extends ModelCriteria
      * Performs a DELETE on the database based on the current ModelCriteria
      *
      * @param ConnectionInterface $con the connection to use
-     * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
      *                         if supported by native driver or if emulated using Propel.
-     * @throws PropelException Any exceptions caught during processing will be
+     * @throws \Propel\Runtime\Exception\PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
      */
-    public function delete(ConnectionInterface $con = null)
+    public function delete(?ConnectionInterface $con = null): int
     {
         if (null === $con) {
             $con = Propel::getServiceContainer()->getWriteConnection(ShoppingListTableMap::DATABASE_NAME);
@@ -598,65 +1086,77 @@ abstract class ShoppingListQuery extends ModelCriteria
     /**
      * Filter by the latest updated
      *
-     * @param      int $nbDays Maximum age of the latest update in days
+     * @param int $nbDays Maximum age of the latest update in days
      *
-     * @return     $this|ChildShoppingListQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
-        return $this->addUsingAlias(ShoppingListTableMap::COL_UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        $this->addUsingAlias(ShoppingListTableMap::COL_UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+
+        return $this;
     }
 
     /**
      * Order by update date desc
      *
-     * @return     $this|ChildShoppingListQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
-        return $this->addDescendingOrderByColumn(ShoppingListTableMap::COL_UPDATED_AT);
+        $this->addDescendingOrderByColumn(ShoppingListTableMap::COL_UPDATED_AT);
+
+        return $this;
     }
 
     /**
      * Order by update date asc
      *
-     * @return     $this|ChildShoppingListQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
-        return $this->addAscendingOrderByColumn(ShoppingListTableMap::COL_UPDATED_AT);
+        $this->addAscendingOrderByColumn(ShoppingListTableMap::COL_UPDATED_AT);
+
+        return $this;
     }
 
     /**
      * Order by create date desc
      *
-     * @return     $this|ChildShoppingListQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
-        return $this->addDescendingOrderByColumn(ShoppingListTableMap::COL_CREATED_AT);
+        $this->addDescendingOrderByColumn(ShoppingListTableMap::COL_CREATED_AT);
+
+        return $this;
     }
 
     /**
      * Filter by the latest created
      *
-     * @param      int $nbDays Maximum age of in days
+     * @param int $nbDays Maximum age of in days
      *
-     * @return     $this|ChildShoppingListQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
-        return $this->addUsingAlias(ShoppingListTableMap::COL_CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        $this->addUsingAlias(ShoppingListTableMap::COL_CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+
+        return $this;
     }
 
     /**
      * Order by create date asc
      *
-     * @return     $this|ChildShoppingListQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {
-        return $this->addAscendingOrderByColumn(ShoppingListTableMap::COL_CREATED_AT);
+        $this->addAscendingOrderByColumn(ShoppingListTableMap::COL_CREATED_AT);
+
+        return $this;
     }
 
-} // ShoppingListQuery
+}

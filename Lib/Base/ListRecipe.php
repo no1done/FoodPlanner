@@ -10,13 +10,17 @@ use Lib\ListRecipeQuery as ChildListRecipeQuery;
 use Lib\Recipe as ChildRecipe;
 use Lib\RecipeQuery as ChildRecipeQuery;
 use Lib\ShoppingList as ChildShoppingList;
+use Lib\ShoppingListItem as ChildShoppingListItem;
+use Lib\ShoppingListItemQuery as ChildShoppingListItemQuery;
 use Lib\ShoppingListQuery as ChildShoppingListQuery;
 use Lib\Map\ListRecipeTableMap;
+use Lib\Map\ShoppingListItemTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
@@ -36,19 +40,21 @@ abstract class ListRecipe implements ActiveRecordInterface
 {
     /**
      * TableMap class name
+     *
+     * @var string
      */
-    const TABLE_MAP = '\\Lib\\Map\\ListRecipeTableMap';
+    public const TABLE_MAP = '\\Lib\\Map\\ListRecipeTableMap';
 
 
     /**
      * attribute to determine if this object has previously been saved.
-     * @var boolean
+     * @var bool
      */
     protected $new = true;
 
     /**
      * attribute to determine whether this object has been deleted.
-     * @var boolean
+     * @var bool
      */
     protected $deleted = false;
 
@@ -57,14 +63,14 @@ abstract class ListRecipe implements ActiveRecordInterface
      * Tracking modified columns allows us to only update modified columns.
      * @var array
      */
-    protected $modifiedColumns = array();
+    protected $modifiedColumns = [];
 
     /**
      * The (virtual) columns that are added at runtime
      * The formatters can add supplementary columns based on a resultset
      * @var array
      */
-    protected $virtualColumns = array();
+    protected $virtualColumns = [];
 
     /**
      * The value for the id field.
@@ -88,6 +94,13 @@ abstract class ListRecipe implements ActiveRecordInterface
     protected $recipe_id;
 
     /**
+     * The value for the ref field.
+     *
+     * @var        string|null
+     */
+    protected $ref;
+
+    /**
      * The value for the serves field.
      *
      * @var        int
@@ -95,16 +108,24 @@ abstract class ListRecipe implements ActiveRecordInterface
     protected $serves;
 
     /**
+     * The value for the complete field.
+     *
+     * Note: this column has a database default value of: false
+     * @var        boolean|null
+     */
+    protected $complete;
+
+    /**
      * The value for the created_at field.
      *
-     * @var        DateTime
+     * @var        DateTime|null
      */
     protected $created_at;
 
     /**
      * The value for the updated_at field.
      *
-     * @var        DateTime
+     * @var        DateTime|null
      */
     protected $updated_at;
 
@@ -119,26 +140,53 @@ abstract class ListRecipe implements ActiveRecordInterface
     protected $aRecipe;
 
     /**
+     * @var        ObjectCollection|ChildShoppingListItem[] Collection to store aggregation of ChildShoppingListItem objects.
+     * @phpstan-var ObjectCollection&\Traversable<ChildShoppingListItem> Collection to store aggregation of ChildShoppingListItem objects.
+     */
+    protected $collShoppingListItems;
+    protected $collShoppingListItemsPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
-     * @var boolean
+     * @var bool
      */
     protected $alreadyInSave = false;
 
     /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildShoppingListItem[]
+     * @phpstan-var ObjectCollection&\Traversable<ChildShoppingListItem>
+     */
+    protected $shoppingListItemsScheduledForDeletion = null;
+
+    /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues(): void
+    {
+        $this->complete = false;
+    }
+
+    /**
      * Initializes internal state of Lib\Base\ListRecipe object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
      * Returns whether the object has been modified.
      *
-     * @return boolean True if the object has been modified.
+     * @return bool True if the object has been modified.
      */
-    public function isModified()
+    public function isModified(): bool
     {
         return !!$this->modifiedColumns;
     }
@@ -146,10 +194,10 @@ abstract class ListRecipe implements ActiveRecordInterface
     /**
      * Has specified column been modified?
      *
-     * @param  string  $col column fully qualified name (TableMap::TYPE_COLNAME), e.g. Book::AUTHOR_ID
-     * @return boolean True if $col has been modified.
+     * @param string $col column fully qualified name (TableMap::TYPE_COLNAME), e.g. Book::AUTHOR_ID
+     * @return bool True if $col has been modified.
      */
-    public function isColumnModified($col)
+    public function isColumnModified(string $col): bool
     {
         return $this->modifiedColumns && isset($this->modifiedColumns[$col]);
     }
@@ -158,7 +206,7 @@ abstract class ListRecipe implements ActiveRecordInterface
      * Get the columns that have been modified in this object.
      * @return array A unique list of the modified column names for this object.
      */
-    public function getModifiedColumns()
+    public function getModifiedColumns(): array
     {
         return $this->modifiedColumns ? array_keys($this->modifiedColumns) : [];
     }
@@ -168,9 +216,9 @@ abstract class ListRecipe implements ActiveRecordInterface
      * be false, if the object was retrieved from storage or was created
      * and then saved.
      *
-     * @return boolean true, if the object has never been persisted.
+     * @return bool True, if the object has never been persisted.
      */
-    public function isNew()
+    public function isNew(): bool
     {
         return $this->new;
     }
@@ -179,45 +227,43 @@ abstract class ListRecipe implements ActiveRecordInterface
      * Setter for the isNew attribute.  This method will be called
      * by Propel-generated children and objects.
      *
-     * @param boolean $b the state of the object.
+     * @param bool $b the state of the object.
      */
-    public function setNew($b)
+    public function setNew(bool $b): void
     {
-        $this->new = (boolean) $b;
+        $this->new = $b;
     }
 
     /**
      * Whether this object has been deleted.
-     * @return boolean The deleted state of this object.
+     * @return bool The deleted state of this object.
      */
-    public function isDeleted()
+    public function isDeleted(): bool
     {
         return $this->deleted;
     }
 
     /**
      * Specify whether this object has been deleted.
-     * @param  boolean $b The deleted state of this object.
+     * @param bool $b The deleted state of this object.
      * @return void
      */
-    public function setDeleted($b)
+    public function setDeleted(bool $b): void
     {
-        $this->deleted = (boolean) $b;
+        $this->deleted = $b;
     }
 
     /**
      * Sets the modified state for the object to be false.
-     * @param  string $col If supplied, only the specified column is reset.
+     * @param string $col If supplied, only the specified column is reset.
      * @return void
      */
-    public function resetModified($col = null)
+    public function resetModified(?string $col = null): void
     {
         if (null !== $col) {
-            if (isset($this->modifiedColumns[$col])) {
-                unset($this->modifiedColumns[$col]);
-            }
+            unset($this->modifiedColumns[$col]);
         } else {
-            $this->modifiedColumns = array();
+            $this->modifiedColumns = [];
         }
     }
 
@@ -226,10 +272,10 @@ abstract class ListRecipe implements ActiveRecordInterface
      * <code>obj</code> is an instance of <code>ListRecipe</code>, delegates to
      * <code>equals(ListRecipe)</code>.  Otherwise, returns <code>false</code>.
      *
-     * @param  mixed   $obj The object to compare to.
-     * @return boolean Whether equal to the object specified.
+     * @param mixed $obj The object to compare to.
+     * @return bool Whether equal to the object specified.
      */
-    public function equals($obj)
+    public function equals($obj): bool
     {
         if (!$obj instanceof static) {
             return false;
@@ -251,7 +297,7 @@ abstract class ListRecipe implements ActiveRecordInterface
      *
      * @return array
      */
-    public function getVirtualColumns()
+    public function getVirtualColumns(): array
     {
         return $this->virtualColumns;
     }
@@ -259,10 +305,10 @@ abstract class ListRecipe implements ActiveRecordInterface
     /**
      * Checks the existence of a virtual column in this object
      *
-     * @param  string  $name The virtual column name
-     * @return boolean
+     * @param string $name The virtual column name
+     * @return bool
      */
-    public function hasVirtualColumn($name)
+    public function hasVirtualColumn(string $name): bool
     {
         return array_key_exists($name, $this->virtualColumns);
     }
@@ -270,15 +316,15 @@ abstract class ListRecipe implements ActiveRecordInterface
     /**
      * Get the value of a virtual column in this object
      *
-     * @param  string $name The virtual column name
+     * @param string $name The virtual column name
      * @return mixed
      *
-     * @throws PropelException
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getVirtualColumn($name)
+    public function getVirtualColumn(string $name)
     {
         if (!$this->hasVirtualColumn($name)) {
-            throw new PropelException(sprintf('Cannot get value of inexistent virtual column %s.', $name));
+            throw new PropelException(sprintf('Cannot get value of nonexistent virtual column `%s`.', $name));
         }
 
         return $this->virtualColumns[$name];
@@ -287,12 +333,12 @@ abstract class ListRecipe implements ActiveRecordInterface
     /**
      * Set the value of a virtual column in this object
      *
-     * @param string $name  The virtual column name
-     * @param mixed  $value The value to give to the virtual column
+     * @param string $name The virtual column name
+     * @param mixed $value The value to give to the virtual column
      *
-     * @return $this|ListRecipe The current object, for fluid interface
+     * @return $this The current object, for fluid interface
      */
-    public function setVirtualColumn($name, $value)
+    public function setVirtualColumn(string $name, $value)
     {
         $this->virtualColumns[$name] = $value;
 
@@ -302,13 +348,13 @@ abstract class ListRecipe implements ActiveRecordInterface
     /**
      * Logs a message using Propel::log().
      *
-     * @param  string  $msg
-     * @param  int     $priority One of the Propel::LOG_* logging levels
-     * @return boolean
+     * @param string $msg
+     * @param int $priority One of the Propel::LOG_* logging levels
+     * @return void
      */
-    protected function log($msg, $priority = Propel::LOG_INFO)
+    protected function log(string $msg, int $priority = Propel::LOG_INFO): void
     {
-        return Propel::log(get_class($this) . ': ' . $msg, $priority);
+        Propel::log(get_class($this) . ': ' . $msg, $priority);
     }
 
     /**
@@ -319,24 +365,27 @@ abstract class ListRecipe implements ActiveRecordInterface
      *  => {"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
      * </code>
      *
-     * @param  mixed   $parser                 A AbstractParser instance, or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param  boolean $includeLazyLoadColumns (optional) Whether to include lazy load(ed) columns. Defaults to TRUE.
-     * @return string  The exported data
+     * @param \Propel\Runtime\Parser\AbstractParser|string $parser An AbstractParser instance, or a format name ('XML', 'YAML', 'JSON', 'CSV')
+     * @param bool $includeLazyLoadColumns (optional) Whether to include lazy load(ed) columns. Defaults to TRUE.
+     * @param string $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME, TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM. Defaults to TableMap::TYPE_PHPNAME.
+     * @return string The exported data
      */
-    public function exportTo($parser, $includeLazyLoadColumns = true)
+    public function exportTo($parser, bool $includeLazyLoadColumns = true, string $keyType = TableMap::TYPE_PHPNAME): string
     {
         if (!$parser instanceof AbstractParser) {
             $parser = AbstractParser::getParser($parser);
         }
 
-        return $parser->fromArray($this->toArray(TableMap::TYPE_PHPNAME, $includeLazyLoadColumns, array(), true));
+        return $parser->fromArray($this->toArray($keyType, $includeLazyLoadColumns, array(), true));
     }
 
     /**
      * Clean up internal collections prior to serializing
      * Avoids recursive loops that turn into segmentation faults when serializing
+     *
+     * @return array<string>
      */
-    public function __sleep()
+    public function __sleep(): array
     {
         $this->clearAllReferences();
 
@@ -382,6 +431,16 @@ abstract class ListRecipe implements ActiveRecordInterface
     }
 
     /**
+     * Get the [ref] column value.
+     *
+     * @return string|null
+     */
+    public function getRef()
+    {
+        return $this->ref;
+    }
+
+    /**
      * Get the [serves] column value.
      *
      * @return int
@@ -392,17 +451,39 @@ abstract class ListRecipe implements ActiveRecordInterface
     }
 
     /**
+     * Get the [complete] column value.
+     *
+     * @return boolean|null
+     */
+    public function getComplete()
+    {
+        return $this->complete;
+    }
+
+    /**
+     * Get the [complete] column value.
+     *
+     * @return boolean|null
+     */
+    public function isComplete()
+    {
+        return $this->getComplete();
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
-     * @param      string|null $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw DateTime object will be returned.
+     * @param string|null $format The date/time format string (either date()-style or strftime()-style).
+     *   If format is NULL, then the raw DateTime object will be returned.
      *
-     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+     * @return string|DateTime|null Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00.
      *
-     * @throws PropelException - if unable to parse/validate the date/time value.
+     * @throws \Propel\Runtime\Exception\PropelException - if unable to parse/validate the date/time value.
+     *
+     * @psalm-return ($format is null ? DateTime|null : string|null)
      */
-    public function getCreatedAt($format = NULL)
+    public function getCreatedAt($format = null)
     {
         if ($format === null) {
             return $this->created_at;
@@ -415,14 +496,16 @@ abstract class ListRecipe implements ActiveRecordInterface
      * Get the [optionally formatted] temporal [updated_at] column value.
      *
      *
-     * @param      string|null $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw DateTime object will be returned.
+     * @param string|null $format The date/time format string (either date()-style or strftime()-style).
+     *   If format is NULL, then the raw DateTime object will be returned.
      *
-     * @return string|DateTime Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+     * @return string|DateTime|null Formatted date/time value as string or DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00.
      *
-     * @throws PropelException - if unable to parse/validate the date/time value.
+     * @throws \Propel\Runtime\Exception\PropelException - if unable to parse/validate the date/time value.
+     *
+     * @psalm-return ($format is null ? DateTime|null : string|null)
      */
-    public function getUpdatedAt($format = NULL)
+    public function getUpdatedAt($format = null)
     {
         if ($format === null) {
             return $this->updated_at;
@@ -434,8 +517,8 @@ abstract class ListRecipe implements ActiveRecordInterface
     /**
      * Set the value of [id] column.
      *
-     * @param int $v new value
-     * @return $this|\Lib\ListRecipe The current object (for fluent API support)
+     * @param int $v New value
+     * @return $this The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -449,13 +532,13 @@ abstract class ListRecipe implements ActiveRecordInterface
         }
 
         return $this;
-    } // setId()
+    }
 
     /**
      * Set the value of [shopping_list_id] column.
      *
-     * @param int $v new value
-     * @return $this|\Lib\ListRecipe The current object (for fluent API support)
+     * @param int $v New value
+     * @return $this The current object (for fluent API support)
      */
     public function setShoppingListId($v)
     {
@@ -473,13 +556,13 @@ abstract class ListRecipe implements ActiveRecordInterface
         }
 
         return $this;
-    } // setShoppingListId()
+    }
 
     /**
      * Set the value of [recipe_id] column.
      *
-     * @param int $v new value
-     * @return $this|\Lib\ListRecipe The current object (for fluent API support)
+     * @param int $v New value
+     * @return $this The current object (for fluent API support)
      */
     public function setRecipeId($v)
     {
@@ -497,13 +580,33 @@ abstract class ListRecipe implements ActiveRecordInterface
         }
 
         return $this;
-    } // setRecipeId()
+    }
+
+    /**
+     * Set the value of [ref] column.
+     *
+     * @param string|null $v New value
+     * @return $this The current object (for fluent API support)
+     */
+    public function setRef($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->ref !== $v) {
+            $this->ref = $v;
+            $this->modifiedColumns[ListRecipeTableMap::COL_REF] = true;
+        }
+
+        return $this;
+    }
 
     /**
      * Set the value of [serves] column.
      *
-     * @param int $v new value
-     * @return $this|\Lib\ListRecipe The current object (for fluent API support)
+     * @param int $v New value
+     * @return $this The current object (for fluent API support)
      */
     public function setServes($v)
     {
@@ -517,14 +620,42 @@ abstract class ListRecipe implements ActiveRecordInterface
         }
 
         return $this;
-    } // setServes()
+    }
+
+    /**
+     * Sets the value of the [complete] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param bool|integer|string|null $v The new value
+     * @return $this The current object (for fluent API support)
+     */
+    public function setComplete($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->complete !== $v) {
+            $this->complete = $v;
+            $this->modifiedColumns[ListRecipeTableMap::COL_COMPLETE] = true;
+        }
+
+        return $this;
+    }
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     * @param string|integer|\DateTimeInterface|null $v string, integer (timestamp), or \DateTimeInterface value.
      *               Empty strings are treated as NULL.
-     * @return $this|\Lib\ListRecipe The current object (for fluent API support)
+     * @return $this The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -537,14 +668,14 @@ abstract class ListRecipe implements ActiveRecordInterface
         } // if either are not null
 
         return $this;
-    } // setCreatedAt()
+    }
 
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
-     * @param  mixed $v string, integer (timestamp), or \DateTimeInterface value.
+     * @param string|integer|\DateTimeInterface|null $v string, integer (timestamp), or \DateTimeInterface value.
      *               Empty strings are treated as NULL.
-     * @return $this|\Lib\ListRecipe The current object (for fluent API support)
+     * @return $this The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -557,7 +688,7 @@ abstract class ListRecipe implements ActiveRecordInterface
         } // if either are not null
 
         return $this;
-    } // setUpdatedAt()
+    }
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -565,13 +696,17 @@ abstract class ListRecipe implements ActiveRecordInterface
      * This method can be used in conjunction with isModified() to indicate whether an object is both
      * modified _and_ has some values set which are non-default.
      *
-     * @return boolean Whether the columns in this object are only been set with default values.
+     * @return bool Whether the columns in this object are only been set with default values.
      */
-    public function hasOnlyDefaultValues()
+    public function hasOnlyDefaultValues(): bool
     {
+            if ($this->complete !== false) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
-    } // hasOnlyDefaultValues()
+    }
 
     /**
      * Hydrates (populates) the object variables with values from the database resultset.
@@ -581,17 +716,17 @@ abstract class ListRecipe implements ActiveRecordInterface
      * for results of JOIN queries where the resultset row includes columns from two or
      * more tables.
      *
-     * @param array   $row       The row returned by DataFetcher->fetch().
-     * @param int     $startcol  0-based offset column which indicates which restultset column to start with.
-     * @param boolean $rehydrate Whether this object is being re-hydrated from the database.
-     * @param string  $indexType The index type of $row. Mostly DataFetcher->getIndexType().
+     * @param array $row The row returned by DataFetcher->fetch().
+     * @param int $startcol 0-based offset column which indicates which resultset column to start with.
+     * @param bool $rehydrate Whether this object is being re-hydrated from the database.
+     * @param string $indexType The index type of $row. Mostly DataFetcher->getIndexType().
                                   One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                            TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *
-     * @return int             next starting column
-     * @throws PropelException - Any caught Exception will be rewrapped as a PropelException.
+     * @return int next starting column
+     * @throws \Propel\Runtime\Exception\PropelException - Any caught Exception will be rewrapped as a PropelException.
      */
-    public function hydrate($row, $startcol = 0, $rehydrate = false, $indexType = TableMap::TYPE_NUM)
+    public function hydrate(array $row, int $startcol = 0, bool $rehydrate = false, string $indexType = TableMap::TYPE_NUM): int
     {
         try {
 
@@ -604,29 +739,35 @@ abstract class ListRecipe implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ListRecipeTableMap::translateFieldName('RecipeId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->recipe_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ListRecipeTableMap::translateFieldName('Serves', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ListRecipeTableMap::translateFieldName('Ref', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->ref = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ListRecipeTableMap::translateFieldName('Serves', TableMap::TYPE_PHPNAME, $indexType)];
             $this->serves = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ListRecipeTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ListRecipeTableMap::translateFieldName('Complete', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->complete = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ListRecipeTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ListRecipeTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ListRecipeTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
-            $this->resetModified();
 
+            $this->resetModified();
             $this->setNew(false);
 
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = ListRecipeTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = ListRecipeTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Lib\\ListRecipe'), 0, $e);
@@ -644,9 +785,10 @@ abstract class ListRecipe implements ActiveRecordInterface
      * the base method from the overridden method (i.e. parent::ensureConsistency()),
      * in case your model changes.
      *
-     * @throws PropelException
+     * @throws \Propel\Runtime\Exception\PropelException
+     * @return void
      */
-    public function ensureConsistency()
+    public function ensureConsistency(): void
     {
         if ($this->aShoppingList !== null && $this->shopping_list_id !== $this->aShoppingList->getId()) {
             $this->aShoppingList = null;
@@ -654,19 +796,19 @@ abstract class ListRecipe implements ActiveRecordInterface
         if ($this->aRecipe !== null && $this->recipe_id !== $this->aRecipe->getId()) {
             $this->aRecipe = null;
         }
-    } // ensureConsistency
+    }
 
     /**
      * Reloads this object from datastore based on primary key and (optionally) resets all associated objects.
      *
      * This will only work if the object has been saved and has a valid primary key set.
      *
-     * @param      boolean $deep (optional) Whether to also de-associated any related objects.
-     * @param      ConnectionInterface $con (optional) The ConnectionInterface connection to use.
+     * @param bool $deep (optional) Whether to also de-associated any related objects.
+     * @param ConnectionInterface $con (optional) The ConnectionInterface connection to use.
      * @return void
-     * @throws PropelException - if this object is deleted, unsaved or doesn't have pk match in db
+     * @throws \Propel\Runtime\Exception\PropelException - if this object is deleted, unsaved or doesn't have pk match in db
      */
-    public function reload($deep = false, ConnectionInterface $con = null)
+    public function reload(bool $deep = false, ?ConnectionInterface $con = null): void
     {
         if ($this->isDeleted()) {
             throw new PropelException("Cannot reload a deleted object.");
@@ -695,19 +837,21 @@ abstract class ListRecipe implements ActiveRecordInterface
 
             $this->aShoppingList = null;
             $this->aRecipe = null;
+            $this->collShoppingListItems = null;
+
         } // if (deep)
     }
 
     /**
      * Removes this object from datastore and sets delete attribute.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      * @return void
-     * @throws PropelException
+     * @throws \Propel\Runtime\Exception\PropelException
      * @see ListRecipe::setDeleted()
      * @see ListRecipe::isDeleted()
      */
-    public function delete(ConnectionInterface $con = null)
+    public function delete(?ConnectionInterface $con = null): void
     {
         if ($this->isDeleted()) {
             throw new PropelException("This object has already been deleted.");
@@ -737,12 +881,12 @@ abstract class ListRecipe implements ActiveRecordInterface
      * method.  This method wraps all precipitate database operations in a
      * single transaction.
      *
-     * @param      ConnectionInterface $con
-     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
-     * @throws PropelException
+     * @param ConnectionInterface $con
+     * @return int The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @throws \Propel\Runtime\Exception\PropelException
      * @see doSave()
      */
-    public function save(ConnectionInterface $con = null)
+    public function save(?ConnectionInterface $con = null): int
     {
         if ($this->isDeleted()) {
             throw new PropelException("You cannot save an object that has been deleted.");
@@ -800,12 +944,12 @@ abstract class ListRecipe implements ActiveRecordInterface
      * If the object is new, it inserts it; otherwise an update is performed.
      * All related objects are also updated in this method.
      *
-     * @param      ConnectionInterface $con
-     * @return int             The number of rows affected by this insert/update and any referring fk objects' save() operations.
-     * @throws PropelException
+     * @param ConnectionInterface $con
+     * @return int The number of rows affected by this insert/update and any referring fk objects' save() operations.
+     * @throws \Propel\Runtime\Exception\PropelException
      * @see save()
      */
-    protected function doSave(ConnectionInterface $con)
+    protected function doSave(ConnectionInterface $con): int
     {
         $affectedRows = 0; // initialize var to track total num of affected rows
         if (!$this->alreadyInSave) {
@@ -841,24 +985,42 @@ abstract class ListRecipe implements ActiveRecordInterface
                 $this->resetModified();
             }
 
+            if ($this->shoppingListItemsScheduledForDeletion !== null) {
+                if (!$this->shoppingListItemsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->shoppingListItemsScheduledForDeletion as $shoppingListItem) {
+                        // need to save related object because we set the relation to null
+                        $shoppingListItem->save($con);
+                    }
+                    $this->shoppingListItemsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collShoppingListItems !== null) {
+                foreach ($this->collShoppingListItems as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             $this->alreadyInSave = false;
 
         }
 
         return $affectedRows;
-    } // doSave()
+    }
 
     /**
      * Insert the row in the database.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      *
-     * @throws PropelException
+     * @throws \Propel\Runtime\Exception\PropelException
      * @see doSave()
      */
-    protected function doInsert(ConnectionInterface $con)
+    protected function doInsert(ConnectionInterface $con): void
     {
-        $modifiedColumns = array();
+        $modifiedColumns = [];
         $index = 0;
 
         $this->modifiedColumns[ListRecipeTableMap::COL_ID] = true;
@@ -876,8 +1038,14 @@ abstract class ListRecipe implements ActiveRecordInterface
         if ($this->isColumnModified(ListRecipeTableMap::COL_RECIPE_ID)) {
             $modifiedColumns[':p' . $index++]  = 'recipe_id';
         }
+        if ($this->isColumnModified(ListRecipeTableMap::COL_REF)) {
+            $modifiedColumns[':p' . $index++]  = 'ref';
+        }
         if ($this->isColumnModified(ListRecipeTableMap::COL_SERVES)) {
             $modifiedColumns[':p' . $index++]  = 'serves';
+        }
+        if ($this->isColumnModified(ListRecipeTableMap::COL_COMPLETE)) {
+            $modifiedColumns[':p' . $index++]  = 'complete';
         }
         if ($this->isColumnModified(ListRecipeTableMap::COL_CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'created_at';
@@ -898,21 +1066,35 @@ abstract class ListRecipe implements ActiveRecordInterface
                 switch ($columnName) {
                     case 'id':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+
                         break;
                     case 'shopping_list_id':
                         $stmt->bindValue($identifier, $this->shopping_list_id, PDO::PARAM_INT);
+
                         break;
                     case 'recipe_id':
                         $stmt->bindValue($identifier, $this->recipe_id, PDO::PARAM_INT);
+
+                        break;
+                    case 'ref':
+                        $stmt->bindValue($identifier, $this->ref, PDO::PARAM_STR);
+
                         break;
                     case 'serves':
                         $stmt->bindValue($identifier, $this->serves, PDO::PARAM_INT);
+
+                        break;
+                    case 'complete':
+                        $stmt->bindValue($identifier, (int) $this->complete, PDO::PARAM_INT);
+
                         break;
                     case 'created_at':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+
                         break;
                     case 'updated_at':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s.u") : null, PDO::PARAM_STR);
+
                         break;
                 }
             }
@@ -935,12 +1117,12 @@ abstract class ListRecipe implements ActiveRecordInterface
     /**
      * Update the row in the database.
      *
-     * @param      ConnectionInterface $con
+     * @param ConnectionInterface $con
      *
-     * @return Integer Number of updated rows
+     * @return int Number of updated rows
      * @see doSave()
      */
-    protected function doUpdate(ConnectionInterface $con)
+    protected function doUpdate(ConnectionInterface $con): int
     {
         $selectCriteria = $this->buildPkeyCriteria();
         $valuesCriteria = $this->buildCriteria();
@@ -951,14 +1133,14 @@ abstract class ListRecipe implements ActiveRecordInterface
     /**
      * Retrieves a field from the object by name passed in as a string.
      *
-     * @param      string $name name
-     * @param      string $type The type of fieldname the $name is of:
+     * @param string $name name
+     * @param string $type The type of fieldname the $name is of:
      *                     one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                     TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                     Defaults to TableMap::TYPE_PHPNAME.
      * @return mixed Value of field.
      */
-    public function getByName($name, $type = TableMap::TYPE_PHPNAME)
+    public function getByName(string $name, string $type = TableMap::TYPE_PHPNAME)
     {
         $pos = ListRecipeTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
@@ -970,33 +1152,38 @@ abstract class ListRecipe implements ActiveRecordInterface
      * Retrieves a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param      int $pos position in xml schema
+     * @param int $pos Position in XML schema
      * @return mixed Value of field at $pos
      */
-    public function getByPosition($pos)
+    public function getByPosition(int $pos)
     {
         switch ($pos) {
             case 0:
                 return $this->getId();
-                break;
+
             case 1:
                 return $this->getShoppingListId();
-                break;
+
             case 2:
                 return $this->getRecipeId();
-                break;
+
             case 3:
-                return $this->getServes();
-                break;
+                return $this->getRef();
+
             case 4:
-                return $this->getCreatedAt();
-                break;
+                return $this->getServes();
+
             case 5:
+                return $this->getComplete();
+
+            case 6:
+                return $this->getCreatedAt();
+
+            case 7:
                 return $this->getUpdatedAt();
-                break;
+
             default:
                 return null;
-                break;
         } // switch()
     }
 
@@ -1006,37 +1193,38 @@ abstract class ListRecipe implements ActiveRecordInterface
      * You can specify the key type of the array by passing one of the class
      * type constants.
      *
-     * @param     string  $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME,
+     * @param string $keyType (optional) One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME,
      *                    TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                    Defaults to TableMap::TYPE_PHPNAME.
-     * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
-     * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
-     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
+     * @param bool $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
+     * @param array $alreadyDumpedObjects List of objects to skip to avoid recursion
+     * @param bool $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
-     * @return array an associative array containing the field names (as keys) and field values
+     * @return array An associative array containing the field names (as keys) and field values
      */
-    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
+    public function toArray(string $keyType = TableMap::TYPE_PHPNAME, bool $includeLazyLoadColumns = true, array $alreadyDumpedObjects = [], bool $includeForeignObjects = false): array
     {
-
         if (isset($alreadyDumpedObjects['ListRecipe'][$this->hashCode()])) {
-            return '*RECURSION*';
+            return ['*RECURSION*'];
         }
         $alreadyDumpedObjects['ListRecipe'][$this->hashCode()] = true;
         $keys = ListRecipeTableMap::getFieldNames($keyType);
-        $result = array(
+        $result = [
             $keys[0] => $this->getId(),
             $keys[1] => $this->getShoppingListId(),
             $keys[2] => $this->getRecipeId(),
-            $keys[3] => $this->getServes(),
-            $keys[4] => $this->getCreatedAt(),
-            $keys[5] => $this->getUpdatedAt(),
-        );
-        if ($result[$keys[4]] instanceof \DateTimeInterface) {
-            $result[$keys[4]] = $result[$keys[4]]->format('c');
+            $keys[3] => $this->getRef(),
+            $keys[4] => $this->getServes(),
+            $keys[5] => $this->getComplete(),
+            $keys[6] => $this->getCreatedAt(),
+            $keys[7] => $this->getUpdatedAt(),
+        ];
+        if ($result[$keys[6]] instanceof \DateTimeInterface) {
+            $result[$keys[6]] = $result[$keys[6]]->format('Y-m-d H:i:s.u');
         }
 
-        if ($result[$keys[5]] instanceof \DateTimeInterface) {
-            $result[$keys[5]] = $result[$keys[5]]->format('c');
+        if ($result[$keys[7]] instanceof \DateTimeInterface) {
+            $result[$keys[7]] = $result[$keys[7]]->format('Y-m-d H:i:s.u');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1075,6 +1263,21 @@ abstract class ListRecipe implements ActiveRecordInterface
 
                 $result[$key] = $this->aRecipe->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
+            if (null !== $this->collShoppingListItems) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'shoppingListItems';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'shopping_list_items';
+                        break;
+                    default:
+                        $key = 'ShoppingListItems';
+                }
+
+                $result[$key] = $this->collShoppingListItems->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
         }
 
         return $result;
@@ -1083,30 +1286,32 @@ abstract class ListRecipe implements ActiveRecordInterface
     /**
      * Sets a field from the object by name passed in as a string.
      *
-     * @param  string $name
-     * @param  mixed  $value field value
-     * @param  string $type The type of fieldname the $name is of:
+     * @param string $name
+     * @param mixed $value field value
+     * @param string $type The type of fieldname the $name is of:
      *                one of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *                Defaults to TableMap::TYPE_PHPNAME.
-     * @return $this|\Lib\ListRecipe
+     * @return $this
      */
-    public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
+    public function setByName(string $name, $value, string $type = TableMap::TYPE_PHPNAME)
     {
         $pos = ListRecipeTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
-        return $this->setByPosition($pos, $value);
+        $this->setByPosition($pos, $value);
+
+        return $this;
     }
 
     /**
      * Sets a field from the object by Position as specified in the xml schema.
      * Zero-based.
      *
-     * @param  int $pos position in xml schema
-     * @param  mixed $value field value
-     * @return $this|\Lib\ListRecipe
+     * @param int $pos position in xml schema
+     * @param mixed $value field value
+     * @return $this
      */
-    public function setByPosition($pos, $value)
+    public function setByPosition(int $pos, $value)
     {
         switch ($pos) {
             case 0:
@@ -1119,12 +1324,18 @@ abstract class ListRecipe implements ActiveRecordInterface
                 $this->setRecipeId($value);
                 break;
             case 3:
-                $this->setServes($value);
+                $this->setRef($value);
                 break;
             case 4:
-                $this->setCreatedAt($value);
+                $this->setServes($value);
                 break;
             case 5:
+                $this->setComplete($value);
+                break;
+            case 6:
+                $this->setCreatedAt($value);
+                break;
+            case 7:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1145,11 +1356,11 @@ abstract class ListRecipe implements ActiveRecordInterface
      * TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      * The default key type is the column's TableMap::TYPE_PHPNAME.
      *
-     * @param      array  $arr     An array to populate the object from.
-     * @param      string $keyType The type of keys the array uses.
-     * @return void
+     * @param array $arr An array to populate the object from.
+     * @param string $keyType The type of keys the array uses.
+     * @return $this
      */
-    public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
+    public function fromArray(array $arr, string $keyType = TableMap::TYPE_PHPNAME)
     {
         $keys = ListRecipeTableMap::getFieldNames($keyType);
 
@@ -1163,14 +1374,22 @@ abstract class ListRecipe implements ActiveRecordInterface
             $this->setRecipeId($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setServes($arr[$keys[3]]);
+            $this->setRef($arr[$keys[3]]);
         }
         if (array_key_exists($keys[4], $arr)) {
-            $this->setCreatedAt($arr[$keys[4]]);
+            $this->setServes($arr[$keys[4]]);
         }
         if (array_key_exists($keys[5], $arr)) {
-            $this->setUpdatedAt($arr[$keys[5]]);
+            $this->setComplete($arr[$keys[5]]);
         }
+        if (array_key_exists($keys[6], $arr)) {
+            $this->setCreatedAt($arr[$keys[6]]);
+        }
+        if (array_key_exists($keys[7], $arr)) {
+            $this->setUpdatedAt($arr[$keys[7]]);
+        }
+
+        return $this;
     }
 
      /**
@@ -1190,9 +1409,9 @@ abstract class ListRecipe implements ActiveRecordInterface
      * @param string $data The source data to import from
      * @param string $keyType The type of keys the array uses.
      *
-     * @return $this|\Lib\ListRecipe The current object, for fluid interface
+     * @return $this The current object, for fluid interface
      */
-    public function importFrom($parser, $data, $keyType = TableMap::TYPE_PHPNAME)
+    public function importFrom($parser, string $data, string $keyType = TableMap::TYPE_PHPNAME)
     {
         if (!$parser instanceof AbstractParser) {
             $parser = AbstractParser::getParser($parser);
@@ -1206,9 +1425,9 @@ abstract class ListRecipe implements ActiveRecordInterface
     /**
      * Build a Criteria object containing the values of all modified columns in this object.
      *
-     * @return Criteria The Criteria object containing all modified values.
+     * @return \Propel\Runtime\ActiveQuery\Criteria The Criteria object containing all modified values.
      */
-    public function buildCriteria()
+    public function buildCriteria(): Criteria
     {
         $criteria = new Criteria(ListRecipeTableMap::DATABASE_NAME);
 
@@ -1221,8 +1440,14 @@ abstract class ListRecipe implements ActiveRecordInterface
         if ($this->isColumnModified(ListRecipeTableMap::COL_RECIPE_ID)) {
             $criteria->add(ListRecipeTableMap::COL_RECIPE_ID, $this->recipe_id);
         }
+        if ($this->isColumnModified(ListRecipeTableMap::COL_REF)) {
+            $criteria->add(ListRecipeTableMap::COL_REF, $this->ref);
+        }
         if ($this->isColumnModified(ListRecipeTableMap::COL_SERVES)) {
             $criteria->add(ListRecipeTableMap::COL_SERVES, $this->serves);
+        }
+        if ($this->isColumnModified(ListRecipeTableMap::COL_COMPLETE)) {
+            $criteria->add(ListRecipeTableMap::COL_COMPLETE, $this->complete);
         }
         if ($this->isColumnModified(ListRecipeTableMap::COL_CREATED_AT)) {
             $criteria->add(ListRecipeTableMap::COL_CREATED_AT, $this->created_at);
@@ -1238,13 +1463,13 @@ abstract class ListRecipe implements ActiveRecordInterface
      * Builds a Criteria object containing the primary key for this object.
      *
      * Unlike buildCriteria() this method includes the primary key values regardless
-     * of whether or not they have been modified.
+     * of whether they have been modified.
      *
      * @throws LogicException if no primary key is defined
      *
-     * @return Criteria The Criteria object containing value(s) for primary key(s).
+     * @return \Propel\Runtime\ActiveQuery\Criteria The Criteria object containing value(s) for primary key(s).
      */
-    public function buildPkeyCriteria()
+    public function buildPkeyCriteria(): Criteria
     {
         $criteria = ChildListRecipeQuery::create();
         $criteria->add(ListRecipeTableMap::COL_ID, $this->id);
@@ -1256,7 +1481,7 @@ abstract class ListRecipe implements ActiveRecordInterface
      * If the primary key is not null, return the hashcode of the
      * primary key. Otherwise, return the hash code of the object.
      *
-     * @return int Hashcode
+     * @return int|string Hashcode
      */
     public function hashCode()
     {
@@ -1286,19 +1511,20 @@ abstract class ListRecipe implements ActiveRecordInterface
     /**
      * Generic method to set the primary key (id column).
      *
-     * @param       int $key Primary key.
+     * @param int|null $key Primary key.
      * @return void
      */
-    public function setPrimaryKey($key)
+    public function setPrimaryKey(?int $key = null): void
     {
         $this->setId($key);
     }
 
     /**
      * Returns true if the primary key for this object is null.
-     * @return boolean
+     *
+     * @return bool
      */
-    public function isPrimaryKeyNull()
+    public function isPrimaryKeyNull(): bool
     {
         return null === $this->getId();
     }
@@ -1309,18 +1535,35 @@ abstract class ListRecipe implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Lib\ListRecipe (or compatible) type.
-     * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
-     * @throws PropelException
+     * @param object $copyObj An object of \Lib\ListRecipe (or compatible) type.
+     * @param bool $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @param bool $makeNew Whether to reset autoincrement PKs and make the object new.
+     * @throws \Propel\Runtime\Exception\PropelException
+     * @return void
      */
-    public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
+    public function copyInto(object $copyObj, bool $deepCopy = false, bool $makeNew = true): void
     {
         $copyObj->setShoppingListId($this->getShoppingListId());
         $copyObj->setRecipeId($this->getRecipeId());
+        $copyObj->setRef($this->getRef());
         $copyObj->setServes($this->getServes());
+        $copyObj->setComplete($this->getComplete());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
+
+        if ($deepCopy) {
+            // important: temporarily setNew(false) because this affects the behavior of
+            // the getter/setter methods for fkey referrer objects.
+            $copyObj->setNew(false);
+
+            foreach ($this->getShoppingListItems() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addShoppingListItem($relObj->copy($deepCopy));
+                }
+            }
+
+        } // if ($deepCopy)
+
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1335,11 +1578,11 @@ abstract class ListRecipe implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param  boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
+     * @param bool $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @return \Lib\ListRecipe Clone of current object.
-     * @throws PropelException
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function copy($deepCopy = false)
+    public function copy(bool $deepCopy = false)
     {
         // we use get_class(), because this might be a subclass
         $clazz = get_class($this);
@@ -1352,9 +1595,9 @@ abstract class ListRecipe implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildShoppingList object.
      *
-     * @param  ChildShoppingList $v
-     * @return $this|\Lib\ListRecipe The current object (for fluent API support)
-     * @throws PropelException
+     * @param ChildShoppingList $v
+     * @return $this The current object (for fluent API support)
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function setShoppingList(ChildShoppingList $v = null)
     {
@@ -1380,11 +1623,11 @@ abstract class ListRecipe implements ActiveRecordInterface
     /**
      * Get the associated ChildShoppingList object
      *
-     * @param  ConnectionInterface $con Optional Connection object.
+     * @param ConnectionInterface $con Optional Connection object.
      * @return ChildShoppingList The associated ChildShoppingList object.
-     * @throws PropelException
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getShoppingList(ConnectionInterface $con = null)
+    public function getShoppingList(?ConnectionInterface $con = null)
     {
         if ($this->aShoppingList === null && ($this->shopping_list_id != 0)) {
             $this->aShoppingList = ChildShoppingListQuery::create()->findPk($this->shopping_list_id, $con);
@@ -1403,9 +1646,9 @@ abstract class ListRecipe implements ActiveRecordInterface
     /**
      * Declares an association between this object and a ChildRecipe object.
      *
-     * @param  ChildRecipe $v
-     * @return $this|\Lib\ListRecipe The current object (for fluent API support)
-     * @throws PropelException
+     * @param ChildRecipe $v
+     * @return $this The current object (for fluent API support)
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function setRecipe(ChildRecipe $v = null)
     {
@@ -1431,11 +1674,11 @@ abstract class ListRecipe implements ActiveRecordInterface
     /**
      * Get the associated ChildRecipe object
      *
-     * @param  ConnectionInterface $con Optional Connection object.
+     * @param ConnectionInterface $con Optional Connection object.
      * @return ChildRecipe The associated ChildRecipe object.
-     * @throws PropelException
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function getRecipe(ConnectionInterface $con = null)
+    public function getRecipe(?ConnectionInterface $con = null)
     {
         if ($this->aRecipe === null && ($this->recipe_id != 0)) {
             $this->aRecipe = ChildRecipeQuery::create()->findPk($this->recipe_id, $con);
@@ -1451,10 +1694,320 @@ abstract class ListRecipe implements ActiveRecordInterface
         return $this->aRecipe;
     }
 
+
+    /**
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
+     *
+     * @param string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName): void
+    {
+        if ('ShoppingListItem' === $relationName) {
+            $this->initShoppingListItems();
+            return;
+        }
+    }
+
+    /**
+     * Clears out the collShoppingListItems collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return $this
+     * @see addShoppingListItems()
+     */
+    public function clearShoppingListItems()
+    {
+        $this->collShoppingListItems = null; // important to set this to NULL since that means it is uninitialized
+
+        return $this;
+    }
+
+    /**
+     * Reset is the collShoppingListItems collection loaded partially.
+     *
+     * @return void
+     */
+    public function resetPartialShoppingListItems($v = true): void
+    {
+        $this->collShoppingListItemsPartial = $v;
+    }
+
+    /**
+     * Initializes the collShoppingListItems collection.
+     *
+     * By default this just sets the collShoppingListItems collection to an empty array (like clearcollShoppingListItems());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param bool $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initShoppingListItems(bool $overrideExisting = true): void
+    {
+        if (null !== $this->collShoppingListItems && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = ShoppingListItemTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collShoppingListItems = new $collectionClassName;
+        $this->collShoppingListItems->setModel('\Lib\ShoppingListItem');
+    }
+
+    /**
+     * Gets an array of ChildShoppingListItem objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildListRecipe is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildShoppingListItem[] List of ChildShoppingListItem objects
+     * @phpstan-return ObjectCollection&\Traversable<ChildShoppingListItem> List of ChildShoppingListItem objects
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function getShoppingListItems(?Criteria $criteria = null, ?ConnectionInterface $con = null)
+    {
+        $partial = $this->collShoppingListItemsPartial && !$this->isNew();
+        if (null === $this->collShoppingListItems || null !== $criteria || $partial) {
+            if ($this->isNew()) {
+                // return empty collection
+                if (null === $this->collShoppingListItems) {
+                    $this->initShoppingListItems();
+                } else {
+                    $collectionClassName = ShoppingListItemTableMap::getTableMap()->getCollectionClassName();
+
+                    $collShoppingListItems = new $collectionClassName;
+                    $collShoppingListItems->setModel('\Lib\ShoppingListItem');
+
+                    return $collShoppingListItems;
+                }
+            } else {
+                $collShoppingListItems = ChildShoppingListItemQuery::create(null, $criteria)
+                    ->filterByListRecipe($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collShoppingListItemsPartial && count($collShoppingListItems)) {
+                        $this->initShoppingListItems(false);
+
+                        foreach ($collShoppingListItems as $obj) {
+                            if (false == $this->collShoppingListItems->contains($obj)) {
+                                $this->collShoppingListItems->append($obj);
+                            }
+                        }
+
+                        $this->collShoppingListItemsPartial = true;
+                    }
+
+                    return $collShoppingListItems;
+                }
+
+                if ($partial && $this->collShoppingListItems) {
+                    foreach ($this->collShoppingListItems as $obj) {
+                        if ($obj->isNew()) {
+                            $collShoppingListItems[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collShoppingListItems = $collShoppingListItems;
+                $this->collShoppingListItemsPartial = false;
+            }
+        }
+
+        return $this->collShoppingListItems;
+    }
+
+    /**
+     * Sets a collection of ChildShoppingListItem objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param Collection $shoppingListItems A Propel collection.
+     * @param ConnectionInterface $con Optional connection object
+     * @return $this The current object (for fluent API support)
+     */
+    public function setShoppingListItems(Collection $shoppingListItems, ?ConnectionInterface $con = null)
+    {
+        /** @var ChildShoppingListItem[] $shoppingListItemsToDelete */
+        $shoppingListItemsToDelete = $this->getShoppingListItems(new Criteria(), $con)->diff($shoppingListItems);
+
+
+        $this->shoppingListItemsScheduledForDeletion = $shoppingListItemsToDelete;
+
+        foreach ($shoppingListItemsToDelete as $shoppingListItemRemoved) {
+            $shoppingListItemRemoved->setListRecipe(null);
+        }
+
+        $this->collShoppingListItems = null;
+        foreach ($shoppingListItems as $shoppingListItem) {
+            $this->addShoppingListItem($shoppingListItem);
+        }
+
+        $this->collShoppingListItems = $shoppingListItems;
+        $this->collShoppingListItemsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ShoppingListItem objects.
+     *
+     * @param Criteria $criteria
+     * @param bool $distinct
+     * @param ConnectionInterface $con
+     * @return int Count of related ShoppingListItem objects.
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function countShoppingListItems(?Criteria $criteria = null, bool $distinct = false, ?ConnectionInterface $con = null): int
+    {
+        $partial = $this->collShoppingListItemsPartial && !$this->isNew();
+        if (null === $this->collShoppingListItems || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collShoppingListItems) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getShoppingListItems());
+            }
+
+            $query = ChildShoppingListItemQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByListRecipe($this)
+                ->count($con);
+        }
+
+        return count($this->collShoppingListItems);
+    }
+
+    /**
+     * Method called to associate a ChildShoppingListItem object to this object
+     * through the ChildShoppingListItem foreign key attribute.
+     *
+     * @param ChildShoppingListItem $l ChildShoppingListItem
+     * @return $this The current object (for fluent API support)
+     */
+    public function addShoppingListItem(ChildShoppingListItem $l)
+    {
+        if ($this->collShoppingListItems === null) {
+            $this->initShoppingListItems();
+            $this->collShoppingListItemsPartial = true;
+        }
+
+        if (!$this->collShoppingListItems->contains($l)) {
+            $this->doAddShoppingListItem($l);
+
+            if ($this->shoppingListItemsScheduledForDeletion and $this->shoppingListItemsScheduledForDeletion->contains($l)) {
+                $this->shoppingListItemsScheduledForDeletion->remove($this->shoppingListItemsScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildShoppingListItem $shoppingListItem The ChildShoppingListItem object to add.
+     */
+    protected function doAddShoppingListItem(ChildShoppingListItem $shoppingListItem): void
+    {
+        $this->collShoppingListItems[]= $shoppingListItem;
+        $shoppingListItem->setListRecipe($this);
+    }
+
+    /**
+     * @param ChildShoppingListItem $shoppingListItem The ChildShoppingListItem object to remove.
+     * @return $this The current object (for fluent API support)
+     */
+    public function removeShoppingListItem(ChildShoppingListItem $shoppingListItem)
+    {
+        if ($this->getShoppingListItems()->contains($shoppingListItem)) {
+            $pos = $this->collShoppingListItems->search($shoppingListItem);
+            $this->collShoppingListItems->remove($pos);
+            if (null === $this->shoppingListItemsScheduledForDeletion) {
+                $this->shoppingListItemsScheduledForDeletion = clone $this->collShoppingListItems;
+                $this->shoppingListItemsScheduledForDeletion->clear();
+            }
+            $this->shoppingListItemsScheduledForDeletion[]= $shoppingListItem;
+            $shoppingListItem->setListRecipe(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this ListRecipe is new, it will return
+     * an empty collection; or if this ListRecipe has previously
+     * been saved, it will retrieve related ShoppingListItems from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in ListRecipe.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param ConnectionInterface $con optional connection object
+     * @param string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildShoppingListItem[] List of ChildShoppingListItem objects
+     * @phpstan-return ObjectCollection&\Traversable<ChildShoppingListItem}> List of ChildShoppingListItem objects
+     */
+    public function getShoppingListItemsJoinShoppingList(?Criteria $criteria = null, ?ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildShoppingListItemQuery::create(null, $criteria);
+        $query->joinWith('ShoppingList', $joinBehavior);
+
+        return $this->getShoppingListItems($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this ListRecipe is new, it will return
+     * an empty collection; or if this ListRecipe has previously
+     * been saved, it will retrieve related ShoppingListItems from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in ListRecipe.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param ConnectionInterface $con optional connection object
+     * @param string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildShoppingListItem[] List of ChildShoppingListItem objects
+     * @phpstan-return ObjectCollection&\Traversable<ChildShoppingListItem}> List of ChildShoppingListItem objects
+     */
+    public function getShoppingListItemsJoinItem(?Criteria $criteria = null, ?ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildShoppingListItemQuery::create(null, $criteria);
+        $query->joinWith('Item', $joinBehavior);
+
+        return $this->getShoppingListItems($query, $con);
+    }
+
     /**
      * Clears the current object, sets all attributes to their default values and removes
      * outgoing references as well as back-references (from other objects to this one. Results probably in a database
      * change of those foreign objects when you call `save` there).
+     *
+     * @return $this
      */
     public function clear()
     {
@@ -1467,14 +2020,19 @@ abstract class ListRecipe implements ActiveRecordInterface
         $this->id = null;
         $this->shopping_list_id = null;
         $this->recipe_id = null;
+        $this->ref = null;
         $this->serves = null;
+        $this->complete = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
+
+        return $this;
     }
 
     /**
@@ -1483,15 +2041,23 @@ abstract class ListRecipe implements ActiveRecordInterface
      * This method is used to reset all php object references (not the actual reference in the database).
      * Necessary for object serialisation.
      *
-     * @param      boolean $deep Whether to also clear the references on all referrer objects.
+     * @param bool $deep Whether to also clear the references on all referrer objects.
+     * @return $this
      */
-    public function clearAllReferences($deep = false)
+    public function clearAllReferences(bool $deep = false)
     {
         if ($deep) {
+            if ($this->collShoppingListItems) {
+                foreach ($this->collShoppingListItems as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
+        $this->collShoppingListItems = null;
         $this->aShoppingList = null;
         $this->aRecipe = null;
+        return $this;
     }
 
     /**
@@ -1509,7 +2075,7 @@ abstract class ListRecipe implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     $this|ChildListRecipe The current object (for fluent API support)
+     * @return $this The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
@@ -1520,99 +2086,79 @@ abstract class ListRecipe implements ActiveRecordInterface
 
     /**
      * Code to be run before persisting the object
-     * @param  ConnectionInterface $con
-     * @return boolean
+     * @param ConnectionInterface|null $con
+     * @return bool
      */
-    public function preSave(ConnectionInterface $con = null)
+    public function preSave(?ConnectionInterface $con = null): bool
     {
-        if (is_callable('parent::preSave')) {
-            return parent::preSave($con);
-        }
-        return true;
+                return true;
     }
 
     /**
      * Code to be run after persisting the object
-     * @param ConnectionInterface $con
+     * @param ConnectionInterface|null $con
+     * @return void
      */
-    public function postSave(ConnectionInterface $con = null)
+    public function postSave(?ConnectionInterface $con = null): void
     {
-        if (is_callable('parent::postSave')) {
-            parent::postSave($con);
-        }
-    }
+            }
 
     /**
      * Code to be run before inserting to database
-     * @param  ConnectionInterface $con
-     * @return boolean
+     * @param ConnectionInterface|null $con
+     * @return bool
      */
-    public function preInsert(ConnectionInterface $con = null)
+    public function preInsert(?ConnectionInterface $con = null): bool
     {
-        if (is_callable('parent::preInsert')) {
-            return parent::preInsert($con);
-        }
-        return true;
+                return true;
     }
 
     /**
      * Code to be run after inserting to database
-     * @param ConnectionInterface $con
+     * @param ConnectionInterface|null $con
+     * @return void
      */
-    public function postInsert(ConnectionInterface $con = null)
+    public function postInsert(?ConnectionInterface $con = null): void
     {
-        if (is_callable('parent::postInsert')) {
-            parent::postInsert($con);
-        }
-    }
+            }
 
     /**
      * Code to be run before updating the object in database
-     * @param  ConnectionInterface $con
-     * @return boolean
+     * @param ConnectionInterface|null $con
+     * @return bool
      */
-    public function preUpdate(ConnectionInterface $con = null)
+    public function preUpdate(?ConnectionInterface $con = null): bool
     {
-        if (is_callable('parent::preUpdate')) {
-            return parent::preUpdate($con);
-        }
-        return true;
+                return true;
     }
 
     /**
      * Code to be run after updating the object in database
-     * @param ConnectionInterface $con
+     * @param ConnectionInterface|null $con
+     * @return void
      */
-    public function postUpdate(ConnectionInterface $con = null)
+    public function postUpdate(?ConnectionInterface $con = null): void
     {
-        if (is_callable('parent::postUpdate')) {
-            parent::postUpdate($con);
-        }
-    }
+            }
 
     /**
      * Code to be run before deleting the object in database
-     * @param  ConnectionInterface $con
-     * @return boolean
+     * @param ConnectionInterface|null $con
+     * @return bool
      */
-    public function preDelete(ConnectionInterface $con = null)
+    public function preDelete(?ConnectionInterface $con = null): bool
     {
-        if (is_callable('parent::preDelete')) {
-            return parent::preDelete($con);
-        }
-        return true;
+                return true;
     }
 
     /**
      * Code to be run after deleting the object in database
-     * @param ConnectionInterface $con
+     * @param ConnectionInterface|null $con
+     * @return void
      */
-    public function postDelete(ConnectionInterface $con = null)
+    public function postDelete(?ConnectionInterface $con = null): void
     {
-        if (is_callable('parent::postDelete')) {
-            parent::postDelete($con);
-        }
-    }
+            }
 
 
     /**
@@ -1622,7 +2168,7 @@ abstract class ListRecipe implements ActiveRecordInterface
      * Allows to define default __call() behavior if you overwrite __call()
      *
      * @param string $name
-     * @param mixed  $params
+     * @param mixed $params
      *
      * @return array|string
      */
@@ -1642,15 +2188,18 @@ abstract class ListRecipe implements ActiveRecordInterface
 
         if (0 === strpos($name, 'from')) {
             $format = substr($name, 4);
+            $inputData = $params[0];
+            $keyType = $params[1] ?? TableMap::TYPE_PHPNAME;
 
-            return $this->importFrom($format, reset($params));
+            return $this->importFrom($format, $inputData, $keyType);
         }
 
         if (0 === strpos($name, 'to')) {
             $format = substr($name, 2);
-            $includeLazyLoadColumns = isset($params[0]) ? $params[0] : true;
+            $includeLazyLoadColumns = $params[0] ?? true;
+            $keyType = $params[1] ?? TableMap::TYPE_PHPNAME;
 
-            return $this->exportTo($format, $includeLazyLoadColumns);
+            return $this->exportTo($format, $includeLazyLoadColumns, $keyType);
         }
 
         throw new BadMethodCallException(sprintf('Call to undefined method: %s.', $name));

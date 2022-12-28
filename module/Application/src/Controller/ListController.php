@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Application\Controller;
 
+use Application\Service\ListService;
 use Exception;
 use Laminas\Http\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\Mvc\Plugin\FlashMessenger\FlashMessenger;
 use Laminas\View\Model\ViewModel;
+use Lib\ItemQuery;
 use Lib\ShoppingList;
 use Lib\ShoppingListQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -21,6 +23,18 @@ use RuntimeException;
  */
 class ListController extends AbstractActionController
 {
+    /** @var ListService */
+    protected ListService $listService;
+
+    /**
+     * ListController constructor.
+     * @param ListService $listService
+     */
+    public function __construct(ListService $listService)
+    {
+        $this->listService = $listService;
+    }
+
     /**
      * List all shopping lists
      *
@@ -51,12 +65,50 @@ class ListController extends AbstractActionController
             if (!$list) throw new RuntimeException("List does not exist");
 
             return [
-                'list' => ShoppingListQuery::create()->findPk($id)
+                'list' => ShoppingListQuery::create()->findPk($id),
+                'shoppingList' => $this->listService->getShopList($list),
+                'items' => ItemQuery::create()->findByRemoved(false)
             ];
         } catch (Exception $e) {
             $this->flashMessenger()->addErrorMessage($e->getMessage());
             return $this->redirect()->toRoute('list');
         }
+    }
+
+    /**
+     * Post route for adding a single item
+     *
+     * @return Response
+     */
+    public function addItemAction()
+    {
+        $listId = $this->params()->fromRoute('id');
+
+        try {
+
+            $item_id = (int) $this->params()->fromPost('item_id');
+            $quantity = (float) $this->params()->fromPost('quantity');
+
+            $list = ShoppingListQuery::create()->findPk($listId);
+
+            $listItem = $this->listService->addSingleItem(
+                $list,
+                $item_id,
+                $quantity
+            );
+
+            $this->flashMessenger()->addSuccessMessage(
+                "{$listItem->getItem()->getName()} added to list."
+            );
+
+        } catch (Exception $e) {
+            $this->flashMessenger()->addErrorMessage($e->getMessage());
+        }
+
+        return $this->redirect()->toRoute('list', [
+            'action' => 'view',
+            'id' => $listId
+        ]);
     }
 
     /**
