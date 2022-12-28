@@ -36,7 +36,7 @@ use Lib\DayPlanRecipe;
                             <a href="<?= $this->url('recipe', [
                                 'id' => $recipe->getRecipeId(),
                                 'action' => 'view'
-                            ]); ?>">
+                            ], ['query' => ['servings' =>  $recipe->getServers()]]); ?>">
                                 <?= $recipe->getRecipe()->getName(); ?>
                             </a>
                         </td>
