@@ -11,14 +11,13 @@ use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveQuery\ModelJoin;
+use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 
 /**
- * Base class that represents a query for the 'day_plan_recipe' table.
- *
- *
+ * Base class that represents a query for the `day_plan_recipe` table.
  *
  * @method     ChildDayPlanRecipeQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildDayPlanRecipeQuery orderByDayPlanId($order = Criteria::ASC) Order by the day_plan_id column
@@ -78,20 +77,20 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     \Lib\DayPlanQuery|\Lib\RecipeQuery|\Lib\CategoryQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
- * @method     ChildDayPlanRecipe findOne(ConnectionInterface $con = null) Return the first ChildDayPlanRecipe matching the query
- * @method     ChildDayPlanRecipe findOneOrCreate(ConnectionInterface $con = null) Return the first ChildDayPlanRecipe matching the query, or a new ChildDayPlanRecipe object populated from the query conditions when no match is found
+ * @method     ChildDayPlanRecipe|null findOne(?ConnectionInterface $con = null) Return the first ChildDayPlanRecipe matching the query
+ * @method     ChildDayPlanRecipe findOneOrCreate(?ConnectionInterface $con = null) Return the first ChildDayPlanRecipe matching the query, or a new ChildDayPlanRecipe object populated from the query conditions when no match is found
  *
- * @method     ChildDayPlanRecipe findOneById(int $id) Return the first ChildDayPlanRecipe filtered by the id column
- * @method     ChildDayPlanRecipe findOneByDayPlanId(int $day_plan_id) Return the first ChildDayPlanRecipe filtered by the day_plan_id column
- * @method     ChildDayPlanRecipe findOneByRecipeId(int $recipe_id) Return the first ChildDayPlanRecipe filtered by the recipe_id column
- * @method     ChildDayPlanRecipe findOneByCategoryId(int $category_id) Return the first ChildDayPlanRecipe filtered by the category_id column
- * @method     ChildDayPlanRecipe findOneByServers(int $servers) Return the first ChildDayPlanRecipe filtered by the servers column
- * @method     ChildDayPlanRecipe findOneByComplete(boolean $complete) Return the first ChildDayPlanRecipe filtered by the complete column
- * @method     ChildDayPlanRecipe findOneByCreatedAt(string $created_at) Return the first ChildDayPlanRecipe filtered by the created_at column
- * @method     ChildDayPlanRecipe findOneByUpdatedAt(string $updated_at) Return the first ChildDayPlanRecipe filtered by the updated_at column *
-
- * @method     ChildDayPlanRecipe requirePk($key, ConnectionInterface $con = null) Return the ChildDayPlanRecipe by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildDayPlanRecipe requireOne(ConnectionInterface $con = null) Return the first ChildDayPlanRecipe matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildDayPlanRecipe|null findOneById(int $id) Return the first ChildDayPlanRecipe filtered by the id column
+ * @method     ChildDayPlanRecipe|null findOneByDayPlanId(int $day_plan_id) Return the first ChildDayPlanRecipe filtered by the day_plan_id column
+ * @method     ChildDayPlanRecipe|null findOneByRecipeId(int $recipe_id) Return the first ChildDayPlanRecipe filtered by the recipe_id column
+ * @method     ChildDayPlanRecipe|null findOneByCategoryId(int $category_id) Return the first ChildDayPlanRecipe filtered by the category_id column
+ * @method     ChildDayPlanRecipe|null findOneByServers(int $servers) Return the first ChildDayPlanRecipe filtered by the servers column
+ * @method     ChildDayPlanRecipe|null findOneByComplete(boolean $complete) Return the first ChildDayPlanRecipe filtered by the complete column
+ * @method     ChildDayPlanRecipe|null findOneByCreatedAt(string $created_at) Return the first ChildDayPlanRecipe filtered by the created_at column
+ * @method     ChildDayPlanRecipe|null findOneByUpdatedAt(string $updated_at) Return the first ChildDayPlanRecipe filtered by the updated_at column
+ *
+ * @method     ChildDayPlanRecipe requirePk($key, ?ConnectionInterface $con = null) Return the ChildDayPlanRecipe by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildDayPlanRecipe requireOne(?ConnectionInterface $con = null) Return the first ChildDayPlanRecipe matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildDayPlanRecipe requireOneById(int $id) Return the first ChildDayPlanRecipe filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildDayPlanRecipe requireOneByDayPlanId(int $day_plan_id) Return the first ChildDayPlanRecipe filtered by the day_plan_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -102,17 +101,28 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildDayPlanRecipe requireOneByCreatedAt(string $created_at) Return the first ChildDayPlanRecipe filtered by the created_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildDayPlanRecipe requireOneByUpdatedAt(string $updated_at) Return the first ChildDayPlanRecipe filtered by the updated_at column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildDayPlanRecipe[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildDayPlanRecipe objects based on current ModelCriteria
- * @method     ChildDayPlanRecipe[]|ObjectCollection findById(int $id) Return ChildDayPlanRecipe objects filtered by the id column
- * @method     ChildDayPlanRecipe[]|ObjectCollection findByDayPlanId(int $day_plan_id) Return ChildDayPlanRecipe objects filtered by the day_plan_id column
- * @method     ChildDayPlanRecipe[]|ObjectCollection findByRecipeId(int $recipe_id) Return ChildDayPlanRecipe objects filtered by the recipe_id column
- * @method     ChildDayPlanRecipe[]|ObjectCollection findByCategoryId(int $category_id) Return ChildDayPlanRecipe objects filtered by the category_id column
- * @method     ChildDayPlanRecipe[]|ObjectCollection findByServers(int $servers) Return ChildDayPlanRecipe objects filtered by the servers column
- * @method     ChildDayPlanRecipe[]|ObjectCollection findByComplete(boolean $complete) Return ChildDayPlanRecipe objects filtered by the complete column
- * @method     ChildDayPlanRecipe[]|ObjectCollection findByCreatedAt(string $created_at) Return ChildDayPlanRecipe objects filtered by the created_at column
- * @method     ChildDayPlanRecipe[]|ObjectCollection findByUpdatedAt(string $updated_at) Return ChildDayPlanRecipe objects filtered by the updated_at column
- * @method     ChildDayPlanRecipe[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
+ * @method     ChildDayPlanRecipe[]|Collection find(?ConnectionInterface $con = null) Return ChildDayPlanRecipe objects based on current ModelCriteria
+ * @psalm-method Collection&\Traversable<ChildDayPlanRecipe> find(?ConnectionInterface $con = null) Return ChildDayPlanRecipe objects based on current ModelCriteria
  *
+ * @method     ChildDayPlanRecipe[]|Collection findById(int|array<int> $id) Return ChildDayPlanRecipe objects filtered by the id column
+ * @psalm-method Collection&\Traversable<ChildDayPlanRecipe> findById(int|array<int> $id) Return ChildDayPlanRecipe objects filtered by the id column
+ * @method     ChildDayPlanRecipe[]|Collection findByDayPlanId(int|array<int> $day_plan_id) Return ChildDayPlanRecipe objects filtered by the day_plan_id column
+ * @psalm-method Collection&\Traversable<ChildDayPlanRecipe> findByDayPlanId(int|array<int> $day_plan_id) Return ChildDayPlanRecipe objects filtered by the day_plan_id column
+ * @method     ChildDayPlanRecipe[]|Collection findByRecipeId(int|array<int> $recipe_id) Return ChildDayPlanRecipe objects filtered by the recipe_id column
+ * @psalm-method Collection&\Traversable<ChildDayPlanRecipe> findByRecipeId(int|array<int> $recipe_id) Return ChildDayPlanRecipe objects filtered by the recipe_id column
+ * @method     ChildDayPlanRecipe[]|Collection findByCategoryId(int|array<int> $category_id) Return ChildDayPlanRecipe objects filtered by the category_id column
+ * @psalm-method Collection&\Traversable<ChildDayPlanRecipe> findByCategoryId(int|array<int> $category_id) Return ChildDayPlanRecipe objects filtered by the category_id column
+ * @method     ChildDayPlanRecipe[]|Collection findByServers(int|array<int> $servers) Return ChildDayPlanRecipe objects filtered by the servers column
+ * @psalm-method Collection&\Traversable<ChildDayPlanRecipe> findByServers(int|array<int> $servers) Return ChildDayPlanRecipe objects filtered by the servers column
+ * @method     ChildDayPlanRecipe[]|Collection findByComplete(boolean|array<boolean> $complete) Return ChildDayPlanRecipe objects filtered by the complete column
+ * @psalm-method Collection&\Traversable<ChildDayPlanRecipe> findByComplete(boolean|array<boolean> $complete) Return ChildDayPlanRecipe objects filtered by the complete column
+ * @method     ChildDayPlanRecipe[]|Collection findByCreatedAt(string|array<string> $created_at) Return ChildDayPlanRecipe objects filtered by the created_at column
+ * @psalm-method Collection&\Traversable<ChildDayPlanRecipe> findByCreatedAt(string|array<string> $created_at) Return ChildDayPlanRecipe objects filtered by the created_at column
+ * @method     ChildDayPlanRecipe[]|Collection findByUpdatedAt(string|array<string> $updated_at) Return ChildDayPlanRecipe objects filtered by the updated_at column
+ * @psalm-method Collection&\Traversable<ChildDayPlanRecipe> findByUpdatedAt(string|array<string> $updated_at) Return ChildDayPlanRecipe objects filtered by the updated_at column
+ *
+ * @method     ChildDayPlanRecipe[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ?ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
+ * @psalm-method \Propel\Runtime\Util\PropelModelPager&\Traversable<ChildDayPlanRecipe> paginate($page = 1, $maxPerPage = 10, ?ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  */
 abstract class DayPlanRecipeQuery extends ModelCriteria
 {
@@ -121,9 +131,9 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
     /**
      * Initializes internal state of \Lib\Base\DayPlanRecipeQuery object.
      *
-     * @param     string $dbName The database name
-     * @param     string $modelName The phpName of a model, e.g. 'Book'
-     * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
+     * @param string $dbName The database name
+     * @param string $modelName The phpName of a model, e.g. 'Book'
+     * @param string $modelAlias The alias for the model in this query, e.g. 'b'
      */
     public function __construct($dbName = 'default', $modelName = '\\Lib\\DayPlanRecipe', $modelAlias = null)
     {
@@ -133,12 +143,12 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
     /**
      * Returns a new ChildDayPlanRecipeQuery object.
      *
-     * @param     string $modelAlias The alias of a model in the query
-     * @param     Criteria $criteria Optional Criteria to build the query from
+     * @param string $modelAlias The alias of a model in the query
+     * @param Criteria $criteria Optional Criteria to build the query from
      *
      * @return ChildDayPlanRecipeQuery
      */
-    public static function create($modelAlias = null, Criteria $criteria = null)
+    public static function create(?string $modelAlias = null, ?Criteria $criteria = null): Criteria
     {
         if ($criteria instanceof ChildDayPlanRecipeQuery) {
             return $criteria;
@@ -168,7 +178,7 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
      *
      * @return ChildDayPlanRecipe|array|mixed the result, formatted by the current formatter
      */
-    public function findPk($key, ConnectionInterface $con = null)
+    public function findPk($key, ?ConnectionInterface $con = null)
     {
         if ($key === null) {
             return null;
@@ -200,8 +210,8 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
      * @throws \Propel\Runtime\Exception\PropelException
      *
@@ -233,8 +243,8 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
     /**
      * Find object by primary key.
      *
-     * @param     mixed $key Primary key to use for the query
-     * @param     ConnectionInterface $con A connection object
+     * @param mixed $key Primary key to use for the query
+     * @param ConnectionInterface $con A connection object
      *
      * @return ChildDayPlanRecipe|array|mixed the result, formatted by the current formatter
      */
@@ -254,12 +264,12 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
      * <code>
      * $objs = $c->findPks(array(12, 56, 832), $con);
      * </code>
-     * @param     array $keys Primary keys to use for the query
-     * @param     ConnectionInterface $con an optional connection object
+     * @param array $keys Primary keys to use for the query
+     * @param ConnectionInterface $con an optional connection object
      *
-     * @return ObjectCollection|array|mixed the list of results, formatted by the current formatter
+     * @return Collection|array|mixed the list of results, formatted by the current formatter
      */
-    public function findPks($keys, ConnectionInterface $con = null)
+    public function findPks($keys, ?ConnectionInterface $con = null)
     {
         if (null === $con) {
             $con = Propel::getServiceContainer()->getReadConnection($this->getDbName());
@@ -276,27 +286,31 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
     /**
      * Filter the query by primary key
      *
-     * @param     mixed $key Primary key to use for the query
+     * @param mixed $key Primary key to use for the query
      *
-     * @return $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(DayPlanRecipeTableMap::COL_ID, $key, Criteria::EQUAL);
+        $this->addUsingAlias(DayPlanRecipeTableMap::COL_ID, $key, Criteria::EQUAL);
+
+        return $this;
     }
 
     /**
      * Filter the query by a list of primary keys
      *
-     * @param     array $keys The list of primary key to use for the query
+     * @param array|int $keys The list of primary key to use for the query
      *
-     * @return $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(DayPlanRecipeTableMap::COL_ID, $keys, Criteria::IN);
+        $this->addUsingAlias(DayPlanRecipeTableMap::COL_ID, $keys, Criteria::IN);
+
+        return $this;
     }
 
     /**
@@ -309,15 +323,15 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @param     mixed $id The value to use as filter.
+     * @param mixed $id The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function filterById($id = null, $comparison = null)
+    public function filterById($id = null, ?string $comparison = null)
     {
         if (is_array($id)) {
             $useMinMax = false;
@@ -337,7 +351,9 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(DayPlanRecipeTableMap::COL_ID, $id, $comparison);
+        $this->addUsingAlias(DayPlanRecipeTableMap::COL_ID, $id, $comparison);
+
+        return $this;
     }
 
     /**
@@ -352,15 +368,15 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
      *
      * @see       filterByDayPlan()
      *
-     * @param     mixed $dayPlanId The value to use as filter.
+     * @param mixed $dayPlanId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function filterByDayPlanId($dayPlanId = null, $comparison = null)
+    public function filterByDayPlanId($dayPlanId = null, ?string $comparison = null)
     {
         if (is_array($dayPlanId)) {
             $useMinMax = false;
@@ -380,7 +396,9 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(DayPlanRecipeTableMap::COL_DAY_PLAN_ID, $dayPlanId, $comparison);
+        $this->addUsingAlias(DayPlanRecipeTableMap::COL_DAY_PLAN_ID, $dayPlanId, $comparison);
+
+        return $this;
     }
 
     /**
@@ -395,15 +413,15 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
      *
      * @see       filterByRecipe()
      *
-     * @param     mixed $recipeId The value to use as filter.
+     * @param mixed $recipeId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function filterByRecipeId($recipeId = null, $comparison = null)
+    public function filterByRecipeId($recipeId = null, ?string $comparison = null)
     {
         if (is_array($recipeId)) {
             $useMinMax = false;
@@ -423,7 +441,9 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(DayPlanRecipeTableMap::COL_RECIPE_ID, $recipeId, $comparison);
+        $this->addUsingAlias(DayPlanRecipeTableMap::COL_RECIPE_ID, $recipeId, $comparison);
+
+        return $this;
     }
 
     /**
@@ -438,15 +458,15 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
      *
      * @see       filterByCategory()
      *
-     * @param     mixed $categoryId The value to use as filter.
+     * @param mixed $categoryId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function filterByCategoryId($categoryId = null, $comparison = null)
+    public function filterByCategoryId($categoryId = null, ?string $comparison = null)
     {
         if (is_array($categoryId)) {
             $useMinMax = false;
@@ -466,7 +486,9 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(DayPlanRecipeTableMap::COL_CATEGORY_ID, $categoryId, $comparison);
+        $this->addUsingAlias(DayPlanRecipeTableMap::COL_CATEGORY_ID, $categoryId, $comparison);
+
+        return $this;
     }
 
     /**
@@ -479,15 +501,15 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
      * $query->filterByServers(array('min' => 12)); // WHERE servers > 12
      * </code>
      *
-     * @param     mixed $servers The value to use as filter.
+     * @param mixed $servers The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function filterByServers($servers = null, $comparison = null)
+    public function filterByServers($servers = null, ?string $comparison = null)
     {
         if (is_array($servers)) {
             $useMinMax = false;
@@ -507,7 +529,9 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(DayPlanRecipeTableMap::COL_SERVERS, $servers, $comparison);
+        $this->addUsingAlias(DayPlanRecipeTableMap::COL_SERVERS, $servers, $comparison);
+
+        return $this;
     }
 
     /**
@@ -519,22 +543,24 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
      * $query->filterByComplete('yes'); // WHERE complete = true
      * </code>
      *
-     * @param     boolean|string $complete The value to use as filter.
+     * @param bool|string $complete The value to use as filter.
      *              Non-boolean arguments are converted using the following rules:
      *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
      *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
      *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function filterByComplete($complete = null, $comparison = null)
+    public function filterByComplete($complete = null, ?string $comparison = null)
     {
         if (is_string($complete)) {
             $complete = in_array(strtolower($complete), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
         }
 
-        return $this->addUsingAlias(DayPlanRecipeTableMap::COL_COMPLETE, $complete, $comparison);
+        $this->addUsingAlias(DayPlanRecipeTableMap::COL_COMPLETE, $complete, $comparison);
+
+        return $this;
     }
 
     /**
@@ -547,17 +573,17 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
      * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $createdAt The value to use as filter.
+     * @param mixed $createdAt The value to use as filter.
      *              Values can be integers (unix timestamps), DateTime objects, or strings.
      *              Empty strings are treated as NULL.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    public function filterByCreatedAt($createdAt = null, ?string $comparison = null)
     {
         if (is_array($createdAt)) {
             $useMinMax = false;
@@ -577,7 +603,9 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(DayPlanRecipeTableMap::COL_CREATED_AT, $createdAt, $comparison);
+        $this->addUsingAlias(DayPlanRecipeTableMap::COL_CREATED_AT, $createdAt, $comparison);
+
+        return $this;
     }
 
     /**
@@ -590,17 +618,17 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
      * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $updatedAt The value to use as filter.
+     * @param mixed $updatedAt The value to use as filter.
      *              Values can be integers (unix timestamps), DateTime objects, or strings.
      *              Empty strings are treated as NULL.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    public function filterByUpdatedAt($updatedAt = null, ?string $comparison = null)
     {
         if (is_array($updatedAt)) {
             $useMinMax = false;
@@ -620,20 +648,22 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(DayPlanRecipeTableMap::COL_UPDATED_AT, $updatedAt, $comparison);
+        $this->addUsingAlias(DayPlanRecipeTableMap::COL_UPDATED_AT, $updatedAt, $comparison);
+
+        return $this;
     }
 
     /**
      * Filter the query by a related \Lib\DayPlan object
      *
      * @param \Lib\DayPlan|ObjectCollection $dayPlan The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @throws \Propel\Runtime\Exception\PropelException
      *
-     * @return ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function filterByDayPlan($dayPlan, $comparison = null)
+    public function filterByDayPlan($dayPlan, ?string $comparison = null)
     {
         if ($dayPlan instanceof \Lib\DayPlan) {
             return $this
@@ -643,8 +673,10 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
                 $comparison = Criteria::IN;
             }
 
-            return $this
+            $this
                 ->addUsingAlias(DayPlanRecipeTableMap::COL_DAY_PLAN_ID, $dayPlan->toKeyValue('PrimaryKey', 'Id'), $comparison);
+
+            return $this;
         } else {
             throw new PropelException('filterByDayPlan() only accepts arguments of type \Lib\DayPlan or Collection');
         }
@@ -653,12 +685,12 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the DayPlan relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string|null $relationAlias Optional alias for the relation
+     * @param string|null $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function joinDayPlan($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinDayPlan(?string $relationAlias = null, ?string $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('DayPlan');
@@ -687,9 +719,9 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
+     * @param string $relationAlias optional alias for the relation,
      *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return \Lib\DayPlanQuery A secondary query class using the current class as primary query
      */
@@ -701,16 +733,112 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
     }
 
     /**
+     * Use the DayPlan relation DayPlan object
+     *
+     * @param callable(\Lib\DayPlanQuery):\Lib\DayPlanQuery $callable A function working on the related query
+     *
+     * @param string|null $relationAlias optional alias for the relation
+     *
+     * @param string|null $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this
+     */
+    public function withDayPlanQuery(
+        callable $callable,
+        string $relationAlias = null,
+        ?string $joinType = Criteria::INNER_JOIN
+    ) {
+        $relatedQuery = $this->useDayPlanQuery(
+            $relationAlias,
+            $joinType
+        );
+        $callable($relatedQuery);
+        $relatedQuery->endUse();
+
+        return $this;
+    }
+
+    /**
+     * Use the relation to DayPlan table for an EXISTS query.
+     *
+     * @see \Propel\Runtime\ActiveQuery\ModelCriteria::useExistsQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the exists query, like ExtendedBookQuery::class
+     * @param string $typeOfExists Either ExistsQueryCriterion::TYPE_EXISTS or ExistsQueryCriterion::TYPE_NOT_EXISTS
+     *
+     * @return \Lib\DayPlanQuery The inner query object of the EXISTS statement
+     */
+    public function useDayPlanExistsQuery($modelAlias = null, $queryClass = null, $typeOfExists = 'EXISTS')
+    {
+        /** @var $q \Lib\DayPlanQuery */
+        $q = $this->useExistsQuery('DayPlan', $modelAlias, $queryClass, $typeOfExists);
+        return $q;
+    }
+
+    /**
+     * Use the relation to DayPlan table for a NOT EXISTS query.
+     *
+     * @see useDayPlanExistsQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the exists query, like ExtendedBookQuery::class
+     *
+     * @return \Lib\DayPlanQuery The inner query object of the NOT EXISTS statement
+     */
+    public function useDayPlanNotExistsQuery($modelAlias = null, $queryClass = null)
+    {
+        /** @var $q \Lib\DayPlanQuery */
+        $q = $this->useExistsQuery('DayPlan', $modelAlias, $queryClass, 'NOT EXISTS');
+        return $q;
+    }
+
+    /**
+     * Use the relation to DayPlan table for an IN query.
+     *
+     * @see \Propel\Runtime\ActiveQuery\ModelCriteria::useInQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the IN query, like ExtendedBookQuery::class
+     * @param string $typeOfIn Criteria::IN or Criteria::NOT_IN
+     *
+     * @return \Lib\DayPlanQuery The inner query object of the IN statement
+     */
+    public function useInDayPlanQuery($modelAlias = null, $queryClass = null, $typeOfIn = 'IN')
+    {
+        /** @var $q \Lib\DayPlanQuery */
+        $q = $this->useInQuery('DayPlan', $modelAlias, $queryClass, $typeOfIn);
+        return $q;
+    }
+
+    /**
+     * Use the relation to DayPlan table for a NOT IN query.
+     *
+     * @see useDayPlanInQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the NOT IN query, like ExtendedBookQuery::class
+     *
+     * @return \Lib\DayPlanQuery The inner query object of the NOT IN statement
+     */
+    public function useNotInDayPlanQuery($modelAlias = null, $queryClass = null)
+    {
+        /** @var $q \Lib\DayPlanQuery */
+        $q = $this->useInQuery('DayPlan', $modelAlias, $queryClass, 'NOT IN');
+        return $q;
+    }
+
+    /**
      * Filter the query by a related \Lib\Recipe object
      *
      * @param \Lib\Recipe|ObjectCollection $recipe The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @throws \Propel\Runtime\Exception\PropelException
      *
-     * @return ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function filterByRecipe($recipe, $comparison = null)
+    public function filterByRecipe($recipe, ?string $comparison = null)
     {
         if ($recipe instanceof \Lib\Recipe) {
             return $this
@@ -720,8 +848,10 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
                 $comparison = Criteria::IN;
             }
 
-            return $this
+            $this
                 ->addUsingAlias(DayPlanRecipeTableMap::COL_RECIPE_ID, $recipe->toKeyValue('PrimaryKey', 'Id'), $comparison);
+
+            return $this;
         } else {
             throw new PropelException('filterByRecipe() only accepts arguments of type \Lib\Recipe or Collection');
         }
@@ -730,12 +860,12 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the Recipe relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string|null $relationAlias Optional alias for the relation
+     * @param string|null $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function joinRecipe($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinRecipe(?string $relationAlias = null, ?string $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Recipe');
@@ -764,9 +894,9 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
+     * @param string $relationAlias optional alias for the relation,
      *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return \Lib\RecipeQuery A secondary query class using the current class as primary query
      */
@@ -778,16 +908,112 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
     }
 
     /**
+     * Use the Recipe relation Recipe object
+     *
+     * @param callable(\Lib\RecipeQuery):\Lib\RecipeQuery $callable A function working on the related query
+     *
+     * @param string|null $relationAlias optional alias for the relation
+     *
+     * @param string|null $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this
+     */
+    public function withRecipeQuery(
+        callable $callable,
+        string $relationAlias = null,
+        ?string $joinType = Criteria::INNER_JOIN
+    ) {
+        $relatedQuery = $this->useRecipeQuery(
+            $relationAlias,
+            $joinType
+        );
+        $callable($relatedQuery);
+        $relatedQuery->endUse();
+
+        return $this;
+    }
+
+    /**
+     * Use the relation to Recipe table for an EXISTS query.
+     *
+     * @see \Propel\Runtime\ActiveQuery\ModelCriteria::useExistsQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the exists query, like ExtendedBookQuery::class
+     * @param string $typeOfExists Either ExistsQueryCriterion::TYPE_EXISTS or ExistsQueryCriterion::TYPE_NOT_EXISTS
+     *
+     * @return \Lib\RecipeQuery The inner query object of the EXISTS statement
+     */
+    public function useRecipeExistsQuery($modelAlias = null, $queryClass = null, $typeOfExists = 'EXISTS')
+    {
+        /** @var $q \Lib\RecipeQuery */
+        $q = $this->useExistsQuery('Recipe', $modelAlias, $queryClass, $typeOfExists);
+        return $q;
+    }
+
+    /**
+     * Use the relation to Recipe table for a NOT EXISTS query.
+     *
+     * @see useRecipeExistsQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the exists query, like ExtendedBookQuery::class
+     *
+     * @return \Lib\RecipeQuery The inner query object of the NOT EXISTS statement
+     */
+    public function useRecipeNotExistsQuery($modelAlias = null, $queryClass = null)
+    {
+        /** @var $q \Lib\RecipeQuery */
+        $q = $this->useExistsQuery('Recipe', $modelAlias, $queryClass, 'NOT EXISTS');
+        return $q;
+    }
+
+    /**
+     * Use the relation to Recipe table for an IN query.
+     *
+     * @see \Propel\Runtime\ActiveQuery\ModelCriteria::useInQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the IN query, like ExtendedBookQuery::class
+     * @param string $typeOfIn Criteria::IN or Criteria::NOT_IN
+     *
+     * @return \Lib\RecipeQuery The inner query object of the IN statement
+     */
+    public function useInRecipeQuery($modelAlias = null, $queryClass = null, $typeOfIn = 'IN')
+    {
+        /** @var $q \Lib\RecipeQuery */
+        $q = $this->useInQuery('Recipe', $modelAlias, $queryClass, $typeOfIn);
+        return $q;
+    }
+
+    /**
+     * Use the relation to Recipe table for a NOT IN query.
+     *
+     * @see useRecipeInQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the NOT IN query, like ExtendedBookQuery::class
+     *
+     * @return \Lib\RecipeQuery The inner query object of the NOT IN statement
+     */
+    public function useNotInRecipeQuery($modelAlias = null, $queryClass = null)
+    {
+        /** @var $q \Lib\RecipeQuery */
+        $q = $this->useInQuery('Recipe', $modelAlias, $queryClass, 'NOT IN');
+        return $q;
+    }
+
+    /**
      * Filter the query by a related \Lib\Category object
      *
      * @param \Lib\Category|ObjectCollection $category The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     * @param string|null $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @throws \Propel\Runtime\Exception\PropelException
      *
-     * @return ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function filterByCategory($category, $comparison = null)
+    public function filterByCategory($category, ?string $comparison = null)
     {
         if ($category instanceof \Lib\Category) {
             return $this
@@ -797,8 +1023,10 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
                 $comparison = Criteria::IN;
             }
 
-            return $this
+            $this
                 ->addUsingAlias(DayPlanRecipeTableMap::COL_CATEGORY_ID, $category->toKeyValue('PrimaryKey', 'Id'), $comparison);
+
+            return $this;
         } else {
             throw new PropelException('filterByCategory() only accepts arguments of type \Lib\Category or Collection');
         }
@@ -807,12 +1035,12 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
     /**
      * Adds a JOIN clause to the query using the Category relation
      *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string|null $relationAlias Optional alias for the relation
+     * @param string|null $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
-    public function joinCategory($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinCategory(?string $relationAlias = null, ?string $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Category');
@@ -841,9 +1069,9 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
      *
      * @see useQuery()
      *
-     * @param     string $relationAlias optional alias for the relation,
+     * @param string $relationAlias optional alias for the relation,
      *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     * @param string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return \Lib\CategoryQuery A secondary query class using the current class as primary query
      */
@@ -855,11 +1083,107 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
     }
 
     /**
+     * Use the Category relation Category object
+     *
+     * @param callable(\Lib\CategoryQuery):\Lib\CategoryQuery $callable A function working on the related query
+     *
+     * @param string|null $relationAlias optional alias for the relation
+     *
+     * @param string|null $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this
+     */
+    public function withCategoryQuery(
+        callable $callable,
+        string $relationAlias = null,
+        ?string $joinType = Criteria::INNER_JOIN
+    ) {
+        $relatedQuery = $this->useCategoryQuery(
+            $relationAlias,
+            $joinType
+        );
+        $callable($relatedQuery);
+        $relatedQuery->endUse();
+
+        return $this;
+    }
+
+    /**
+     * Use the relation to Category table for an EXISTS query.
+     *
+     * @see \Propel\Runtime\ActiveQuery\ModelCriteria::useExistsQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the exists query, like ExtendedBookQuery::class
+     * @param string $typeOfExists Either ExistsQueryCriterion::TYPE_EXISTS or ExistsQueryCriterion::TYPE_NOT_EXISTS
+     *
+     * @return \Lib\CategoryQuery The inner query object of the EXISTS statement
+     */
+    public function useCategoryExistsQuery($modelAlias = null, $queryClass = null, $typeOfExists = 'EXISTS')
+    {
+        /** @var $q \Lib\CategoryQuery */
+        $q = $this->useExistsQuery('Category', $modelAlias, $queryClass, $typeOfExists);
+        return $q;
+    }
+
+    /**
+     * Use the relation to Category table for a NOT EXISTS query.
+     *
+     * @see useCategoryExistsQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the exists query, like ExtendedBookQuery::class
+     *
+     * @return \Lib\CategoryQuery The inner query object of the NOT EXISTS statement
+     */
+    public function useCategoryNotExistsQuery($modelAlias = null, $queryClass = null)
+    {
+        /** @var $q \Lib\CategoryQuery */
+        $q = $this->useExistsQuery('Category', $modelAlias, $queryClass, 'NOT EXISTS');
+        return $q;
+    }
+
+    /**
+     * Use the relation to Category table for an IN query.
+     *
+     * @see \Propel\Runtime\ActiveQuery\ModelCriteria::useInQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the IN query, like ExtendedBookQuery::class
+     * @param string $typeOfIn Criteria::IN or Criteria::NOT_IN
+     *
+     * @return \Lib\CategoryQuery The inner query object of the IN statement
+     */
+    public function useInCategoryQuery($modelAlias = null, $queryClass = null, $typeOfIn = 'IN')
+    {
+        /** @var $q \Lib\CategoryQuery */
+        $q = $this->useInQuery('Category', $modelAlias, $queryClass, $typeOfIn);
+        return $q;
+    }
+
+    /**
+     * Use the relation to Category table for a NOT IN query.
+     *
+     * @see useCategoryInQuery()
+     *
+     * @param string|null $modelAlias sets an alias for the nested query
+     * @param string|null $queryClass Allows to use a custom query class for the NOT IN query, like ExtendedBookQuery::class
+     *
+     * @return \Lib\CategoryQuery The inner query object of the NOT IN statement
+     */
+    public function useNotInCategoryQuery($modelAlias = null, $queryClass = null)
+    {
+        /** @var $q \Lib\CategoryQuery */
+        $q = $this->useInQuery('Category', $modelAlias, $queryClass, 'NOT IN');
+        return $q;
+    }
+
+    /**
      * Exclude object from result
      *
-     * @param   ChildDayPlanRecipe $dayPlanRecipe Object to remove from the list of results
+     * @param ChildDayPlanRecipe $dayPlanRecipe Object to remove from the list of results
      *
-     * @return $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
     public function prune($dayPlanRecipe = null)
     {
@@ -876,7 +1200,7 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
-    public function doDeleteAll(ConnectionInterface $con = null)
+    public function doDeleteAll(?ConnectionInterface $con = null): int
     {
         if (null === $con) {
             $con = Propel::getServiceContainer()->getWriteConnection(DayPlanRecipeTableMap::DATABASE_NAME);
@@ -901,12 +1225,12 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
      * Performs a DELETE on the database based on the current ModelCriteria
      *
      * @param ConnectionInterface $con the connection to use
-     * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
      *                         if supported by native driver or if emulated using Propel.
-     * @throws PropelException Any exceptions caught during processing will be
+     * @throws \Propel\Runtime\Exception\PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
      */
-    public function delete(ConnectionInterface $con = null)
+    public function delete(?ConnectionInterface $con = null): int
     {
         if (null === $con) {
             $con = Propel::getServiceContainer()->getWriteConnection(DayPlanRecipeTableMap::DATABASE_NAME);
@@ -936,65 +1260,77 @@ abstract class DayPlanRecipeQuery extends ModelCriteria
     /**
      * Filter by the latest updated
      *
-     * @param      int $nbDays Maximum age of the latest update in days
+     * @param int $nbDays Maximum age of the latest update in days
      *
-     * @return     $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
-        return $this->addUsingAlias(DayPlanRecipeTableMap::COL_UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        $this->addUsingAlias(DayPlanRecipeTableMap::COL_UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+
+        return $this;
     }
 
     /**
      * Order by update date desc
      *
-     * @return     $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
-        return $this->addDescendingOrderByColumn(DayPlanRecipeTableMap::COL_UPDATED_AT);
+        $this->addDescendingOrderByColumn(DayPlanRecipeTableMap::COL_UPDATED_AT);
+
+        return $this;
     }
 
     /**
      * Order by update date asc
      *
-     * @return     $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
-        return $this->addAscendingOrderByColumn(DayPlanRecipeTableMap::COL_UPDATED_AT);
+        $this->addAscendingOrderByColumn(DayPlanRecipeTableMap::COL_UPDATED_AT);
+
+        return $this;
     }
 
     /**
      * Order by create date desc
      *
-     * @return     $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
-        return $this->addDescendingOrderByColumn(DayPlanRecipeTableMap::COL_CREATED_AT);
+        $this->addDescendingOrderByColumn(DayPlanRecipeTableMap::COL_CREATED_AT);
+
+        return $this;
     }
 
     /**
      * Filter by the latest created
      *
-     * @param      int $nbDays Maximum age of in days
+     * @param int $nbDays Maximum age of in days
      *
-     * @return     $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
-        return $this->addUsingAlias(DayPlanRecipeTableMap::COL_CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        $this->addUsingAlias(DayPlanRecipeTableMap::COL_CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+
+        return $this;
     }
 
     /**
      * Order by create date asc
      *
-     * @return     $this|ChildDayPlanRecipeQuery The current query, for fluid interface
+     * @return $this The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {
-        return $this->addAscendingOrderByColumn(DayPlanRecipeTableMap::COL_CREATED_AT);
+        $this->addAscendingOrderByColumn(DayPlanRecipeTableMap::COL_CREATED_AT);
+
+        return $this;
     }
 
-} // DayPlanRecipeQuery
+}

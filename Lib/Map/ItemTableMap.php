@@ -33,114 +33,171 @@ class ItemTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Lib.Map.ItemTableMap';
+    public const CLASS_NAME = 'Lib.Map.ItemTableMap';
 
     /**
      * The default database name for this class
      */
-    const DATABASE_NAME = 'default';
+    public const DATABASE_NAME = 'default';
 
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'item';
+    public const TABLE_NAME = 'item';
+
+    /**
+     * The PHP name of this class (PascalCase)
+     */
+    public const TABLE_PHP_NAME = 'Item';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Lib\\Item';
+    public const OM_CLASS = '\\Lib\\Item';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Lib.Item';
+    public const CLASS_DEFAULT = 'Lib.Item';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    public const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
      */
-    const NUM_LAZY_LOAD_COLUMNS = 0;
+    public const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    public const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the id field
      */
-    const COL_ID = 'item.id';
+    public const COL_ID = 'item.id';
 
     /**
      * the column name for the name field
      */
-    const COL_NAME = 'item.name';
+    public const COL_NAME = 'item.name';
 
     /**
      * the column name for the unit field
      */
-    const COL_UNIT = 'item.unit';
+    public const COL_UNIT = 'item.unit';
 
     /**
      * the column name for the removed field
      */
-    const COL_REMOVED = 'item.removed';
+    public const COL_REMOVED = 'item.removed';
 
     /**
      * the column name for the created_at field
      */
-    const COL_CREATED_AT = 'item.created_at';
+    public const COL_CREATED_AT = 'item.created_at';
 
     /**
      * the column name for the updated_at field
      */
-    const COL_UPDATED_AT = 'item.updated_at';
+    public const COL_UPDATED_AT = 'item.updated_at';
 
     /**
      * The default string format for model objects of the related table
      */
-    const DEFAULT_STRING_FORMAT = 'YAML';
+    public const DEFAULT_STRING_FORMAT = 'YAML';
 
     /**
      * holds an array of fieldnames
      *
      * first dimension keys are the type constants
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
+     *
+     * @var array<string, mixed>
      */
-    protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'Unit', 'Removed', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('id', 'name', 'unit', 'removed', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ItemTableMap::COL_ID, ItemTableMap::COL_NAME, ItemTableMap::COL_UNIT, ItemTableMap::COL_REMOVED, ItemTableMap::COL_CREATED_AT, ItemTableMap::COL_UPDATED_AT, ),
-        self::TYPE_FIELDNAME     => array('id', 'name', 'unit', 'removed', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
-    );
+    protected static $fieldNames = [
+        self::TYPE_PHPNAME       => ['Id', 'Name', 'Unit', 'Removed', 'CreatedAt', 'UpdatedAt', ],
+        self::TYPE_CAMELNAME     => ['id', 'name', 'unit', 'removed', 'createdAt', 'updatedAt', ],
+        self::TYPE_COLNAME       => [ItemTableMap::COL_ID, ItemTableMap::COL_NAME, ItemTableMap::COL_UNIT, ItemTableMap::COL_REMOVED, ItemTableMap::COL_CREATED_AT, ItemTableMap::COL_UPDATED_AT, ],
+        self::TYPE_FIELDNAME     => ['id', 'name', 'unit', 'removed', 'created_at', 'updated_at', ],
+        self::TYPE_NUM           => [0, 1, 2, 3, 4, 5, ]
+    ];
 
     /**
      * holds an array of keys for quick access to the fieldnames array
      *
      * first dimension keys are the type constants
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
+     *
+     * @var array<string, mixed>
      */
-    protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Unit' => 2, 'Removed' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'unit' => 2, 'removed' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        self::TYPE_COLNAME       => array(ItemTableMap::COL_ID => 0, ItemTableMap::COL_NAME => 1, ItemTableMap::COL_UNIT => 2, ItemTableMap::COL_REMOVED => 3, ItemTableMap::COL_CREATED_AT => 4, ItemTableMap::COL_UPDATED_AT => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'unit' => 2, 'removed' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
-    );
+    protected static $fieldKeys = [
+        self::TYPE_PHPNAME       => ['Id' => 0, 'Name' => 1, 'Unit' => 2, 'Removed' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ],
+        self::TYPE_CAMELNAME     => ['id' => 0, 'name' => 1, 'unit' => 2, 'removed' => 3, 'createdAt' => 4, 'updatedAt' => 5, ],
+        self::TYPE_COLNAME       => [ItemTableMap::COL_ID => 0, ItemTableMap::COL_NAME => 1, ItemTableMap::COL_UNIT => 2, ItemTableMap::COL_REMOVED => 3, ItemTableMap::COL_CREATED_AT => 4, ItemTableMap::COL_UPDATED_AT => 5, ],
+        self::TYPE_FIELDNAME     => ['id' => 0, 'name' => 1, 'unit' => 2, 'removed' => 3, 'created_at' => 4, 'updated_at' => 5, ],
+        self::TYPE_NUM           => [0, 1, 2, 3, 4, 5, ]
+    ];
+
+    /**
+     * Holds a list of column names and their normalized version.
+     *
+     * @var array<string>
+     */
+    protected $normalizedColumnNameMap = [
+        'Id' => 'ID',
+        'Item.Id' => 'ID',
+        'id' => 'ID',
+        'item.id' => 'ID',
+        'ItemTableMap::COL_ID' => 'ID',
+        'COL_ID' => 'ID',
+        'Name' => 'NAME',
+        'Item.Name' => 'NAME',
+        'name' => 'NAME',
+        'item.name' => 'NAME',
+        'ItemTableMap::COL_NAME' => 'NAME',
+        'COL_NAME' => 'NAME',
+        'Unit' => 'UNIT',
+        'Item.Unit' => 'UNIT',
+        'unit' => 'UNIT',
+        'item.unit' => 'UNIT',
+        'ItemTableMap::COL_UNIT' => 'UNIT',
+        'COL_UNIT' => 'UNIT',
+        'Removed' => 'REMOVED',
+        'Item.Removed' => 'REMOVED',
+        'removed' => 'REMOVED',
+        'item.removed' => 'REMOVED',
+        'ItemTableMap::COL_REMOVED' => 'REMOVED',
+        'COL_REMOVED' => 'REMOVED',
+        'CreatedAt' => 'CREATED_AT',
+        'Item.CreatedAt' => 'CREATED_AT',
+        'createdAt' => 'CREATED_AT',
+        'item.createdAt' => 'CREATED_AT',
+        'ItemTableMap::COL_CREATED_AT' => 'CREATED_AT',
+        'COL_CREATED_AT' => 'CREATED_AT',
+        'created_at' => 'CREATED_AT',
+        'item.created_at' => 'CREATED_AT',
+        'UpdatedAt' => 'UPDATED_AT',
+        'Item.UpdatedAt' => 'UPDATED_AT',
+        'updatedAt' => 'UPDATED_AT',
+        'item.updatedAt' => 'UPDATED_AT',
+        'ItemTableMap::COL_UPDATED_AT' => 'UPDATED_AT',
+        'COL_UPDATED_AT' => 'UPDATED_AT',
+        'updated_at' => 'UPDATED_AT',
+        'item.updated_at' => 'UPDATED_AT',
+    ];
 
     /**
      * Initialize the table attributes and columns
      * Relations are not initialized by this method since they are lazy loaded
      *
      * @return void
-     * @throws PropelException
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function initialize()
+    public function initialize(): void
     {
         // attributes
         $this->setName('item');
@@ -156,12 +213,14 @@ class ItemTableMap extends TableMap
         $this->addColumn('removed', 'Removed', 'BOOLEAN', false, 1, false);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-    } // initialize()
+    }
 
     /**
      * Build the RelationMap objects for this table relationships
+     *
+     * @return void
      */
-    public function buildRelations()
+    public function buildRelations(): void
     {
         $this->addRelation('RecipeItem', '\\Lib\\RecipeItem', RelationMap::ONE_TO_MANY, array (
   0 =>
@@ -177,20 +236,20 @@ class ItemTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, 'ShoppingListItems', false);
-    } // buildRelations()
+    }
 
     /**
      *
      * Gets the list of behaviors registered for this table
      *
-     * @return array Associative array (name => parameters) of behaviors
+     * @return array<string, array> Associative array (name => parameters) of behaviors
      */
-    public function getBehaviors()
+    public function getBehaviors(): array
     {
-        return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
-        );
-    } // getBehaviors()
+        return [
+            'timestampable' => ['create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false'],
+        ];
+    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -198,14 +257,14 @@ class ItemTableMap extends TableMap
      * For tables with a single-column primary key, that simple pkey value will be returned.  For tables with
      * a multi-column primary key, a serialize()d version of the primary key will be returned.
      *
-     * @param array  $row       resultset row.
-     * @param int    $offset    The 0-based offset for reading from the resultset row.
+     * @param array $row Resultset row.
+     * @param int $offset The 0-based offset for reading from the resultset row.
      * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM
      *
-     * @return string The primary key hash of the row
+     * @return string|null The primary key hash of the row
      */
-    public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
+    public static function getPrimaryKeyHashFromRow(array $row, int $offset = 0, string $indexType = TableMap::TYPE_NUM): ?string
     {
         // If the PK cannot be derived from the row, return NULL.
         if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
@@ -220,14 +279,14 @@ class ItemTableMap extends TableMap
      * For tables with a single-column primary key, that simple pkey value will be returned.  For tables with
      * a multi-column primary key, an array of the primary key columns will be returned.
      *
-     * @param array  $row       resultset row.
-     * @param int    $offset    The 0-based offset for reading from the resultset row.
+     * @param array $row Resultset row.
+     * @param int $offset The 0-based offset for reading from the resultset row.
      * @param string $indexType One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM
      *
      * @return mixed The primary key of the row
      */
-    public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
+    public static function getPrimaryKeyFromRow(array $row, int $offset = 0, string $indexType = TableMap::TYPE_NUM)
     {
         return (int) $row[
             $indexType == TableMap::TYPE_NUM
@@ -244,10 +303,10 @@ class ItemTableMap extends TableMap
      * relative to a location on the PHP include_path.
      * (e.g. path.to.MyClass -> 'path/to/MyClass.php')
      *
-     * @param boolean $withPrefix Whether or not to return the path with the class name
+     * @param bool $withPrefix Whether to return the path with the class name
      * @return string path.to.ClassName
      */
-    public static function getOMClass($withPrefix = true)
+    public static function getOMClass(bool $withPrefix = true): string
     {
         return $withPrefix ? ItemTableMap::CLASS_DEFAULT : ItemTableMap::OM_CLASS;
     }
@@ -255,17 +314,17 @@ class ItemTableMap extends TableMap
     /**
      * Populates an object of the default type or an object that inherit from the default.
      *
-     * @param array  $row       row returned by DataFetcher->fetch().
-     * @param int    $offset    The 0-based offset for reading from the resultset row.
+     * @param array $row Row returned by DataFetcher->fetch().
+     * @param int $offset The 0-based offset for reading from the resultset row.
      * @param string $indexType The index type of $row. Mostly DataFetcher->getIndexType().
                                  One of the class type constants TableMap::TYPE_PHPNAME, TableMap::TYPE_CAMELNAME
      *                           TableMap::TYPE_COLNAME, TableMap::TYPE_FIELDNAME, TableMap::TYPE_NUM.
      *
-     * @throws PropelException Any exceptions caught during processing will be
+     * @throws \Propel\Runtime\Exception\PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (Item object, last column rank)
+     * @return array (Item object, last column rank)
      */
-    public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
+    public static function populateObject(array $row, int $offset = 0, string $indexType = TableMap::TYPE_NUM): array
     {
         $key = ItemTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
         if (null !== ($obj = ItemTableMap::getInstanceFromPool($key))) {
@@ -289,13 +348,13 @@ class ItemTableMap extends TableMap
      * objects that inherit from the default.
      *
      * @param DataFetcherInterface $dataFetcher
-     * @return array
-     * @throws PropelException Any exceptions caught during processing will be
+     * @return array<object>
+     * @throws \Propel\Runtime\Exception\PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
      */
-    public static function populateObjects(DataFetcherInterface $dataFetcher)
+    public static function populateObjects(DataFetcherInterface $dataFetcher): array
     {
-        $results = array();
+        $results = [];
 
         // set the class once to avoid overhead in the loop
         $cls = static::getOMClass(false);
@@ -325,12 +384,13 @@ class ItemTableMap extends TableMap
      * XML schema will not be added to the select list and only loaded
      * on demand.
      *
-     * @param Criteria $criteria object containing the columns to add.
-     * @param string   $alias    optional table alias
-     * @throws PropelException Any exceptions caught during processing will be
+     * @param Criteria $criteria Object containing the columns to add.
+     * @param string|null $alias Optional table alias
+     * @throws \Propel\Runtime\Exception\PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
+     * @return void
      */
-    public static function addSelectColumns(Criteria $criteria, $alias = null)
+    public static function addSelectColumns(Criteria $criteria, ?string $alias = null): void
     {
         if (null === $alias) {
             $criteria->addSelectColumn(ItemTableMap::COL_ID);
@@ -350,40 +410,60 @@ class ItemTableMap extends TableMap
     }
 
     /**
+     * Remove all the columns needed to create a new object.
+     *
+     * Note: any columns that were marked with lazyLoad="true" in the
+     * XML schema will not be removed as they are only loaded on demand.
+     *
+     * @param Criteria $criteria Object containing the columns to remove.
+     * @param string|null $alias Optional table alias
+     * @throws \Propel\Runtime\Exception\PropelException Any exceptions caught during processing will be
+     *                         rethrown wrapped into a PropelException.
+     * @return void
+     */
+    public static function removeSelectColumns(Criteria $criteria, ?string $alias = null): void
+    {
+        if (null === $alias) {
+            $criteria->removeSelectColumn(ItemTableMap::COL_ID);
+            $criteria->removeSelectColumn(ItemTableMap::COL_NAME);
+            $criteria->removeSelectColumn(ItemTableMap::COL_UNIT);
+            $criteria->removeSelectColumn(ItemTableMap::COL_REMOVED);
+            $criteria->removeSelectColumn(ItemTableMap::COL_CREATED_AT);
+            $criteria->removeSelectColumn(ItemTableMap::COL_UPDATED_AT);
+        } else {
+            $criteria->removeSelectColumn($alias . '.id');
+            $criteria->removeSelectColumn($alias . '.name');
+            $criteria->removeSelectColumn($alias . '.unit');
+            $criteria->removeSelectColumn($alias . '.removed');
+            $criteria->removeSelectColumn($alias . '.created_at');
+            $criteria->removeSelectColumn($alias . '.updated_at');
+        }
+    }
+
+    /**
      * Returns the TableMap related to this object.
      * This method is not needed for general use but a specific application could have a need.
      * @return TableMap
-     * @throws PropelException Any exceptions caught during processing will be
+     * @throws \Propel\Runtime\Exception\PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
      */
-    public static function getTableMap()
+    public static function getTableMap(): TableMap
     {
         return Propel::getServiceContainer()->getDatabaseMap(ItemTableMap::DATABASE_NAME)->getTable(ItemTableMap::TABLE_NAME);
     }
 
     /**
-     * Add a TableMap instance to the database for this tableMap class.
-     */
-    public static function buildTableMap()
-    {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(ItemTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(ItemTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new ItemTableMap());
-        }
-    }
-
-    /**
      * Performs a DELETE on the database, given a Item or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Item object or primary key or array of primary keys
+     * @param mixed $values Criteria or Item object or primary key or array of primary keys
      *              which is used to create the DELETE statement
-     * @param  ConnectionInterface $con the connection to use
-     * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
+     * @param ConnectionInterface $con the connection to use
+     * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
      *                         if supported by native driver or if emulated using Propel.
-     * @throws PropelException Any exceptions caught during processing will be
+     * @throws \Propel\Runtime\Exception\PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
      */
-     public static function doDelete($values, ConnectionInterface $con = null)
+     public static function doDelete($values, ?ConnectionInterface $con = null): int
      {
         if (null === $con) {
             $con = Propel::getServiceContainer()->getWriteConnection(ItemTableMap::DATABASE_NAME);
@@ -419,7 +499,7 @@ class ItemTableMap extends TableMap
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
-    public static function doDeleteAll(ConnectionInterface $con = null)
+    public static function doDeleteAll(?ConnectionInterface $con = null): int
     {
         return ItemQuery::create()->doDeleteAll($con);
     }
@@ -427,13 +507,13 @@ class ItemTableMap extends TableMap
     /**
      * Performs an INSERT on the database, given a Item or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Item object containing data that is used to create the INSERT statement.
+     * @param mixed $criteria Criteria or Item object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
-     * @return mixed           The new primary key.
-     * @throws PropelException Any exceptions caught during processing will be
+     * @return mixed The new primary key.
+     * @throws \Propel\Runtime\Exception\PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
      */
-    public static function doInsert($criteria, ConnectionInterface $con = null)
+    public static function doInsert($criteria, ?ConnectionInterface $con = null)
     {
         if (null === $con) {
             $con = Propel::getServiceContainer()->getWriteConnection(ItemTableMap::DATABASE_NAME);
@@ -460,7 +540,4 @@ class ItemTableMap extends TableMap
         });
     }
 
-} // ItemTableMap
-// This is the static code needed to register the TableMap for this table with the main Propel class.
-//
-ItemTableMap::buildTableMap();
+}

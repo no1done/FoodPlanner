@@ -10,3 +10,4 @@ composer.lock
 db_data
 propel.yml
 generated-conf/config.php
+generated-conf
